@@ -1,14 +1,14 @@
 import { UserRole } from '../enums/user-role.enum';
 
-export interface User {
+export interface UserDto {
   name: string;
   email: string;
   password: string;
-  companyName: string;
+  company_name: string;
   nif: string;
   phone: string;
   address: string;
-  profilePhoto: string;
+  profile_photo?: string;
   role: UserRole;
-  isActive: boolean;
+  is_active: boolean;
 }

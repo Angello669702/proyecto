@@ -1,15 +1,15 @@
 import { User } from '../../auth/interfaces/user.interface';
 import { RegistrationStatus } from '../enums/registration-status.enum';
 
-export interface Registration {
-  companyName: string;
+export interface RegistrationDto {
+  company_name: string;
   nif: string;
-  contactName: string;
+  contact_name: string;
   email: string;
   phone: string;
   address: string;
-  notes: string;
+  notes?: string;
   status: RegistrationStatus;
-  reviewer: User;
-  reviewedAt: Date;
+  reviewed_by: User;
+  reviewed_at: Date;
 }

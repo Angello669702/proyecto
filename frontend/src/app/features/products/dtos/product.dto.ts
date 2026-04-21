@@ -1,13 +1,13 @@
 import { Category } from '../../categories/interfaces/category.interface';
 
-export interface Product {
+export interface ProductDto {
   category: Category;
   name: string;
   sku: string;
-  description: string;
-  image: string;
+  description?: string;
+  image?: string;
   price: number;
   stock: number;
-  stockAlertThreshold: number;
-  isActive: boolean;
+  stock_alert_threshold: number;
+  is_active: boolean;
 }
