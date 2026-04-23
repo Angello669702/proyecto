@@ -1,13 +1,15 @@
 import { Injectable } from '@angular/core';
 import { Product } from '../interfaces/product.interface';
-import { ProductDto } from '../dtos/product.dto';
+import { ProductDto } from '../dtos/product.interface.dto';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ProductMapper {
-  #map(product: ProductDto): Product {
+  mapOne(product: ProductDto): Product {
     return {
+      id: uuidv4(),
       category: product.category,
       name: product.name,
       sku: product.sku,
@@ -20,7 +22,7 @@ export class ProductMapper {
     };
   }
 
-  map(products: ProductDto[]): Product[] {
-    return products.map((product) => this.#map(product));
+  mapList(products: ProductDto[]): Product[] {
+    return products.map((product) => this.mapOne(product));
   }
 }

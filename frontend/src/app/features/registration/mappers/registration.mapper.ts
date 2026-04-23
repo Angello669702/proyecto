@@ -1,13 +1,14 @@
 import { Injectable } from '@angular/core';
-import { RegistrationDto } from '../dtos/registration.dto';
+import { RegistrationDto } from '../dtos/registration.interface.dto';
 import { Registration } from '../interfaces/registration.interface';
-
+import { v4 as uuidv4 } from 'uuid';
 @Injectable({
   providedIn: 'root',
 })
 export class RegistrationMapper {
   #map(registration: RegistrationDto): Registration {
     return {
+      id: uuidv4(),
       companyName: registration.company_name,
       nif: registration.nif,
       contactName: registration.contact_name,

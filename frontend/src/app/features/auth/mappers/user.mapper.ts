@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
-import { UserDto } from '../dtos/user.dto';
+import { UserDto } from '../dtos/user.interface.dto';
 import { User } from '../interfaces/user.interface';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable({
   providedIn: 'root',
@@ -8,6 +9,7 @@ import { User } from '../interfaces/user.interface';
 export class UserMapper {
   #map(user: UserDto): User {
     return {
+      id: uuidv4(),
       name: user.name,
       email: user.email,
       password: user.password,

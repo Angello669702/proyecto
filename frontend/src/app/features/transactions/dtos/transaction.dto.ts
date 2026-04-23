@@ -1,7 +1,7 @@
 import { User } from '../../auth/interfaces/user.interface';
 import { PaymentStatus } from '../enums/payment-status.enum';
 import { TransactionStatus } from '../enums/transaction-status.enum';
-import { TransactionItem } from '../interface/transaction-item.interface';
+import { TransactionItem } from '../interfaces/transaction-item.interface';
 
 export interface TransactionDto {
   user: User;

@@ -1,13 +1,14 @@
 import { Injectable } from '@angular/core';
-import { Transaction } from '../interface/transaction.interface';
+import { Transaction } from '../interfaces/transaction.interface';
 import { TransactionDto } from '../dtos/transaction.dto';
-
+import { v4 as uuidv4 } from 'uuid';
 @Injectable({
   providedIn: 'root',
 })
 export class TransactionMapper {
   #map(transaction: TransactionDto): Transaction {
     return {
+      id: uuidv4(),
       user: transaction.user,
       transactionsItems: transaction.transactions_items,
       status: transaction.status,
