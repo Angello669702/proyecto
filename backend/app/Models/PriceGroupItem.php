@@ -5,11 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class TransactionItem extends Model
+class PriceGroupItem extends Model
 {
-    public function transaction(): BelongsTo
+    public function priceGroup(): BelongsTo
     {
-        return $this->belongsTo(Transaction::class);
+        return $this->belongsTo(PriceGroup::class);
     }
 
     public function product(): BelongsTo
