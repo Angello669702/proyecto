@@ -6,7 +6,7 @@ import { v4 as uuidv4 } from 'uuid';
   providedIn: 'root',
 })
 export class CategoryMapper {
-  #map(category: CategoryDto): Category {
+  mapOne(category: CategoryDto): Category {
     return {
       id: uuidv4(),
       description: category.description ?? '',
@@ -15,7 +15,7 @@ export class CategoryMapper {
     };
   }
 
-  map(categories: CategoryDto[]): Category[] {
-    return categories.map((category) => this.#map(category));
+  mapList(categories: CategoryDto[]): Category[] {
+    return categories.map((category) => this.mapOne(category));
   }
 }

@@ -6,7 +6,7 @@ import { v4 as uuidv4 } from 'uuid';
   providedIn: 'root',
 })
 export class RegistrationMapper {
-  #map(registration: RegistrationDto): Registration {
+  mapOne(registration: RegistrationDto): Registration {
     return {
       id: uuidv4(),
       companyName: registration.company_name,
@@ -22,7 +22,7 @@ export class RegistrationMapper {
     };
   }
 
-  map(registrations: RegistrationDto[]): Registration[] {
-    return registrations.map((registration) => this.#map(registration));
+  mapList(registrations: RegistrationDto[]): Registration[] {
+    return registrations.map((registration) => this.mapOne(registration));
   }
 }

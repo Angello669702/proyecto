@@ -1,5 +1,4 @@
 import { NEVER, Observable, tap } from 'rxjs';
-import { LoginRequest } from '../interfaces/login-request.interface';
 import { User } from '../interfaces/user.interface';
 import { AuthServiceAbstract } from './auth.service.abstract';
 import { computed, inject, Injectable, ResourceRef, Signal, signal } from '@angular/core';
@@ -24,7 +23,7 @@ export class AuthService extends AuthServiceAbstract {
     );
   }
 
-  login(loginRequest: Signal<AuthRequest>): ResourceRef<LoginRequest | undefined> {
+  login(loginRequest: Signal<AuthRequest>): ResourceRef<AuthResponse | undefined> {
     return rxResource({
       params: () => loginRequest(),
       stream: ({ params: formData }) =>

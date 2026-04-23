@@ -1,4 +1,4 @@
-import { ResourceRef } from '@angular/core';
+import { ResourceRef, Signal } from '@angular/core';
 import { User } from '../interfaces/user.interface';
 import { AuthRequest, AuthResponse } from '../interfaces/auth.interface';
 
@@ -14,7 +14,7 @@ export abstract class AuthServiceAbstract {
     password: '',
   };
 
-  abstract login(loginRequest: AuthRequest): ResourceRef<AuthResponse | undefined>;
+  abstract login(loginRequest: Signal<AuthRequest>): ResourceRef<AuthResponse | undefined>;
 
   isDefaultUser(user: User): boolean {
     return user.id === this.defaultUser.id;
