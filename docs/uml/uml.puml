@@ -1,0 +1,151 @@
+@startuml DiagramaClases
+
+skinparam classAttributeIconSize 0
+skinparam classFontStyle Bold
+skinparam ArrowColor #555555
+skinparam ClassBorderColor #888888
+skinparam ClassBackgroundColor #f5f5f5
+
+class User {
+    +id: unsignedBigInteger
+    +name: string
+    +company_name: string
+    +nif: string
+    +email: string
+    +password: string
+    +phone: string
+    +address: text
+    +profile_photo: string
+    +role: enum(admin, client)
+    +is_active: boolean
+    +price_group_id: unsignedBigInteger
+    +email_verified_at: timestamp
+    +remember_token: string
+    +created_at: timestamp
+    +updated_at: timestamp
+}
+
+class RegistrationRequest {
+    +id: unsignedBigInteger
+    +company_name: string
+    +nif: string
+    +contact_name: string
+    +email: string
+    +phone: string
+    +address: text
+    +notes: text
+    +status: enum(pending, approved, rejected)
+    +reviewed_by: unsignedBigInteger
+    +reviewed_at: timestamp
+    +created_at: timestamp
+    +updated_at: timestamp
+}
+
+class Category {
+    +id: unsignedBigInteger
+    +name: string
+    +description: text
+    +image: string
+    +is_active: boolean
+    +created_at: timestamp
+    +updated_at: timestamp
+}
+
+class Product {
+    +id: unsignedBigInteger
+    +category_id: unsignedBigInteger
+    +name: string
+    +sku: string
+    +description: text
+    +image: string
+    +price: decimal
+    +stock: integer
+    +stock_alert_threshold: integer
+    +is_active: boolean
+    +created_at: timestamp
+    +updated_at: timestamp
+}
+
+class PriceGroup {
+    +id: unsignedBigInteger
+    +name: string
+    +description: text
+    +created_at: timestamp
+    +updated_at: timestamp
+}
+
+class PriceGroupItem {
+    +id: unsignedBigInteger
+    +price_group_id: unsignedBigInteger
+    +product_id: unsignedBigInteger
+    +price: decimal
+    +created_at: timestamp
+    +updated_at: timestamp
+}
+
+class Transaction {
+    +id: unsignedBigInteger
+    +user_id: unsignedBigInteger
+    +status: enum(pending, preparing, shipped, delivered, cancelled)
+    +subtotal: decimal
+    +discount_applied: decimal
+    +shipping_cost: decimal
+    +total: decimal
+    +shipping_address: text
+    +payment_intent_id: string
+    +payment_status: enum(unpaid, paid, refunded)
+    +notes: text
+    +created_at: timestamp
+    +updated_at: timestamp
+}
+
+class TransactionItem {
+    +id: unsignedBigInteger
+    +transaction_id: unsignedBigInteger
+    +product_id: unsignedBigInteger
+    +quantity: integer
+    +unit_price: decimal
+    +subtotal: decimal
+    +created_at: timestamp
+    +updated_at: timestamp
+}
+
+class UserProductFavorite {
+    +id: unsignedBigInteger
+    +user_id: unsignedBigInteger
+    +product_id: unsignedBigInteger
+    +created_at: timestamp
+}
+
+class ActionLog {
+    +id: unsignedBigInteger
+    +user_id: unsignedBigInteger
+    +action: string
+    +entity_type: string
+    +entity_id: unsignedBigInteger
+    +description: text
+    +ip_address: string
+    +created_at: timestamp
+}
+
+User "1" -- "0..*" Transaction : realiza
+User "1" -- "0..*" ActionLog : genera
+User "1" -- "0..*" UserProductFavorite : guarda
+User "0..*" -- "0..1" PriceGroup : pertenece a
+User "1" -- "0..*" RegistrationRequest : revisa >
+
+RegistrationRequest "0..*" -- "0..1" User : revisada por >
+
+Transaction "1" *-- "1..*" TransactionItem : contiene
+
+TransactionItem "0..*" -- "1" Product : referencia
+
+Product "0..*" -- "1" Category : pertenece a
+Product "1" -- "0..*" PriceGroupItem : tiene precios en
+Product "1" -- "0..*" UserProductFavorite : es favorito de
+
+PriceGroup "1" *-- "0..*" PriceGroupItem : define precios de
+
+ActionLog "0..*" -- "0..1" User : registrada por >
+
+@enduml
