@@ -10,13 +10,13 @@ class UserController extends Controller
 {
     public function index()
     {
-        $users = User::with('priceGroup')->paginate(20);
+        $users = User::with('priceGroup', 'favorites', 'transactions')->paginate(20);
         return UserResource::collection($users);
     }
 
     public function show(User $user)
     {
-        return new UserResource($user->load('priceGroup'));
+        return new UserResource($user->load('priceGroup', 'favorites', 'transactions.items.product'));
     }
 
     public function store(UserRequest $request)

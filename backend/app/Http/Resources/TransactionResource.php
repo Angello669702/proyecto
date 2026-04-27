@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Http\Resources\UserResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -19,12 +20,7 @@ class TransactionResource extends JsonResource
             'shipping_address' => $this->shipping_address,
             'payment_status'   => $this->payment_status,
             'notes'            => $this->notes,
-            'user'             => $this->whenLoaded('user', fn() => [
-                'id'           => $this->user->id,
-                'name'         => $this->user->name,
-                'company_name' => $this->user->company_name,
-                'email'        => $this->user->email,
-            ]),
+            'user' => new UserResource($this->whenLoaded('user')),
             'items'            => TransactionItemResource::collection($this->whenLoaded('items')),
             'created_at'       => $this->created_at->toDateTimeString(),
             'updated_at'       => $this->updated_at->toDateTimeString(),

@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\UserResource;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
@@ -42,8 +43,11 @@ class AuthController extends Controller
         ]);
     }
 
-    public function me(Request $request){
-        return response()->json($request->user());
+    public function me(Request $request)
+    {
+        return new UserResource(
+            $request->user()->load('priceGroup', 'favorites', 'transactions.items.product')
+        );
     }
 
     public function register(Request $request)
