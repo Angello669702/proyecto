@@ -1,11 +1,11 @@
 import { User } from '../../auth/interfaces/user.interface';
 import { PaymentStatus } from '../enums/payment-status.enum';
 import { TransactionStatus } from '../enums/transaction-status.enum';
-import { TransactionItem } from '../interfaces/transaction-item.interface';
+import { TransactionItemDto } from './transaction-item.interface.dto';
 
 export interface TransactionDto {
   user: User;
-  transactions_items: TransactionItem[];
+  transactions_items: TransactionItemDto[];
   status: TransactionStatus;
   subtotal: number;
   discount_applied: number;

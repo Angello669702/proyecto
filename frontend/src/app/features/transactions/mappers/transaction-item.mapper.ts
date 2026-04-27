@@ -6,7 +6,7 @@ import { v4 as uuidv4 } from 'uuid';
   providedIn: 'root',
 })
 export class TransactionItemMapper {
-  #map(transaction: TransactionItemDto): TransactionItem {
+  mapOne(transaction: TransactionItemDto): TransactionItem {
     return {
       id: uuidv4(),
       product: transaction.product,
@@ -16,7 +16,7 @@ export class TransactionItemMapper {
     };
   }
 
-  map(transactions: TransactionItemDto[]): TransactionItem[] {
-    return transactions.map((transaction) => this.#map(transaction));
+  mapList(transactions: TransactionItemDto[]): TransactionItem[] {
+    return transactions.map((transaction) => this.mapOne(transaction));
   }
 }

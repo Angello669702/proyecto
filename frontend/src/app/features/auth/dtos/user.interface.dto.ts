@@ -1,3 +1,5 @@
+import { PriceGroupDto } from '../../price-groups/dtos/price-group.dto.interface';
+import { ProductDto } from '../../products/dtos/product.interface.dto';
 import { UserRole } from '../enums/user-role.enum';
 
 export interface UserDto {
@@ -11,4 +13,6 @@ export interface UserDto {
   profile_photo?: string;
   role: UserRole;
   is_active: boolean;
+  price_group: PriceGroupDto;
+  favourites: ProductDto[];
 }

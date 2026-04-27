@@ -1,16 +1,17 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { Transaction } from '../interfaces/transaction.interface';
 import { TransactionDto } from '../dtos/transaction.dto';
 import { v4 as uuidv4 } from 'uuid';
+import { TransactionItemMapper } from './transaction-item.mapper';
 @Injectable({
   providedIn: 'root',
 })
 export class TransactionMapper {
-  #map(transaction: TransactionDto): Transaction {
+  mapOne(transaction: TransactionDto): Transaction {
     return {
       id: uuidv4(),
       user: transaction.user,
-      transactionsItems: transaction.transactions_items,
+      transactionsItems: inject(TransactionItemMapper).mapList(transaction.transactions_items),
       status: transaction.status,
       subtotal: transaction.subtotal,
       discountApplied: transaction.discount_applied,
@@ -23,7 +24,7 @@ export class TransactionMapper {
     };
   }
 
-  map(transactions: TransactionDto[]): Transaction[] {
-    return transactions.map((transaction) => this.#map(transaction));
+  mapList(transactions: TransactionDto[]): Transaction[] {
+    return transactions.map((transaction) => this.mapOne(transaction));
   }
 }

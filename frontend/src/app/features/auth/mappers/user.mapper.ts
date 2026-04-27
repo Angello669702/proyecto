@@ -1,13 +1,15 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { UserDto } from '../dtos/user.interface.dto';
 import { User } from '../interfaces/user.interface';
 import { v4 as uuidv4 } from 'uuid';
+import { PriceGroupMapper } from '../../price-groups/mappers/price-groups.mapper';
+import { ProductMapper } from '../../products/mappers/product.mapper';
 
 @Injectable({
   providedIn: 'root',
 })
 export class UserMapper {
-  #map(user: UserDto): User {
+  mapOne(user: UserDto): User {
     return {
       id: uuidv4(),
       name: user.name,
@@ -20,10 +22,12 @@ export class UserMapper {
       profilePhoto: user.profile_photo ?? '',
       role: user.role,
       isActive: user.is_active,
+      priceGroup: inject(PriceGroupMapper).mapOne(user.price_group),
+      favourites: inject(ProductMapper).mapList(user.favourites),
     };
   }
 
-  map(users: UserDto[]): User[] {
-    return users.map((user) => this.#map(user));
+  mapList(users: UserDto[]): User[] {
+    return users.map((user) => this.mapOne(user));
   }
 }
