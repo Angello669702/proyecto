@@ -6,7 +6,7 @@ import { ProductMapper } from '../mappers/product.mapper';
 import { CommonCrudService } from '../../../shared/services/common-crud.service';
 
 @Injectable({ providedIn: 'root' })
-export class ProductService extends CommonCrudService<ProductDto, Product> {
+export class ProductService extends CommonCrudService<Product, ProductDto> {
   readonly API_ENDPOINT = '';
   readonly mapper = inject(ProductMapper);
   readonly defaultModel = { id: '' } as Product;

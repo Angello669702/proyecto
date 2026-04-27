@@ -2,10 +2,11 @@ import { Injectable } from '@angular/core';
 import { RegistrationDto } from '../dtos/registration.interface.dto';
 import { Registration } from '../interfaces/registration.interface';
 import { v4 as uuidv4 } from 'uuid';
+import { Mapper } from '../../../shared/interfaces/mapper.interface';
 @Injectable({
   providedIn: 'root',
 })
-export class RegistrationMapper {
+export class RegistrationMapper implements Mapper<Registration, RegistrationDto> {
   mapOne(registration: RegistrationDto): Registration {
     return {
       id: uuidv4(),

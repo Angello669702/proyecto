@@ -2,11 +2,12 @@ import { Injectable } from '@angular/core';
 import { Product } from '../interfaces/product.interface';
 import { ProductDto } from '../dtos/product.interface.dto';
 import { v4 as uuidv4 } from 'uuid';
+import { Mapper } from '../../../shared/interfaces/mapper.interface';
 
 @Injectable({
   providedIn: 'root',
 })
-export class ProductMapper {
+export class ProductMapper implements Mapper<Product, ProductDto> {
   mapOne(product: ProductDto): Product {
     return {
       id: uuidv4(),

@@ -5,9 +5,9 @@ import { CommonCrudServiceAbstract } from './common-crud.service.abstract';
 
 @Injectable({ providedIn: 'root' })
 export abstract class CommonCrudService<
-  TDto,
   TModel extends { id: string },
-> extends CommonCrudServiceAbstract<TDto, TModel> {
+  TDto,
+> extends CommonCrudServiceAbstract<TModel, TDto> {
   #modelsSignal = signal<TModel[]>([]);
   models = computed(() => this.#modelsSignal());
 

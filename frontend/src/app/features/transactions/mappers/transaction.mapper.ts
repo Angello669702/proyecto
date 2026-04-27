@@ -3,10 +3,11 @@ import { Transaction } from '../interfaces/transaction.interface';
 import { TransactionDto } from '../dtos/transaction.dto';
 import { v4 as uuidv4 } from 'uuid';
 import { TransactionItemMapper } from './transaction-item.mapper';
+import { Mapper } from '../../../shared/interfaces/mapper.interface';
 @Injectable({
   providedIn: 'root',
 })
-export class TransactionMapper {
+export class TransactionMapper implements Mapper<Transaction, TransactionDto> {
   mapOne(transaction: TransactionDto): Transaction {
     return {
       id: uuidv4(),

@@ -4,11 +4,12 @@ import { User } from '../interfaces/user.interface';
 import { v4 as uuidv4 } from 'uuid';
 import { PriceGroupMapper } from '../../price-groups/mappers/price-groups.mapper';
 import { ProductMapper } from '../../products/mappers/product.mapper';
+import { Mapper } from '../../../shared/interfaces/mapper.interface';
 
 @Injectable({
   providedIn: 'root',
 })
-export class UserMapper {
+export class UserMapper implements Mapper<User, UserDto> {
   mapOne(user: UserDto): User {
     return {
       id: uuidv4(),

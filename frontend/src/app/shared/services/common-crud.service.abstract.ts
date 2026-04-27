@@ -1,15 +1,11 @@
 import { inject, ResourceRef, Signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Mapper } from '../interfaces/mapper.interface';
 
-export interface IMapper<TDto, TModel> {
-  mapOne(dto: TDto): TModel;
-  mapList(dtos: TDto[]): TModel[];
-}
-
-export abstract class CommonCrudServiceAbstract<TDto, TModel extends { id: string }> {
+export abstract class CommonCrudServiceAbstract<TModel extends { id: string }, TDto> {
   abstract API_ENDPOINT: string;
   abstract defaultModel: TModel;
-  abstract mapper: IMapper<TDto, TModel>;
+  abstract mapper: Mapper<TModel, TDto>;
   protected httpClient = inject(HttpClient);
 
   abstract load(): ResourceRef<TModel[] | undefined>;
