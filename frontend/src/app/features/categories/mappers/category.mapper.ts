@@ -10,6 +10,7 @@ export class CategoryMapper implements Mapper<Category, CategoryDto> {
   mapOne(category: CategoryDto): Category {
     return {
       id: uuidv4(),
+      name: category.name,
       description: category.description ?? '',
       image: category.image ?? '',
       isActive: category.is_active,

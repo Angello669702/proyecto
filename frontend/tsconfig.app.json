@@ -7,9 +7,9 @@
     "types": []
   },
   "include": [
-    "src/**/*.ts"
+    "src/**/*.ts",
+    "src/app/features/products/components/card",
+    "src/app/features/products/components/card-list"
   ],
-  "exclude": [
-    "src/**/*.spec.ts"
-  ]
+  "exclude": ["src/**/*.spec.ts"]
 }

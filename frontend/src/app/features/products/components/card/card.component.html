@@ -1,0 +1,56 @@
+<div
+  class="group relative flex flex-col bg-stone-100 border border-stone-300 rounded overflow-hidden hover:shadow-md transition-shadow duration-200"
+>
+  <!-- Categoría (esquina superior izquierda) -->
+  <div class="absolute top-2 left-2 z-10">
+    <!-- TODO: reemplazar por <app-badge> -->
+    <span
+      class="bg-stone-700 text-stone-100 text-[9px] font-mono uppercase tracking-widest px-2 py-0.5 rounded-sm"
+    >
+      {{ product().category.name }}
+    </span>
+  </div>
+
+  <!-- Imagen -->
+  <div
+    class="h-40 bg-stone-200 border-b border-stone-300 flex items-center justify-center overflow-hidden"
+  >
+    <img
+      [src]="product().image"
+      [alt]="product().name"
+      class="object-contain h-full w-full p-4 transition-transform duration-300 group-hover:scale-105"
+    />
+  </div>
+
+  <!-- Body -->
+  <div class="flex flex-col gap-2 p-3 flex-1">
+    <p class="font-semibold text-stone-800 text-sm leading-snug line-clamp-1">
+      {{ product().name }}
+    </p>
+
+    <p class="text-stone-500 text-xs leading-relaxed line-clamp-2">
+      {{ product().description }}
+    </p>
+
+    <p class="font-mono text-stone-800 text-base font-bold mt-auto pt-2">
+      {{ product().price | currency: 'EUR' : 'symbol' : '1.2-2' : 'es' }}
+      <span class="text-[10px] font-normal text-stone-400">/ ud.</span>
+    </p>
+
+    @if (product().stock === 0) {
+      <button
+        disabled
+        class="w-full h-8 text-[10px] font-mono uppercase tracking-wider bg-stone-300 text-stone-400 rounded-sm cursor-not-allowed"
+      >
+        Sin stock
+      </button>
+    } @else {
+      <button
+        class="w-full h-8 text-[10px] font-mono uppercase tracking-wider bg-stone-800 text-stone-100 rounded-sm hover:bg-stone-700 active:scale-95 transition-all duration-150"
+        (click)="addToCart()"
+      >
+        + Añadir al carrito
+      </button>
+    }
+  </div>
+</div>
