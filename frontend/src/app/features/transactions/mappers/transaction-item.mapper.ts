@@ -9,7 +9,7 @@ import { Mapper } from '../../../shared/interfaces/mapper.interface';
 export class TransactionItemMapper implements Mapper<TransactionItem, TransactionItemDto> {
   mapOne(transaction: TransactionItemDto): TransactionItem {
     return {
-      id: uuidv4(),
+      id: transaction.id,
       product: transaction.product,
       quantity: transaction.quantity,
       unitPrice: transaction.quantity,

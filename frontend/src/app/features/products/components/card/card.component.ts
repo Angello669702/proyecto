@@ -1,19 +1,25 @@
-import { Component, inject, input, output } from '@angular/core';
+import { Component, computed, input, output } from '@angular/core';
 import { Product } from '../../interfaces/product.interface';
 import { CurrencyPipe } from '@angular/common';
-import { TransactionService } from '../../../transactions/services/transaction.service';
-import { AuthService } from '../../../auth/services/auth.service';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-card-product',
-  imports: [CurrencyPipe],
+  imports: [CurrencyPipe, RouterLink],
   templateUrl: './card.component.html',
 })
 export class CardComponent {
   readonly product = input.required<Product>();
-  cart = output<Product>();
+  add = output<Product>();
+  remove = output<Product>();
+
+  readonly detailRoute = computed(() => `/products/${this.product().id}`);
 
   addToCart() {
-    this.cart.emit(this.product());
+    this.add.emit(this.product());
+  }
+
+  removeFromCart() {
+    this.remove.emit(this.product());
   }
 }

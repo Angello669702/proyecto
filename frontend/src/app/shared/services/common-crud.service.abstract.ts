@@ -12,7 +12,7 @@ export abstract class CommonCrudServiceAbstract<TModel extends { id: string }, T
   abstract add(model: Signal<TModel>): ResourceRef<TModel | undefined>;
   abstract update(modelToUpdate: Signal<TModel>): ResourceRef<TModel | undefined>;
   abstract remove(model: Signal<TModel>): ResourceRef<TModel | undefined>;
-  abstract find(id: Signal<number>): ResourceRef<TModel | undefined>;
+  abstract find(id: Signal<string>): ResourceRef<TModel | undefined>;
 
   isDefaultModel(model: TModel): boolean {
     return model.id === this.defaultModel.id;

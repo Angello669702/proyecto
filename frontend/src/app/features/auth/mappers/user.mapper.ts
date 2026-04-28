@@ -1,7 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { UserDto } from '../dtos/user.interface.dto';
 import { User } from '../interfaces/user.interface';
-import { v4 as uuidv4 } from 'uuid';
 import { PriceGroupMapper } from '../../price-groups/mappers/price-groups.mapper';
 import { ProductMapper } from '../../products/mappers/product.mapper';
 import { Mapper } from '../../../shared/interfaces/mapper.interface';
@@ -12,7 +11,7 @@ import { Mapper } from '../../../shared/interfaces/mapper.interface';
 export class UserMapper implements Mapper<User, UserDto> {
   mapOne(user: UserDto): User {
     return {
-      id: uuidv4(),
+      id: user.id,
       name: user.name,
       email: user.email,
       password: user.password,

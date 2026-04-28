@@ -4,7 +4,7 @@ import { inject, signal } from '@angular/core';
 import { Product } from '../interfaces/product.interface';
 import { ProductService } from '../services/product.service';
 
-export const prodcutResolver: ResolveFn<Product> = (route: ActivatedRouteSnapshot) =>
+export const productResolver: ResolveFn<Product> = (route: ActivatedRouteSnapshot) =>
   inject(ProductService)
-    .find(signal(parseInt(route.paramMap.get('id')!, 10)))
+    .find(signal(route.paramMap.get('id')!))
     .value()!;

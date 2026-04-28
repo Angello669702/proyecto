@@ -1,20 +1,43 @@
 import { Component, inject, signal } from '@angular/core';
-import { CardListComponent } from '../components/card-list/card-list.component';
-import { AuthService } from '../../auth/services/auth.service';
-import { TransactionService } from '../../transactions/services/transaction.service';
-import { Product } from '../interfaces/product.interface';
+import { CardListComponent } from '../../components/card-list/card-list.component';
+import { TransactionService } from '../../../transactions/services/transaction.service';
+import { Product } from '../../interfaces/product.interface';
+import { ProductService } from '../../services/product.service';
+import { CartItem } from '../../../../shared/interfaces/cart.interface';
 
 @Component({
-  selector: 'app-card-product',
+  selector: 'app-home',
   imports: [CardListComponent],
-  template: ` <app-card-list [products]="products()"> </app-card-list> `,
+  template: `
+    <app-card-list
+      [products]="products()"
+      (add)="addToCart($event)"
+      (remove)="removeFromCart($event)"
+    >
+    </app-card-list>
+  `,
 })
 export class HomePageComponent {
-  products = signal<Product[]>([]);
+  readonly #productService = inject(ProductService);
   readonly #transactionService = inject(TransactionService);
-  readonly #currentUser = inject(AuthService).currentUser();
 
-  addToCart(product: Product) {}
+  readonly products = this.#productService.models;
+
+  productsResource = this.#productService.load();
+
+  productToAddToCart = signal<CartItem>(this.#transactionService.defaultCartItem);
+  productToRemoveFromCart = signal<CartItem>(this.#transactionService.defaultCartItem);
+
+  addToCartResource = this.#transactionService.addItem(this.productToAddToCart);
+  removeFromCartResource = this.#transactionService.removeItem(this.productToRemoveFromCart);
+
+  addToCart(product: Product) {
+    this.productToAddToCart.set({ product: product, quantity: 1 });
+  }
+
+  removeFromCart(product: Product) {
+    this.productToRemoveFromCart.set({ product: product, quantity: 1 });
+  }
 }
 
 /*

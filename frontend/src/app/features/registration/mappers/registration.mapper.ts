@@ -9,7 +9,7 @@ import { Mapper } from '../../../shared/interfaces/mapper.interface';
 export class RegistrationMapper implements Mapper<Registration, RegistrationDto> {
   mapOne(registration: RegistrationDto): Registration {
     return {
-      id: uuidv4(),
+      id: registration.id,
       companyName: registration.company_name,
       nif: registration.nif,
       contactName: registration.contact_name,

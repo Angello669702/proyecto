@@ -16,7 +16,7 @@
     class="h-40 bg-stone-200 border-b border-stone-300 flex items-center justify-center overflow-hidden"
   >
     <img
-      [src]="product().image"
+      [src]="product().image[0]"
       [alt]="product().name"
       class="object-contain h-full w-full p-4 transition-transform duration-300 group-hover:scale-105"
     />
@@ -37,20 +37,39 @@
       <span class="text-[10px] font-normal text-stone-400">/ ud.</span>
     </p>
 
-    @if (product().stock === 0) {
-      <button
-        disabled
-        class="w-full h-8 text-[10px] font-mono uppercase tracking-wider bg-stone-300 text-stone-400 rounded-sm cursor-not-allowed"
+    <!-- Botones -->
+    <div class="flex gap-1 mt-1">
+      <!-- Añadir / Sin stock -->
+      @if (product().stock === 0) {
+        <button
+          disabled
+          class="flex-1 h-8 text-[10px] font-mono uppercase tracking-wider bg-stone-300 text-stone-400 rounded-sm cursor-not-allowed"
+        >
+          Sin stock
+        </button>
+      } @else {
+        <button
+          (click)="addToCart()"
+          class="flex-1 h-8 text-[10px] font-mono uppercase tracking-wider bg-stone-800 text-stone-100 rounded-sm hover:bg-stone-700 active:scale-95 transition-all duration-150"
+        >
+          +
+        </button>
+
+        <button
+          (click)="removeFromCart()"
+          class="flex-none w-8 h-8 text-[10px] font-mono bg-stone-200 border border-stone-300 text-stone-600 rounded-sm hover:bg-stone-300 active:scale-95 transition-all duration-150"
+        >
+          −
+        </button>
+      }
+
+      <!-- Detalle -->
+      <a
+        [routerLink]="detailRoute()"
+        class="flex-none w-8 h-8 flex items-center justify-center text-[10px] font-mono bg-stone-200 border border-stone-300 text-stone-600 rounded-sm hover:bg-stone-300 active:scale-95 transition-all duration-150"
       >
-        Sin stock
-      </button>
-    } @else {
-      <button
-        class="w-full h-8 text-[10px] font-mono uppercase tracking-wider bg-stone-800 text-stone-100 rounded-sm hover:bg-stone-700 active:scale-95 transition-all duration-150"
-        (click)="addToCart()"
-      >
-        + Añadir al carrito
-      </button>
-    }
+        →
+      </a>
+    </div>
   </div>
 </div>

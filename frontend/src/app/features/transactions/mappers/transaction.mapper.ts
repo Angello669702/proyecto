@@ -10,7 +10,7 @@ import { Mapper } from '../../../shared/interfaces/mapper.interface';
 export class TransactionMapper implements Mapper<Transaction, TransactionDto> {
   mapOne(transaction: TransactionDto): Transaction {
     return {
-      id: uuidv4(),
+      id: transaction.id,
       user: transaction.user,
       transactionsItems: inject(TransactionItemMapper).mapList(transaction.transactions_items),
       status: transaction.status,

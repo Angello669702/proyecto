@@ -8,8 +8,8 @@ export abstract class CommonCrudService<
   TModel extends { id: string },
   TDto,
 > extends CommonCrudServiceAbstract<TModel, TDto> {
-  #modelsSignal = signal<TModel[]>([]);
-  models = computed(() => this.#modelsSignal());
+  protected modelsSignal = signal<TModel[]>([]);
+  models = computed(() => this.modelsSignal());
 
   load(): ResourceRef<TModel[] | undefined> {
     return rxResource({
@@ -20,7 +20,7 @@ export abstract class CommonCrudService<
   #load(): Observable<TModel[]> {
     return this.httpClient.get<TDto[]>(this.API_ENDPOINT).pipe(
       map((dtos) => this.mapper.mapList(dtos)),
-      tap((models) => this.#modelsSignal.set(models)),
+      tap((models) => this.modelsSignal.set(models)),
       catchError((error) => {
         console.error('Failed to load models', error);
         return throwError(() => error);
@@ -39,7 +39,7 @@ export abstract class CommonCrudService<
   #add(model: TModel): Observable<TModel> {
     return this.httpClient.post<TDto>(this.API_ENDPOINT, model).pipe(
       map((dto) => this.mapper.mapOne(dto)),
-      tap((newModel) => this.#modelsSignal.update((currentModels) => [...currentModels, newModel])),
+      tap((newModel) => this.modelsSignal.update((currentModels) => [...currentModels, newModel])),
       catchError((error) => {
         console.error('Failed to add an model', error);
         return throwError(() => error);
@@ -59,7 +59,7 @@ export abstract class CommonCrudService<
     return this.httpClient.put<TDto>(`${this.API_ENDPOINT}/${model.id}`, model).pipe(
       map((dto) => this.mapper.mapOne(dto)),
       tap((updatedModel) =>
-        this.#modelsSignal.update((currentModels) =>
+        this.modelsSignal.update((currentModels) =>
           currentModels.map((currentModel) =>
             currentModel.id === updatedModel.id ? updatedModel : currentModel,
           ),
@@ -84,7 +84,7 @@ export abstract class CommonCrudService<
     return this.httpClient.delete<TDto>(`${this.API_ENDPOINT}/${model.id}`).pipe(
       map((dto) => this.mapper.mapOne(dto)),
       tap(() =>
-        this.#modelsSignal.update((currentModels) =>
+        this.modelsSignal.update((currentModels) =>
           currentModels.filter((currentModel) => currentModel.id !== model.id),
         ),
       ),
@@ -95,14 +95,14 @@ export abstract class CommonCrudService<
     );
   }
 
-  find(id: Signal<number>): ResourceRef<TModel | undefined> {
+  find(id: Signal<string>): ResourceRef<TModel | undefined> {
     return rxResource({
       params: () => id(),
-      stream: ({ params: id }) => (id === 0 ? NEVER : this.#find(id)),
+      stream: ({ params: id }) => (id === '' ? NEVER : this.#find(id)),
     });
   }
 
-  #find(id: number): Observable<TModel> {
+  #find(id: string): Observable<TModel> {
     return this.httpClient
       .get<TDto>(`${this.API_ENDPOINT}/${id}`)
       .pipe(map((dto) => this.mapper.mapOne(dto)));

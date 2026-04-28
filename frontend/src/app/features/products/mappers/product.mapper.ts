@@ -10,7 +10,7 @@ import { Mapper } from '../../../shared/interfaces/mapper.interface';
 export class ProductMapper implements Mapper<Product, ProductDto> {
   mapOne(product: ProductDto): Product {
     return {
-      id: uuidv4(),
+      id: product.id,
       category: product.category,
       name: product.name,
       sku: product.sku,
