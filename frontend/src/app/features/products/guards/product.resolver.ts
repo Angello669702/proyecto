@@ -5,6 +5,4 @@ import { Product } from '../interfaces/product.interface';
 import { ProductService } from '../services/product.service';
 
 export const productResolver: ResolveFn<Product> = (route: ActivatedRouteSnapshot) =>
-  inject(ProductService)
-    .find(signal(route.paramMap.get('id')!))
-    .value()!;
+  inject(ProductService).findOne(route.paramMap.get('id')!);

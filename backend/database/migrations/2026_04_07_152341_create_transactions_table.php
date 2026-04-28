@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('transactions', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->foreignId('user_id')->constrained('users')->restrictOnDelete();
+            $table->foreignUuid('user_id')->constrained('users')->restrictOnDelete();
             $table->enum('status', ['pending', 'preparing', 'shipped', 'delivered', 'cancelled'])->default('pending');
             $table->decimal('subtotal', 10, 2);
             $table->decimal('discount_applied', 10, 2)->default(0);
@@ -24,9 +24,9 @@ return new class extends Migration
         });
 
         Schema::create('transaction_items', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('transaction_id')->constrained('transactions')->cascadeOnDelete();
-            $table->foreignId('product_id')->constrained('products')->restrictOnDelete();
+            $table->uuid('id')->primary();
+            $table->foreignUuid('transaction_id')->constrained('transactions')->cascadeOnDelete();
+            $table->foreignUuid('product_id')->constrained('products')->restrictOnDelete();
             $table->integer('quantity');
             $table->decimal('unit_price', 10, 2)->comment('Precio en el momento de la compra');
             $table->decimal('subtotal', 10, 2)->comment('quantity * unit_price');

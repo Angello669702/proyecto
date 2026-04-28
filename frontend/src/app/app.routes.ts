@@ -2,7 +2,7 @@ import { Routes } from '@angular/router';
 import { authGuard } from './features/auth/guards/auth.guard';
 
 export enum FEATURES_PAGES {
-  PRODUCTS = 'product',
+  PRODUCTS = 'products',
   AUTH = 'auth',
 }
 
@@ -13,7 +13,7 @@ export const routes: Routes = [
       {
         path: '',
         pathMatch: 'full',
-        redirectTo: FEATURES_PAGES.AUTH,
+        redirectTo: FEATURES_PAGES.PRODUCTS,
       },
       {
         path: FEATURES_PAGES.PRODUCTS,

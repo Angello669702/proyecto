@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Controller;
 use App\Http\Requests\PriceGroupRequest;
 use App\Http\Resources\PriceGroupResource;
 use App\Models\PriceGroup;

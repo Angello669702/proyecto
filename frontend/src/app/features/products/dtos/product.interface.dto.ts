@@ -7,6 +7,7 @@ export interface ProductDto {
   name: string;
   sku: string;
   description?: string;
+  cover_image: string;
   images?: string[];
   price: number;
   stock: number;

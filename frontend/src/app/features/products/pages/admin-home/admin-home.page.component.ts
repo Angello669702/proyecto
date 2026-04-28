@@ -22,7 +22,9 @@ export class AdminHomePageComponent {
   readonly #productService = inject(ProductService);
   readonly products = this.#productService.models;
 
-  productsResource = this.#productService.load();
+  page = signal<number>(1);
+
+  productsResource = this.#productService.load(this.page);
 
   productToUpdateStock = signal<CartItem>(this.#productService.defaultCartItem);
   productToRemove = signal<Product>(this.#productService.defaultModel);

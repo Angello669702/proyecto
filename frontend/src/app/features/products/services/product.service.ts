@@ -10,7 +10,7 @@ import { CartItem } from '../../../shared/interfaces/cart.interface';
 
 @Injectable({ providedIn: 'root' })
 export class ProductService extends CommonCrudService<Product, ProductDto> {
-  readonly API_ENDPOINT = '';
+  readonly API_ENDPOINT = 'http://127.0.0.1:8000/api/products';
   readonly mapper = inject(ProductMapper);
   readonly defaultModel = { id: '' } as Product;
   readonly defaultCartItem = { product: this.defaultModel, quantity: 0 };

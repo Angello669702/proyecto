@@ -8,7 +8,7 @@ export abstract class CommonCrudServiceAbstract<TModel extends { id: string }, T
   abstract mapper: Mapper<TModel, TDto>;
   protected httpClient = inject(HttpClient);
 
-  abstract load(): ResourceRef<TModel[] | undefined>;
+  abstract load(page: Signal<number>): ResourceRef<TModel[] | undefined>;
   abstract add(model: Signal<TModel>): ResourceRef<TModel | undefined>;
   abstract update(modelToUpdate: Signal<TModel>): ResourceRef<TModel | undefined>;
   abstract remove(model: Signal<TModel>): ResourceRef<TModel | undefined>;

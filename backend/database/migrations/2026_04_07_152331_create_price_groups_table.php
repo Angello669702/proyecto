@@ -17,8 +17,8 @@ return new class extends Migration
 
         Schema::create('price_group_items', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->foreignId('price_group_id')->constrained('price_groups')->cascadeOnDelete();
-            $table->foreignId('product_id')->constrained('products')->cascadeOnDelete();
+            $table->foreignUuid('price_group_id')->constrained('price_groups')->cascadeOnDelete();
+            $table->foreignUuid('product_id')->constrained('products')->cascadeOnDelete();
             $table->decimal('price', 10, 2);
             $table->timestamps();
 

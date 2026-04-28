@@ -15,6 +15,7 @@ export class ProductMapper implements Mapper<Product, ProductDto> {
       name: product.name,
       sku: product.sku,
       description: product.description ?? '',
+      coverImage: product.cover_image,
       images: product.images ?? [''],
       price: product.price,
       stock: product.stock,

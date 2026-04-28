@@ -7,6 +7,7 @@ export interface Product {
   name: string;
   sku: string;
   description: string;
+  coverImage: string;
   images: string[];
   price: number;
   stock: number;

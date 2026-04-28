@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->foreignId('price_group_id')->nullable()->after('is_active')
+            $table->foreignUuid('price_group_id')->nullable()->after('is_active')
                 ->constrained('price_groups')->nullOnDelete();
         });
     }

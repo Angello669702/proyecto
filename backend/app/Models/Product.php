@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Product extends Model
 {
@@ -29,5 +30,15 @@ class Product extends Model
     public function priceGroupItems(): HasMany
     {
         return $this->hasMany(PriceGroupItem::class);
+    }
+
+    public function images(): HasMany
+    {
+        return $this->hasMany(ProductImage::class);
+    }
+
+    public function coverImage(): HasOne
+    {
+        return $this->hasOne(ProductImage::class)->where('is_cover', true);
     }
 }

@@ -2,6 +2,7 @@ import { computed, Injectable, ResourceRef, Signal, signal } from '@angular/core
 import { catchError, map, NEVER, Observable, tap, throwError } from 'rxjs';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { CommonCrudServiceAbstract } from './common-crud.service.abstract';
+import { PaginatedResponse } from '../interfaces/paginated.interface';
 
 @Injectable({ providedIn: 'root' })
 export abstract class CommonCrudService<
@@ -11,21 +12,28 @@ export abstract class CommonCrudService<
   protected modelsSignal = signal<TModel[]>([]);
   models = computed(() => this.modelsSignal());
 
-  load(): ResourceRef<TModel[] | undefined> {
+  load(page: Signal<number>): ResourceRef<TModel[] | undefined> {
     return rxResource({
-      stream: () => this.#load(),
+      params: () => page(),
+      stream: ({ params: page }) => this.#load(page),
     });
   }
 
-  #load(): Observable<TModel[]> {
-    return this.httpClient.get<TDto[]>(this.API_ENDPOINT).pipe(
-      map((dtos) => this.mapper.mapList(dtos)),
-      tap((models) => this.modelsSignal.set(models)),
-      catchError((error) => {
-        console.error('Failed to load models', error);
-        return throwError(() => error);
-      }),
-    );
+  #load(page: number): Observable<TModel[]> {
+    return this.httpClient
+      .get<PaginatedResponse<TDto[]>>(this.API_ENDPOINT, {
+        params: {
+          page,
+        },
+      })
+      .pipe(
+        map((response) => this.mapper.mapList(response.data)),
+        tap((models) => this.modelsSignal.set(models)),
+        catchError((error) => {
+          console.error('Failed to load models', error);
+          return throwError(() => error);
+        }),
+      );
   }
 
   add(model: Signal<TModel>): ResourceRef<TModel | undefined> {
@@ -98,13 +106,15 @@ export abstract class CommonCrudService<
   find(id: Signal<string>): ResourceRef<TModel | undefined> {
     return rxResource({
       params: () => id(),
-      stream: ({ params: id }) => (id === '' ? NEVER : this.#find(id)),
+      stream: ({ params: id }) => (id === '' ? NEVER : this.findOne(id)),
     });
   }
 
-  #find(id: string): Observable<TModel> {
-    return this.httpClient
-      .get<TDto>(`${this.API_ENDPOINT}/${id}`)
-      .pipe(map((dto) => this.mapper.mapOne(dto)));
+  findOne(id: string): Observable<TModel> {
+    return this.httpClient.get<{ data: TDto }>(`${this.API_ENDPOINT}/${id}`).pipe(
+      map((response) => {
+        return this.mapper.mapOne(response.data);
+      }),
+    );
   }
 }

@@ -2,7 +2,7 @@ import { Routes } from '@angular/router';
 import { productResolver } from './guards/product.resolver';
 
 export enum PRODUCTS_PAGES {
-  HERO = '/hero',
+  PRODUCT = '/products',
   HOME = 'home',
   NEW = 'new',
   UPDATE = 'update',
@@ -24,6 +24,7 @@ export const PRODUCTS_ROUTES: Routes = [
       },
 
       {
+        path: ':id',
         loadComponent: () =>
           import('./pages/product-detail/product-detail.page.component').then(
             (c) => c.ProdcutDetailPageComponent,
