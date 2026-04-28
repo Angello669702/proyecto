@@ -17,47 +17,61 @@ export class TransactionService extends CommonCrudService<Transaction, Transacti
   readonly defaultModel = { id: '' } as Transaction;
   readonly defaultCartItem = { product: this.#productService.defaultModel, quantity: 0 };
 
-  addItem(product: Signal<CartItem>): ResourceRef<Transaction | undefined> {
+  addItem(cartItem: Signal<CartItem>): ResourceRef<Transaction | undefined> {
     return rxResource({
-      params: () => product(),
-      stream: ({ params: product }) =>
-        this.#productService.isDefaultModel(product.product) ? NEVER : this.#addItem(product),
+      params: () => cartItem(),
+      stream: ({ params: cartItem }) =>
+        this.#productService.isDefaultModel(cartItem.product) ? NEVER : this.#addItem(cartItem),
       equal: (transaction1, transaction2) => transaction1.id === transaction2.id,
     });
   }
 
-  #addItem(product: CartItem): Observable<Transaction> {
-    return this.httpClient.post<TransactionDto>(`${this.API_ENDPOINT}/addItem`, product).pipe(
-      map((dto) => this.mapper.mapOne(dto)),
-      tap((newproduct) =>
-        this.modelsSignal.update((currentproducts) => [...currentproducts, newproduct]),
-      ),
-      catchError((error) => {
-        console.error('Failed to add an model', error);
-        return throwError(() => error);
-      }),
-    );
+  #addItem(cartItem: CartItem): Observable<Transaction> {
+    return this.httpClient
+      .post<TransactionDto>(`${this.API_ENDPOINT}/addItem`, {
+        product_id: cartItem.product.id,
+        quantity: cartItem.quantity,
+      })
+      .pipe(
+        map((dto) => this.mapper.mapOne(dto)),
+        tap((transaction) => this.#updateActiveTransaction(transaction)),
+        catchError((error) => {
+          console.error('Failed to add an model', error);
+          return throwError(() => error);
+        }),
+      );
   }
 
-  removeItem(product: Signal<CartItem>): ResourceRef<Transaction | undefined> {
+  removeItem(cartItem: Signal<CartItem>): ResourceRef<Transaction | undefined> {
     return rxResource({
-      params: () => product(),
-      stream: ({ params: product }) =>
-        this.#productService.isDefaultModel(product.product) ? NEVER : this.#removeItem(product),
+      params: () => cartItem(),
+      stream: ({ params: cartItem }) =>
+        this.#productService.isDefaultModel(cartItem.product) ? NEVER : this.#removeItem(cartItem),
       equal: (transaction1, transaction2) => transaction1.id === transaction2.id,
     });
   }
 
-  #removeItem(product: CartItem): Observable<Transaction> {
-    return this.httpClient.post<TransactionDto>(`${this.API_ENDPOINT}/removeItem`, product).pipe(
-      map((dto) => this.mapper.mapOne(dto)),
-      tap((newproduct) =>
-        this.modelsSignal.update((currentproducts) => [...currentproducts, newproduct]),
-      ),
-      catchError((error) => {
-        console.error('Failed to add an model', error);
-        return throwError(() => error);
-      }),
-    );
+  #removeItem(cartItem: CartItem): Observable<Transaction> {
+    return this.httpClient
+      .post<TransactionDto>(`${this.API_ENDPOINT}/removeItem`, {
+        product_id: cartItem.product.id,
+        quantity: cartItem.quantity,
+      })
+      .pipe(
+        map((dto) => this.mapper.mapOne(dto)),
+        tap((transaction) => this.#updateActiveTransaction(transaction)),
+        catchError((error) => {
+          console.error('Failed to add an model', error);
+          return throwError(() => error);
+        }),
+      );
+  }
+
+  #updateActiveTransaction(transaction: Transaction): void {
+    this.modelsSignal.update((transactions) => {
+      const exists = transactions.find((stored) => stored.id === transaction.id);
+      if (!exists) return [...transactions, transaction];
+      return transactions.map((stored) => (stored.id === transaction.id ? transaction : stored));
+    });
   }
 }

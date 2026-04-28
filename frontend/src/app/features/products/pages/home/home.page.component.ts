@@ -12,7 +12,7 @@ import { CartItem } from '../../../../shared/interfaces/cart.interface';
     <app-card-list
       [products]="products()"
       (add)="addToCart($event)"
-      (remove)="removeFromCart($event)"
+      (removeCart)="removeFromCart($event)"
     >
     </app-card-list>
   `,

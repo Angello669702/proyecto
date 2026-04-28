@@ -26,7 +26,7 @@ export const PRODUCTS_ROUTES: Routes = [
       {
         loadComponent: () =>
           import('./pages/product-detail/product-detail.page.component').then(
-            (c) => c.ProdcutDeatilPageComponent,
+            (c) => c.ProdcutDetailPageComponent,
           ),
         resolve: { product: productResolver },
       },

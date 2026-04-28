@@ -1,37 +1,35 @@
-import { Component, inject, signal } from '@angular/core';
-import { CardListComponent } from '../../components/card-list/card-list.component';
+import { Component, inject, input, signal } from '@angular/core';
 import { TransactionService } from '../../../transactions/services/transaction.service';
 import { Product } from '../../interfaces/product.interface';
-import { ProductService } from '../../services/product.service';
+import { ProductDetailComponent } from '../../components/product-detail/product-detail.component';
+import { CartItem } from '../../../../shared/interfaces/cart.interface';
 
 @Component({
   selector: 'app-home',
-  imports: [CardListComponent],
+  imports: [ProductDetailComponent],
   template: `
-    <app-card-list
-      [products]="products()"
+    <app-product-detail
+      [product]="product()"
       (add)="addToCart($event)"
       (remove)="removeFromCart($event)"
-    >
-    </app-card-list>
+    />
   `,
 })
-export class ProdcutDeatilPageComponent {
-  readonly #productService = inject(ProductService);
+export class ProdcutDetailPageComponent {
+  readonly product = input.required<Product>();
   readonly #transactionService = inject(TransactionService);
 
-  readonly products = this.#productService.models;
+  productToAddToCart = signal<CartItem>(this.#transactionService.defaultCartItem);
+  productToRemoveFromCart = signal<CartItem>(this.#transactionService.defaultCartItem);
 
-  productsResource = this.#productService.load();
+  addToCartResource = this.#transactionService.addItem(this.productToAddToCart);
+  removeFromCartResource = this.#transactionService.removeItem(this.productToRemoveFromCart);
 
-  productToAddToCart = signal<Product>(this.#productService.defaultModel);
-  productToRemoveFromCart = signal<Product>(this.#productService.defaultModel);
-
-  addToCart(product: Product) {
-    this.productToAddToCart.set(product);
+  addToCart(cartItem: CartItem) {
+    this.productToAddToCart.set(cartItem);
   }
 
-  removeFromCart(product: Product) {
-    this.productToRemoveFromCart.set(product);
+  removeFromCart(cartItem: CartItem) {
+    this.productToRemoveFromCart.set(cartItem);
   }
 }

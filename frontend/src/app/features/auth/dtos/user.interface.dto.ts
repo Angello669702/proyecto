@@ -1,6 +1,7 @@
 import { UUID } from '../../../shared/types/uuid.type';
 import { PriceGroupDto } from '../../price-groups/dtos/price-group.dto.interface';
 import { ProductDto } from '../../products/dtos/product.interface.dto';
+import { TransactionDto } from '../../transactions/dtos/transaction.dto';
 import { UserRole } from '../enums/user-role.enum';
 
 export interface UserDto {
@@ -17,4 +18,5 @@ export interface UserDto {
   is_active: boolean;
   price_group: PriceGroupDto;
   favourites: ProductDto[];
+  transaction: TransactionDto;
 }

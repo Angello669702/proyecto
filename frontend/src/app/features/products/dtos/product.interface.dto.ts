@@ -7,7 +7,7 @@ export interface ProductDto {
   name: string;
   sku: string;
   description?: string;
-  image?: string;
+  images?: string[];
   price: number;
   stock: number;
   stock_alert_threshold: number;

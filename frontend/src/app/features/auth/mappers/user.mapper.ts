@@ -4,6 +4,7 @@ import { User } from '../interfaces/user.interface';
 import { PriceGroupMapper } from '../../price-groups/mappers/price-groups.mapper';
 import { ProductMapper } from '../../products/mappers/product.mapper';
 import { Mapper } from '../../../shared/interfaces/mapper.interface';
+import { TransactionMapper } from '../../transactions/mappers/transaction.mapper';
 
 @Injectable({
   providedIn: 'root',
@@ -24,6 +25,7 @@ export class UserMapper implements Mapper<User, UserDto> {
       isActive: user.is_active,
       priceGroup: inject(PriceGroupMapper).mapOne(user.price_group),
       favourites: inject(ProductMapper).mapList(user.favourites),
+      transaction: inject(TransactionMapper).mapOne(user.transaction),
     };
   }
 

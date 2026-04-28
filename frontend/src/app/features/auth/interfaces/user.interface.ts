@@ -1,6 +1,7 @@
 import { UUID } from '../../../shared/types/uuid.type';
 import { PriceGroup } from '../../price-groups/interfaces/price-group.interface';
 import { Product } from '../../products/interfaces/product.interface';
+import { Transaction } from '../../transactions/interfaces/transaction.interface';
 import { UserRole } from '../enums/user-role.enum';
 
 export interface User {
@@ -17,4 +18,5 @@ export interface User {
   isActive: boolean;
   priceGroup: PriceGroup;
   favourites: Product[];
+  transaction: Transaction;
 }
