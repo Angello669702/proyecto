@@ -1,0 +1,30 @@
+<div class="flex items-center justify-center gap-1">
+  <button
+    (click)="prevPage()"
+    [disabled]="currentPage() === 1"
+    class="w-7 h-7 text-xs bg-stone-100 border border-stone-300 rounded disabled:opacity-40"
+  >
+    «
+  </button>
+
+  @for (page of pages(); track $index) {
+    <button
+      (click)="goToPage(page)"
+      [class]="
+        page === currentPage()
+          ? 'w-7 h-7 text-xs bg-stone-800 text-white rounded'
+          : 'w-7 h-7 text-xs bg-stone-100 border rounded'
+      "
+    >
+      {{ page }}
+    </button>
+  }
+
+  <button
+    (click)="nextPage()"
+    [disabled]="currentPage() === lastPage()"
+    class="w-7 h-7 text-xs bg-stone-100 border border-stone-300 rounded disabled:opacity-40"
+  >
+    »
+  </button>
+</div>

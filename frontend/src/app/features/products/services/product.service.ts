@@ -1,4 +1,4 @@
-import { inject, Injectable, ResourceRef, Signal } from '@angular/core';
+import { computed, inject, Injectable, ResourceRef, signal, Signal } from '@angular/core';
 
 import { Product } from '../interfaces/product.interface';
 import { ProductDto } from '../dtos/product.interface.dto';
@@ -7,6 +7,7 @@ import { CommonCrudService } from '../../../shared/services/common-crud.service'
 import { rxResource } from '@angular/core/rxjs-interop';
 import { NEVER, Observable, map, tap, catchError, throwError } from 'rxjs';
 import { CartItem } from '../../../shared/interfaces/cart.interface';
+import { ProductFilter } from '../interfaces/product-filter.interface';
 
 @Injectable({ providedIn: 'root' })
 export class ProductService extends CommonCrudService<Product, ProductDto> {
@@ -14,6 +15,20 @@ export class ProductService extends CommonCrudService<Product, ProductDto> {
   readonly mapper = inject(ProductMapper);
   readonly defaultModel = { id: '' } as Product;
   readonly defaultCartItem = { product: this.defaultModel, quantity: 0 };
+
+  buildFilters(filters: Signal<ProductFilter>): Signal<Record<string, string>> {
+    return computed(() => {
+      const filter = filters();
+      console.log(filter);
+      const params: Record<string, string> = {};
+
+      if (filter.searchText.trim()) params['search'] = filter.searchText.trim();
+      if (filter.minPrice !== null) params['min_price'] = String(filter.minPrice);
+      if (filter.maxPrice !== null) params['max_price'] = String(filter.maxPrice);
+      if (filter.categories.length > 0) params['categories'] = filter.categories.join(',');
+      return params;
+    });
+  }
 
   updateStock(cartItem: Signal<CartItem>): ResourceRef<Product | undefined> {
     return rxResource({

@@ -1,127 +1,114 @@
 <div
   [class]="!product().isActive ? 'opacity-60 grayscale' : ''"
-  class="group relative flex flex-col bg-stone-100 border border-stone-300 rounded overflow-hidden transition-all duration-200"
+  class="group relative flex flex-col bg-stone-100 border border-stone-300 rounded overflow-hidden text-xs"
   [routerLink]="detailRoute()"
 >
   <!-- Categoría -->
-  <div class="absolute top-2 left-2 z-10">
-    <span
-      class="bg-stone-700 text-stone-100 text-[9px] font-mono uppercase tracking-widest px-2 py-0.5 rounded-sm"
-    >
+  <div class="absolute top-1 left-1 z-10">
+    <span class="bg-stone-700 text-stone-100 text-[8px] px-1.5 py-0.5 rounded">
       {{ product().category.name }}
     </span>
   </div>
 
-  <!-- Inactivo badge -->
+  <!-- Inactivo -->
   @if (!product().isActive) {
-    <div class="absolute top-2 right-2 z-10">
-      <span
-        class="bg-red-200 text-red-700 text-[9px] font-mono uppercase tracking-widest px-2 py-0.5 rounded-sm"
-      >
-        Inactivo
-      </span>
+    <div class="absolute top-1 right-1 z-10">
+      <span class="bg-red-200 text-red-700 text-[8px] px-1.5 py-0.5 rounded"> Inactivo </span>
     </div>
   }
 
   <!-- Imagen -->
   <div
-    class="h-40 bg-stone-200 border-b border-stone-300 flex items-center justify-center overflow-hidden"
+    class="h-24 bg-stone-200 border-b border-stone-300 flex items-center justify-center overflow-hidden"
   >
     <img
       [src]="product().coverImage"
       [alt]="product().name"
-      class="object-contain h-full w-full p-4 transition-transform duration-300 group-hover:scale-105"
+      class="object-contain h-full w-full p-2"
     />
   </div>
 
   <!-- Body -->
-  <div class="flex flex-col gap-2 p-3 flex-1" (click)="$event.stopPropagation()">
-    <p class="font-semibold text-stone-800 text-sm leading-snug line-clamp-1">
+  <div class="flex flex-col gap-1 p-2 flex-1" (click)="$event.stopPropagation()">
+    <!-- Info -->
+    <p class="font-semibold text-stone-800 text-[11px] line-clamp-1">
       {{ product().name }}
     </p>
 
-    <p class="text-stone-500 text-xs leading-relaxed line-clamp-2">
+    <p class="text-stone-500 text-[10px] line-clamp-2">
       {{ product().description }}
     </p>
 
-    <p class="font-mono text-stone-800 text-base font-bold mt-auto pt-2">
+    <p class="font-mono text-stone-800 text-sm font-bold mt-auto">
       {{ product().price | currency: 'EUR' : 'symbol' : '1.2-2' : 'es' }}
-      <span class="text-[10px] font-normal text-stone-400">/ ud.</span>
     </p>
 
-    <span class="font-mono text-[10px] uppercase tracking-wider text-stone-400">
-      Stock: {{ product().stock }} uds.
-    </span>
+    <span class="text-[9px] text-stone-400"> Stock: {{ product().stock }} </span>
 
-    <!-- Botones cliente -->
+    <!-- ================= CLIENTE ================= -->
     @if (!admin()) {
       <div class="flex gap-1 mt-1">
         @if (product().stock === 0) {
-          <button
-            disabled
-            class="flex-1 h-8 text-[10px] font-mono uppercase tracking-wider bg-stone-300 text-stone-400 rounded-sm cursor-not-allowed"
-          >
+          <button disabled class="flex-1 h-6 text-[9px] bg-stone-300 text-stone-400 rounded">
             Sin stock
           </button>
         } @else {
           <button
             (click)="addToCart()"
-            class="flex-1 h-8 text-[10px] font-mono uppercase tracking-wider bg-stone-800 text-stone-100 rounded-sm hover:bg-stone-700 active:scale-95 transition-all duration-150"
+            class="flex-1 h-6 text-[9px] bg-stone-800 text-white rounded hover:bg-stone-700"
           >
-            + Carrito
+            +
           </button>
-          <button
-            (click)="removeFromCart()"
-            class="w-8 h-8 font-mono bg-stone-200 border border-stone-300 text-stone-600 rounded-sm hover:bg-stone-300 active:scale-95 transition-all duration-150"
-          >
-            −
-          </button>
+          <button (click)="removeFromCart()" class="w-6 h-6 bg-stone-200 border rounded">−</button>
         }
       </div>
     }
 
-    <!-- Botones admin -->
+    <!-- ================= ADMIN ================= -->
     @if (admin()) {
-      <div class="flex flex-col gap-2 mt-1">
-        <!-- Stock -->
+      <div class="flex flex-col gap-1 mt-1">
+        <!-- Selector cantidad -->
         <div class="flex items-center gap-1">
           <button
             (click)="quantity.set(quantity() - 1)"
             [disabled]="quantity() <= 1"
-            class="w-8 h-8 font-mono bg-stone-200 border border-stone-300 text-stone-600 rounded-sm hover:bg-stone-300 active:scale-95 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+            class="w-6 h-6 bg-stone-200 border rounded text-[10px] disabled:opacity-40"
           >
             −
           </button>
+
           <input
             type="number"
             [value]="quantity()"
             (change)="quantity.set(+$any($event.target).value)"
             min="1"
-            class="flex-1 h-8 text-center font-mono text-sm bg-stone-50 border border-stone-300 rounded-sm text-stone-800 focus:outline-none focus:border-stone-500"
+            class="flex-1 h-6 text-center text-[10px] bg-stone-50 border rounded"
           />
+
           <button
             (click)="quantity.set(quantity() + 1)"
-            class="w-8 h-8 font-mono bg-stone-200 border border-stone-300 text-stone-600 rounded-sm hover:bg-stone-300 active:scale-95 transition-all"
+            class="w-6 h-6 bg-stone-200 border rounded text-[10px]"
           >
             +
           </button>
         </div>
 
-        <!-- Confirmar añadir o restar stock -->
+        <!-- Añadir / Restar stock -->
         <div class="flex gap-1">
           <button
             (click)="removeStock()"
             [disabled]="quantity() === 0 || product().stock === 0"
-            class="flex-1 h-8 text-[10px] font-mono uppercase tracking-wider bg-stone-200 border border-stone-300 text-stone-600 rounded-sm hover:bg-stone-300 active:scale-95 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+            class="flex-1 h-6 text-[9px] bg-stone-200 border rounded disabled:opacity-40"
           >
-            − Restar
+            −
           </button>
+
           <button
             (click)="addStock()"
             [disabled]="quantity() === 0"
-            class="flex-1 h-8 text-[10px] font-mono uppercase tracking-wider bg-stone-800 text-stone-100 rounded-sm hover:bg-stone-700 active:scale-95 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+            class="flex-1 h-6 text-[9px] bg-stone-800 text-white rounded disabled:opacity-40"
           >
-            + Añadir
+            +
           </button>
         </div>
 
@@ -129,25 +116,25 @@
         @if (product().isActive) {
           <button
             (click)="toggleProduct()"
-            class="w-full h-8 text-[10px] font-mono uppercase tracking-wider bg-red-100 border border-red-300 text-red-600 rounded-sm hover:bg-red-200 active:scale-95 transition-all"
+            class="w-full h-6 text-[9px] bg-red-100 text-red-600 rounded"
           >
-            Desactivar
+            OFF
           </button>
         } @else {
           <button
             (click)="toggleProduct()"
-            class="w-full h-8 text-[10px] font-mono uppercase tracking-wider bg-green-100 border border-green-300 text-green-700 rounded-sm hover:bg-green-200 active:scale-95 transition-all"
+            class="w-full h-6 text-[9px] bg-green-100 text-green-700 rounded"
           >
-            Activar
+            ON
           </button>
         }
 
         <!-- Eliminar -->
         <button
           (click)="deleteProduct()"
-          class="w-full h-8 text-[10px] font-mono uppercase tracking-wider bg-red-600 text-white rounded-sm hover:bg-red-700 active:scale-95 transition-all"
+          class="w-full h-6 text-[9px] bg-red-600 text-white rounded"
         >
-          Eliminar
+          DEL
         </button>
       </div>
     }

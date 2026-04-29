@@ -4,52 +4,36 @@ import { TransactionService } from '../../../transactions/services/transaction.s
 import { Product } from '../../interfaces/product.interface';
 import { ProductService } from '../../services/product.service';
 import { CartItem } from '../../../../shared/interfaces/cart.interface';
+import { PaginationButtonsComponent } from '../../../../shared/components/pagination-buttons/pagination-buttons.component';
+import { ProductFilterComponent } from '../../components/product-filter/product-filter.component';
+import { ProductFilter } from '../../interfaces/product-filter.interface';
 
 @Component({
   selector: 'app-home',
-  imports: [CardListComponent],
+  imports: [CardListComponent, PaginationButtonsComponent, ProductFilterComponent],
   template: `
-    <app-card-list
-      [products]="products()"
-      (add)="addToCart($event)"
-      (removeCart)="removeFromCart($event)"
-    />
+    <div class="flex h-[calc(100vh-4rem)] overflow-hidden">
+      <aside class="w-64 border-r border-stone-300 p-4">
+        <app-product-filter (filtersChanged)="onFiltersChanged($event)" />
+      </aside>
 
-    <!-- PAGINACIÓN -->
-    <div class="flex items-center justify-center gap-1 mt-6">
-      <!-- Prev -->
-      <button
-        (click)="prevPage()"
-        [disabled]="page() === 1"
-        class="w-8 h-8 font-mono text-sm bg-stone-100 border border-stone-300 rounded-sm
-               hover:bg-stone-200 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-      >
-        «
-      </button>
-
-      <!-- páginas -->
-      @for (p of pages(); track p) {
-        <button
-          (click)="goToPage(p)"
-          [class]="
-            p === page()
-              ? 'w-8 h-8 font-mono text-sm bg-stone-800 text-stone-100 border border-stone-800 rounded-sm'
-              : 'w-8 h-8 font-mono text-sm bg-stone-100 border border-stone-300 rounded-sm hover:bg-stone-200 transition-colors'
-          "
-        >
-          {{ p }}
-        </button>
-      }
-
-      <!-- Next -->
-      <button
-        (click)="nextPage()"
-        [disabled]="page() === totalPages()"
-        class="w-8 h-8 font-mono text-sm bg-stone-100 border border-stone-300 rounded-sm
-               hover:bg-stone-200 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-      >
-        »
-      </button>
+      <div class="flex-1 flex flex-col min-h-0">
+        <div class="flex-1 p-4 overflow-hidden flex min-h-0">
+          <app-card-list
+            class="flex-1"
+            [products]="products()"
+            (add)="addToCart($event)"
+            (removeCart)="removeFromCart($event)"
+          />
+        </div>
+        <div class="p-2 border-t border-stone-300">
+          <app-pagination-buttons
+            [(currentPage)]="currentPage"
+            [lastPage]="lastPage()"
+            [pages]="pages()"
+          />
+        </div>
+      </div>
     </div>
   `,
 })
@@ -57,15 +41,22 @@ export class HomePageComponent {
   readonly #productService = inject(ProductService);
   readonly #transactionService = inject(TransactionService);
 
-  page = signal(1);
+  currentPage = signal<number>(1);
+  lastPage = this.#productService.lastPage;
+  pages = computed(() => Array.from({ length: this.lastPage() }, (_, i) => i + 1));
 
-  totalPages = signal(10);
-
-  pages = computed(() => Array.from({ length: this.totalPages() }, (_, i) => i + 1));
+  filters = signal<ProductFilter>({
+    categories: [],
+    minPrice: null,
+    maxPrice: null,
+    searchText: '',
+  });
 
   readonly products = this.#productService.models;
-
-  productsResource = this.#productService.load(this.page);
+  productsResource = this.#productService.load(
+    this.currentPage,
+    this.#productService.buildFilters(this.filters),
+  );
 
   productToAddToCart = signal<CartItem>(this.#transactionService.defaultCartItem);
   productToRemoveFromCart = signal<CartItem>(this.#transactionService.defaultCartItem);
@@ -81,15 +72,8 @@ export class HomePageComponent {
     this.productToRemoveFromCart.set({ product: product, quantity: 1 });
   }
 
-  nextPage() {
-    this.page.update((p) => p + 1);
-  }
-
-  prevPage() {
-    this.page.update((p) => p - 1);
-  }
-
-  goToPage(p: number) {
-    this.page.set(p);
+  onFiltersChanged(filters: ProductFilter) {
+    this.filters.set(filters);
+    this.currentPage.set(1);
   }
 }

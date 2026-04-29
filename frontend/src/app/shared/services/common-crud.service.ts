@@ -11,22 +11,30 @@ export abstract class CommonCrudService<
 > extends CommonCrudServiceAbstract<TModel, TDto> {
   protected modelsSignal = signal<TModel[]>([]);
   models = computed(() => this.modelsSignal());
+  #lastPage = signal<number>(0);
+  lastPage = computed(() => this.#lastPage());
 
-  load(page: Signal<number>): ResourceRef<TModel[] | undefined> {
+  load(
+    page: Signal<number>,
+    params?: Signal<Record<string, string>>,
+  ): ResourceRef<TModel[] | undefined> {
     return rxResource({
-      params: () => page(),
-      stream: ({ params: page }) => this.#load(page),
+      params: () => ({ page: page(), extra: params?.() ?? {} }),
+      stream: ({ params }) => this.#load(params.page, params.extra),
     });
   }
 
-  #load(page: number): Observable<TModel[]> {
+  #load(page: number, params: Record<string, string>): Observable<TModel[]> {
+    console.log(params);
     return this.httpClient
       .get<PaginatedResponse<TDto[]>>(this.API_ENDPOINT, {
         params: {
           page,
+          ...params,
         },
       })
       .pipe(
+        tap((response) => this.#lastPage.set(response.meta.last_page)),
         map((response) => this.mapper.mapList(response.data)),
         tap((models) => this.modelsSignal.set(models)),
         catchError((error) => {

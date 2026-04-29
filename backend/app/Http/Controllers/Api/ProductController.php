@@ -10,12 +10,35 @@ use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
-    public function index()
-    {
-        $products = Product::with('category', 'images')->paginate(8);
-        return ProductResource::collection($products);
+    public function index(Request $request)
+{
+    $query = Product::with('category', 'images');
+
+    if ($request->filled('search')) {
+        $search = $request->search;
+        $query->where(function ($q) use ($search) {
+            $q->where('name', 'like', "%{$search}%")
+              ->orWhere('description', 'like', "%{$search}%");
+        });
     }
 
+    if ($request->filled('categories')) {
+    $categoryNames = explode(',', $request->categories);
+    $query->whereHas('category', function ($q) use ($categoryNames) {
+        $q->whereIn('name', $categoryNames);
+    });
+}
+
+    if ($request->filled('min_price')) {
+        $query->where('price', '>=', $request->min_price);
+    }
+
+    if ($request->filled('max_price')) {
+        $query->where('price', '<=', $request->max_price);
+    }
+
+    return ProductResource::collection($query->paginate(6));
+}
     public function show(Product $product)
     {
         return new ProductResource($product->load('category', 'images'));
