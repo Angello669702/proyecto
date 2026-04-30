@@ -1,37 +1,57 @@
-<h3>{{ message() }}</h3>
-<div class="form-group">
-  <form (submit)="login()" [formGroup]="loginForm">
-    <div class="input-group">
-      <label for="name">Login: </label>
+<div class="flex flex-col gap-6 p-6 bg-stone-100 border border-stone-300 rounded">
+  <h3 class="font-mono text-[10px] uppercase tracking-widest text-red-400">
+    {{ message() }}
+  </h3>
+
+  <form (submit)="login()" [formGroup]="loginForm" class="flex flex-col gap-4">
+    <div class="flex flex-col gap-1">
+      <label for="username" class="font-mono text-[9px] uppercase tracking-widest text-stone-400">
+        Login
+      </label>
       <input
         type="text"
         placeholder="Username"
         required
         name="username"
         formControlName="username"
+        class="h-9 px-3 bg-stone-50 border border-stone-300 rounded text-xs text-stone-800 placeholder:text-stone-300 focus:outline-none focus:border-stone-500 transition-colors"
       />
       @let username = loginForm.get('username');
       @if ((username?.dirty && username?.invalid) || message()) {
-        <div class="error">* Username is Mandatory</div>
+        <span class="font-mono text-[9px] uppercase tracking-wider text-red-400">
+          * Username is Mandatory
+        </span>
       }
     </div>
-    <div class="input-group">
-      <label for="password">Password: </label>
 
+    <div class="flex flex-col gap-1">
+      <label for="password" class="font-mono text-[9px] uppercase tracking-widest text-stone-400">
+        Password
+      </label>
       <input
         type="password"
         placeholder="Password"
         required
         name="password"
         formControlName="password"
+        class="h-9 px-3 bg-stone-50 border border-stone-300 rounded text-xs text-stone-800 placeholder:text-stone-300 focus:outline-none focus:border-stone-500 transition-colors"
       />
       @let password = loginForm.get('password');
       @if ((password?.dirty && password?.invalid) || message()) {
-        <div class="error">* Password is Mandatory</div>
+        <span class="font-mono text-[9px] uppercase tracking-wider text-red-400">
+          * Password is Mandatory
+        </span>
       }
     </div>
-    <div class="row">
-      <button [disabled]="loginForm.invalid">Login</button>
-    </div>
+
+    <hr class="border-stone-200" />
+
+    <button
+      type="submit"
+      [disabled]="loginForm.invalid"
+      class="w-full h-10 font-mono text-[10px] uppercase tracking-wider bg-stone-800 text-white rounded hover:bg-stone-700 active:scale-95 transition-all duration-150 disabled:opacity-40 disabled:cursor-not-allowed"
+    >
+      Login
+    </button>
   </form>
 </div>

@@ -31,6 +31,11 @@ export const routes: Routes = [
         path: FEATURE_PAGES.AUTH,
         loadChildren: () => import('./features/auth/auth.routes').then((r) => r.AUTH_ROUTES),
       },
+      {
+        path: 'home',
+        loadChildren: () =>
+          import('./shared/pages/home.page.component').then((r) => r.HomePageComponent),
+      },
     ],
   },
 
