@@ -8,11 +8,12 @@ import { Mapper } from '../../../shared/interfaces/mapper.interface';
   providedIn: 'root',
 })
 export class TransactionMapper implements Mapper<Transaction, TransactionDto> {
+  readonly #transactionItemMapper = inject(TransactionItemMapper);
   mapOne(transaction: TransactionDto): Transaction {
     return {
       id: transaction.id,
       user: transaction.user,
-      transactionsItems: inject(TransactionItemMapper).mapList(transaction.transactions_items),
+      transactionsItems: this.#transactionItemMapper.mapList(transaction.transactions_items),
       status: transaction.status,
       subtotal: transaction.subtotal,
       discountApplied: transaction.discount_applied,

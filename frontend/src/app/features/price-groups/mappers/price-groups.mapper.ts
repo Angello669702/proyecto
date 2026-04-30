@@ -8,12 +8,13 @@ import { Mapper } from '../../../shared/interfaces/mapper.interface';
   providedIn: 'root',
 })
 export class PriceGroupMapper implements Mapper<PriceGroup, PriceGroupDto> {
+  readonly #priceGroupItemMapper = inject(PriceGroupItemMapper);
   mapOne(priceGroup: PriceGroupDto): PriceGroup {
     return {
       id: priceGroup.id,
       name: priceGroup.name,
       description: priceGroup.description,
-      priceGroupItems: inject(PriceGroupItemMapper).mapList(priceGroup.price_group_items),
+      priceGroupItems: this.#priceGroupItemMapper.mapList(priceGroup.price_group_items),
     };
   }
 

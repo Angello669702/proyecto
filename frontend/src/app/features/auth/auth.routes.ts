@@ -10,9 +10,10 @@ export const AUTH_ROUTES: Routes = [
     path: '',
     children: [
       {
-        path: '',
+        path: AUTH_PAGES.LOGIN,
         pathMatch: 'full',
-        redirectTo: AUTH_PAGES.LOGIN,
+        loadComponent: () =>
+          import('./pages/login/login.page.component').then((c) => c.LoginPageComponent),
       },
     ],
   },

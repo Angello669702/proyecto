@@ -6,7 +6,7 @@ import { Category } from '../interfaces/category.interface';
 
 @Injectable({ providedIn: 'root' })
 export class CategoryService extends CommonCrudService<Category, CategoryDto> {
-  readonly API_ENDPOINT = '';
+  readonly API_ENDPOINT = 'http://127.0.0.1:8000/api/categories';
   readonly mapper = inject(CategoryMapper);
   readonly defaultModel = { id: '' } as Category;
 }

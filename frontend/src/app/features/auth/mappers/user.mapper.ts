@@ -10,10 +10,16 @@ import { TransactionMapper } from '../../transactions/mappers/transaction.mapper
   providedIn: 'root',
 })
 export class UserMapper implements Mapper<User, UserDto> {
+  readonly #priceGroupMapper = inject(PriceGroupMapper);
+  readonly #productMapper = inject(ProductMapper);
+  readonly #transactionMapper = inject(TransactionMapper);
+
   mapOne(user: UserDto): User {
+    console.log(user);
     return {
       id: user.id,
       name: user.name,
+      fullName: user.full_name,
       email: user.email,
       password: user.password,
       companyName: user.company_name,
@@ -23,9 +29,9 @@ export class UserMapper implements Mapper<User, UserDto> {
       profilePhoto: user.profile_photo ?? '',
       role: user.role,
       isActive: user.is_active,
-      priceGroup: inject(PriceGroupMapper).mapOne(user.price_group),
-      favourites: inject(ProductMapper).mapList(user.favourites),
-      transaction: inject(TransactionMapper).mapOne(user.transaction),
+      priceGroup: user.price_group ? this.#priceGroupMapper.mapOne(user.price_group) : undefined,
+      favourites: this.#productMapper.mapList(user.favourites ?? []),
+      transaction: user.transaction ? this.#transactionMapper.mapOne(user.transaction) : undefined,
     };
   }
 

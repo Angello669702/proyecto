@@ -15,7 +15,8 @@ class UserSeeder extends Seeder
         $group2 = PriceGroup::where('name', 'Tarifa B')->first();
         
         User::create([
-            'name'         => 'Admin Principal',
+            'name'         => 'admin',
+            'full_name'    => 'Ángel Montiel',
             'company_name' => 'Distribuidora S.L.',
             'nif'          => 'A12345678',
             'email'        => 'admin@distribuidora.com',
@@ -28,7 +29,8 @@ class UserSeeder extends Seeder
 
         
         User::create([
-            'name'           => 'Carlos López',
+            'name' => 'carloslopez',
+            'full_name'           => 'Carlos López',
             'company_name'   => 'Bar El Rincón S.L.',
             'nif'            => 'B11111111',
             'email'          => 'carlos@elrincon.com',
@@ -41,7 +43,8 @@ class UserSeeder extends Seeder
         ]);
 
         User::create([
-            'name'           => 'María García',
+            'name' => 'mariagarcia',
+            'full_name'           => 'María García',
             'company_name'   => 'Restaurante La Plaza',
             'nif'            => 'B22222222',
             'email'          => 'maria@laplaza.com',
@@ -54,7 +57,8 @@ class UserSeeder extends Seeder
         ]);
 
         User::create([
-            'name'         => 'Pedro Martínez',
+            'name' => 'pedromartinez',
+            'full_name'         => 'Pedro Martínez',
             'company_name' => 'Hotel Las Palmas',
             'nif'          => 'B33333333',
             'email'        => 'pedro@laspalmas.com',
@@ -66,7 +70,8 @@ class UserSeeder extends Seeder
         ]);
 
         User::create([
-            'name'         => 'Ana Torres',
+            'name' => 'anatorres',
+            'full_name'         => 'Ana Torres',
             'company_name' => 'Cafetería Sol',
             'nif'          => 'B44444444',
             'email'        => 'ana@cafeteriasol.com',

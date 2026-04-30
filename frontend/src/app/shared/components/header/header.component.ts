@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { PRODUCT_PAGES } from '../../../features/products/product.routes';
 import { TRANSACTION_PAGES } from '../../../features/transactions/transactions.routes';
 import { AuthService } from '../../../features/auth/services/auth.service';
@@ -36,8 +36,24 @@ export class HeaderComponent {
     allTransactions: [TRANSACTION_PAGES.TRANSACTIONS, TRANSACTION_PAGES.ALL],
   };
 
+  userInitials = computed(() => {
+    const user = this.user();
+    if (this.#authService.isDefaultUser(user)) return;
+    return user.fullName
+      .trim()
+      .split(' ')
+      .slice(0, 2)
+      .map((part) => part.charAt(0))
+      .join('')
+      .toUpperCase();
+  });
+
   logout() {
     this.#tokenService.logout();
     this.#router.navigate(this.authNavigation['login']);
+  }
+
+  navigate(route: string[]) {
+    this.#router.navigate(route);
   }
 }

@@ -16,10 +16,7 @@ export class ProductService extends CommonCrudService<Product, ProductDto> {
   readonly defaultModel = { id: '' } as Product;
   readonly defaultCartItem = { product: this.defaultModel, quantity: 0 };
 
-  buildParams(
-    filters: Signal<ProductFilter>,
-    isAdmin: Signal<boolean>,
-  ): Signal<Record<string, string>> {
+  buildParams(filters: Signal<ProductFilter>): Signal<Record<string, string>> {
     return computed(() => {
       const filter = filters();
       const params: Record<string, string> = {};
@@ -29,9 +26,24 @@ export class ProductService extends CommonCrudService<Product, ProductDto> {
       if (filter.maxPrice !== null) params['max_price'] = String(filter.maxPrice);
       if (filter.categories.length > 0) params['categories'] = filter.categories.join(',');
 
-      params['admin'] = String(isAdmin());
       return params;
     });
+  }
+
+  loadFeatureProducts(): ResourceRef<Product[] | undefined> {
+    return rxResource({
+      stream: () => this.#loadFeatureProducts(),
+    });
+  }
+
+  #loadFeatureProducts(): Observable<Product[] | undefined> {
+    return this.httpClient.get<{ data: ProductDto[] }>(`${this.API_ENDPOINT}/featured`, {}).pipe(
+      map((response) => this.mapper.mapList(response.data)),
+      catchError((error) => {
+        console.error('Failed to load models', error);
+        return throwError(() => error);
+      }),
+    );
   }
 
   updateStock(cartItem: Signal<CartItem>): ResourceRef<Product | undefined> {

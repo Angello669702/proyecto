@@ -51,7 +51,7 @@ class User extends Authenticatable
 
     public function favorites(): BelongsToMany
     {
-        return $this->belongsToMany(Product::class, 'user_product_favorites')->withTimestamps();
+        return $this->belongsToMany(Product::class, 'user_product_favorites')->withoutTimestamps();
     }
 
     public function priceGroup(): BelongsTo

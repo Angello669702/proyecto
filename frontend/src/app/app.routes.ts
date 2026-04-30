@@ -14,7 +14,7 @@ export const routes: Routes = [
       {
         path: '',
         pathMatch: 'full',
-        redirectTo: FEATURE_PAGES.PRODUCTS,
+        redirectTo: FEATURE_PAGES.AUTH,
       },
       {
         path: FEATURE_PAGES.PRODUCTS,
@@ -33,7 +33,7 @@ export const routes: Routes = [
       },
       {
         path: 'home',
-        loadChildren: () =>
+        loadComponent: () =>
           import('./shared/pages/home.page.component').then((r) => r.HomePageComponent),
       },
     ],

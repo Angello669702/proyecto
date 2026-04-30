@@ -7,6 +7,7 @@ import { UserRole } from '../enums/user-role.enum';
 export interface UserDto {
   id: UUID;
   name: string;
+  full_name: string;
   email: string;
   password: string;
   company_name: string;
@@ -16,7 +17,7 @@ export interface UserDto {
   profile_photo?: string;
   role: UserRole;
   is_active: boolean;
-  price_group: PriceGroupDto;
-  favourites: ProductDto[];
-  transaction: TransactionDto;
+  price_group?: PriceGroupDto;
+  favourites?: ProductDto[];
+  transaction?: TransactionDto;
 }

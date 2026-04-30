@@ -20,20 +20,16 @@ class AuthController extends Controller
             'password' => 'required',
         ]);
 
-        if (!Auth::attempt($request->only('username', 'password'))) {
+        if (!Auth::attempt([
+            'name' => $request->username,
+            'password' => $request->password,
+        ])) {
             return response()->json([
                 'message' => 'Credenciales incorrectas'
             ], 401);
         }
 
         $user = Auth::user();
-
-        if ($user->two_factor_enabled) {
-            return response()->json([
-                'requires_2fa' => true,
-                'user_id'      => $user->id,
-            ]);
-        }
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
@@ -46,7 +42,7 @@ class AuthController extends Controller
     public function me(Request $request)
     {
         return new UserResource(
-            $request->user()->load('priceGroup', 'favorites', 'transactions.items.product')
+            $request->user()->load('priceGroup')
         );
     }
 

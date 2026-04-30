@@ -3,7 +3,7 @@ import { User } from '../interfaces/user.interface';
 import { AuthRequest, AuthResponse } from '../interfaces/auth.interface';
 
 export abstract class AuthServiceAbstract {
-  protected readonly API_ENDPOINT = 'http://localhost:8000/auth';
+  protected readonly API_ENDPOINT = 'http://localhost:8000/api/auth';
 
   readonly defaultUser: User = {
     id: '0',

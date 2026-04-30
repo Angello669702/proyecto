@@ -62,7 +62,7 @@ export class CatalogPageComponent {
   readonly products = this.#productService.models;
   productsResource = this.#productService.load(
     this.currentPage,
-    this.#productService.buildParams(this.filters, this.isAdmin),
+    this.#productService.buildParams(this.filters),
   );
 
   productToAddToCart = signal<CartItem>(this.#transactionService.defaultCartItem);

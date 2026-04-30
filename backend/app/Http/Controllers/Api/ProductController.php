@@ -14,6 +14,12 @@ class ProductController extends Controller
     {
         $query = Product::with('category', 'images');
 
+        $isAdmin = auth()->user()?->role === 'admin';
+
+        if (!$isAdmin) {
+            $query->where('is_active', true);
+        }
+
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
@@ -60,6 +66,30 @@ class ProductController extends Controller
     {
         $product->delete();
         return response()->json(['message' => 'Producto eliminado correctamente'], 200);
+    }
+
+    public function topSelling()
+    {
+        $products = Product::with(['category', 'images'])
+            ->where('is_active', true)
+            ->withSum(['transactionItems as total_sold' => function ($query) {
+                $query->whereHas('transaction', function ($q) {
+                    $q->where('status', '!=', 'cancelled')
+                        ->where('payment_status', 'paid');
+                });
+            }], 'quantity')
+            ->orderByDesc('total_sold')
+            ->take(4)
+            ->get();
+
+        if ($products->isEmpty() || $products->every(fn ($p) => $p->total_sold === null)) {
+            $products = Product::with(['category', 'images'])
+                ->where('is_active', true)
+                ->take(4)
+                ->get();
+        }
+
+        return ProductResource::collection($products);
     }
 
     public function updateStock(Request $request, Product $product)

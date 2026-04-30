@@ -7,6 +7,7 @@ import { UserRole } from '../enums/user-role.enum';
 export interface User {
   id: UUID;
   name: string;
+  fullName: string;
   email: string;
   password: string;
   companyName: string;
@@ -16,7 +17,7 @@ export interface User {
   profilePhoto: string;
   role: UserRole;
   isActive: boolean;
-  priceGroup: PriceGroup;
+  priceGroup?: PriceGroup;
   favourites: Product[];
-  transaction: Transaction;
+  transaction?: Transaction;
 }
