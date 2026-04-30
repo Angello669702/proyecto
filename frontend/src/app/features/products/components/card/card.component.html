@@ -3,21 +3,18 @@
   class="group relative flex flex-col bg-stone-100 border border-stone-300 rounded overflow-hidden text-xs"
   [routerLink]="detailRoute()"
 >
-  <!-- Categoría -->
   <div class="absolute top-1 left-1 z-10">
     <span class="bg-stone-700 text-stone-100 text-[8px] px-1.5 py-0.5 rounded">
       {{ product().category.name }}
     </span>
   </div>
 
-  <!-- Inactivo -->
   @if (!product().isActive) {
     <div class="absolute top-1 right-1 z-10">
       <span class="bg-red-200 text-red-700 text-[8px] px-1.5 py-0.5 rounded"> Inactivo </span>
     </div>
   }
 
-  <!-- Imagen -->
   <div
     class="h-24 bg-stone-200 border-b border-stone-300 flex items-center justify-center overflow-hidden"
   >
@@ -28,9 +25,7 @@
     />
   </div>
 
-  <!-- Body -->
   <div class="flex flex-col gap-1 p-2 flex-1" (click)="$event.stopPropagation()">
-    <!-- Info -->
     <p class="font-semibold text-stone-800 text-[11px] line-clamp-1">
       {{ product().name }}
     </p>
@@ -45,8 +40,7 @@
 
     <span class="text-[9px] text-stone-400"> Stock: {{ product().stock }} </span>
 
-    <!-- ================= CLIENTE ================= -->
-    @if (!admin()) {
+    @if (!isAdmin()) {
       <div class="flex gap-1 mt-1">
         @if (product().stock === 0) {
           <button disabled class="flex-1 h-6 text-[9px] bg-stone-300 text-stone-400 rounded">
@@ -64,10 +58,8 @@
       </div>
     }
 
-    <!-- ================= ADMIN ================= -->
-    @if (admin()) {
+    @if (isAdmin()) {
       <div class="flex flex-col gap-1 mt-1">
-        <!-- Selector cantidad -->
         <div class="flex items-center gap-1">
           <button
             (click)="quantity.set(quantity() - 1)"
@@ -93,7 +85,6 @@
           </button>
         </div>
 
-        <!-- Añadir / Restar stock -->
         <div class="flex gap-1">
           <button
             (click)="removeStock()"
@@ -112,7 +103,6 @@
           </button>
         </div>
 
-        <!-- Activar / Desactivar -->
         @if (product().isActive) {
           <button
             (click)="toggleProduct()"
@@ -129,7 +119,6 @@
           </button>
         }
 
-        <!-- Eliminar -->
         <button
           (click)="deleteProduct()"
           class="w-full h-6 text-[9px] bg-red-600 text-white rounded"
