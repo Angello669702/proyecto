@@ -25,7 +25,6 @@ export abstract class CommonCrudService<
   }
 
   #load(page: number, params: Record<string, string>): Observable<TModel[]> {
-    console.log(params);
     return this.httpClient
       .get<PaginatedResponse<TDto[]>>(this.API_ENDPOINT, {
         params: {

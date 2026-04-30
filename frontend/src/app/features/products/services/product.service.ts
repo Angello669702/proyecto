@@ -16,16 +16,20 @@ export class ProductService extends CommonCrudService<Product, ProductDto> {
   readonly defaultModel = { id: '' } as Product;
   readonly defaultCartItem = { product: this.defaultModel, quantity: 0 };
 
-  buildFilters(filters: Signal<ProductFilter>): Signal<Record<string, string>> {
+  buildParams(
+    filters: Signal<ProductFilter>,
+    isAdmin: Signal<boolean>,
+  ): Signal<Record<string, string>> {
     return computed(() => {
       const filter = filters();
-      console.log(filter);
       const params: Record<string, string> = {};
 
       if (filter.searchText.trim()) params['search'] = filter.searchText.trim();
       if (filter.minPrice !== null) params['min_price'] = String(filter.minPrice);
       if (filter.maxPrice !== null) params['max_price'] = String(filter.maxPrice);
       if (filter.categories.length > 0) params['categories'] = filter.categories.join(',');
+
+      params['admin'] = String(isAdmin());
       return params;
     });
   }

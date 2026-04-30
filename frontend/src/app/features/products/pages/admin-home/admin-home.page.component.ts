@@ -6,7 +6,7 @@ import { ProductService } from '../../services/product.service';
 import { CartItem } from '../../../../shared/interfaces/cart.interface';
 
 @Component({
-  selector: 'app-admin-home',
+  selector: 'app-admin-product',
   imports: [CardListComponent],
   template: `
     <app-card-list
@@ -18,7 +18,7 @@ import { CartItem } from '../../../../shared/interfaces/cart.interface';
     </app-card-list>
   `,
 })
-export class AdminHomePageComponent {
+export class AdminProductPageComponent {
   readonly #productService = inject(ProductService);
   readonly products = this.#productService.models;
 

@@ -12,6 +12,7 @@ import { CartItem } from '../../../../shared/interfaces/cart.interface';
         @for (product of products(); track product.id) {
           <app-card-product
             [product]="product"
+            [isAdmin]="isAdmin()"
             (add)="addToCart($event)"
             (removeCart)="removeFromCart($event)"
             (isActive)="toggleProduct($event)"
@@ -29,6 +30,7 @@ import { CartItem } from '../../../../shared/interfaces/cart.interface';
 })
 export class CardListComponent {
   readonly products = input.required<Product[]>();
+  readonly isAdmin = input<boolean>(false);
 
   add = output<Product>();
   removeCart = output<Product>();

@@ -9,7 +9,7 @@ import { CartItem } from '../../../../shared/interfaces/cart.interface';
   imports: [ProductDetailComponent],
   template: ` <app-product-detail [product]="product()" (add)="addToCart($event)" /> `,
 })
-export class ProdcutDetailPageComponent {
+export class ProductDetailPageComponent {
   readonly product = input.required<Product>();
   readonly #transactionService = inject(TransactionService);
 

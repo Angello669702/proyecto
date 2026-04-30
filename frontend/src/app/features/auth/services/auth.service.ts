@@ -14,7 +14,8 @@ export class AuthService extends AuthServiceAbstract {
   #httpClient = inject(HttpClient);
   #tokenStorageService = inject(TokenStorageService);
   #currentUser = signal<User>(this.defaultUser);
-  currentUser = computed(() => this.#currentUser);
+  currentUser = computed(() => this.#currentUser());
+  isAdmin = computed(() => this.currentUser().role === 'admin');
 
   #login(loginRequest: AuthRequest): Observable<AuthResponse> {
     return this.#httpClient.post<AuthResponse>(this.API_ENDPOINT, loginRequest).pipe(

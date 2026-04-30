@@ -7,6 +7,7 @@ import { CartItem } from '../../../../shared/interfaces/cart.interface';
 import { PaginationButtonsComponent } from '../../../../shared/components/pagination-buttons/pagination-buttons.component';
 import { ProductFilterComponent } from '../../components/product-filter/product-filter.component';
 import { ProductFilter } from '../../interfaces/product-filter.interface';
+import { AuthService } from '../../../auth/services/auth.service';
 
 @Component({
   selector: 'app-home',
@@ -22,8 +23,12 @@ import { ProductFilter } from '../../interfaces/product-filter.interface';
           <app-card-list
             class="flex-1"
             [products]="products()"
+            [isAdmin]="isAdmin()"
             (add)="addToCart($event)"
             (removeCart)="removeFromCart($event)"
+            (stock)="updateStock($event)"
+            (isActive)="toggle($event)"
+            (removeProduct)="deleteProduct($event)"
           />
         </div>
         <div class="p-2 border-t border-stone-300">
@@ -37,9 +42,11 @@ import { ProductFilter } from '../../interfaces/product-filter.interface';
     </div>
   `,
 })
-export class HomePageComponent {
+export class CatalogPageComponent {
   readonly #productService = inject(ProductService);
   readonly #transactionService = inject(TransactionService);
+
+  isAdmin = inject(AuthService).isAdmin;
 
   currentPage = signal<number>(1);
   lastPage = this.#productService.lastPage;
@@ -55,14 +62,22 @@ export class HomePageComponent {
   readonly products = this.#productService.models;
   productsResource = this.#productService.load(
     this.currentPage,
-    this.#productService.buildFilters(this.filters),
+    this.#productService.buildParams(this.filters, this.isAdmin),
   );
 
   productToAddToCart = signal<CartItem>(this.#transactionService.defaultCartItem);
   productToRemoveFromCart = signal<CartItem>(this.#transactionService.defaultCartItem);
 
+  productToUpdateStock = signal<CartItem>(this.#productService.defaultCartItem);
+  productToRemove = signal<Product>(this.#productService.defaultModel);
+  productToToggle = signal<Product>(this.#productService.defaultModel);
+
   addToCartResource = this.#transactionService.addItem(this.productToAddToCart);
   removeFromCartResource = this.#transactionService.removeItem(this.productToRemoveFromCart);
+
+  updateStockResource = this.#productService.updateStock(this.productToUpdateStock);
+  removeProductResource = this.#productService.remove(this.productToRemove);
+  toggleProductResource = this.#productService.toggle(this.productToToggle);
 
   addToCart(product: Product) {
     this.productToAddToCart.set({ product: product, quantity: 1 });
@@ -70,6 +85,18 @@ export class HomePageComponent {
 
   removeFromCart(product: Product) {
     this.productToRemoveFromCart.set({ product: product, quantity: 1 });
+  }
+
+  updateStock(cartItem: CartItem) {
+    this.productToUpdateStock.set(cartItem);
+  }
+
+  deleteProduct(product: Product) {
+    this.productToRemove.set(product);
+  }
+
+  toggle(product: Product) {
+    this.productToRemove.set(product);
   }
 
   onFiltersChanged(filters: ProductFilter) {

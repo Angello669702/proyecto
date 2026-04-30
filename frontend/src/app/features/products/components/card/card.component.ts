@@ -10,8 +10,8 @@ import { CartItem } from '../../../../shared/interfaces/cart.interface';
   templateUrl: './card.component.html',
 })
 export class CardComponent {
-  readonly admin = input<boolean>(false);
   readonly product = input.required<Product>();
+  readonly isAdmin = input<boolean>(false);
 
   quantity = signal<number>(0);
 

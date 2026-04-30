@@ -1,37 +1,37 @@
 import { Routes } from '@angular/router';
 import { productResolver } from './guards/product.resolver';
 
-export enum PRODUCTS_PAGES {
-  PRODUCT = '/products',
-  HOME = 'home',
+export enum PRODUCT_PAGES {
+  PRODUCTS = '/products',
+  CATALOG = 'catalog',
   NEW = 'new',
   UPDATE = 'update',
 }
 
-export const PRODUCTS_ROUTES: Routes = [
+export const PRODUCT_ROUTES: Routes = [
   {
     path: '',
     children: [
       {
         path: '',
         pathMatch: 'full',
-        redirectTo: PRODUCTS_PAGES.HOME,
+        redirectTo: PRODUCT_PAGES.CATALOG,
       },
       {
-        path: PRODUCTS_PAGES.HOME,
+        path: PRODUCT_PAGES.CATALOG,
         loadComponent: () =>
-          import('./pages/home/home.page.component').then((c) => c.HomePageComponent),
+          import('./pages/catalog/catalog.page.component').then((c) => c.CatalogPageComponent),
       },
 
       {
         path: ':id',
         loadComponent: () =>
           import('./pages/product-detail/product-detail.page.component').then(
-            (c) => c.ProdcutDetailPageComponent,
+            (c) => c.ProductDetailPageComponent,
           ),
         resolve: { product: productResolver },
       },
     ],
   },
-  { path: '**', redirectTo: PRODUCTS_PAGES.HOME },
+  { path: '**', redirectTo: PRODUCT_PAGES.CATALOG },
 ];
