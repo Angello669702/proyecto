@@ -15,7 +15,6 @@ export class UserMapper implements Mapper<User, UserDto> {
   readonly #transactionMapper = inject(TransactionMapper);
 
   mapOne(user: UserDto): User {
-    console.log(user);
     return {
       id: user.id,
       name: user.name,
@@ -30,7 +29,7 @@ export class UserMapper implements Mapper<User, UserDto> {
       role: user.role,
       isActive: user.is_active,
       priceGroup: user.price_group ? this.#priceGroupMapper.mapOne(user.price_group) : undefined,
-      favourites: this.#productMapper.mapList(user.favourites ?? []),
+      favourites: user.favourites ? this.#productMapper.mapList(user.favourites) : undefined,
       transaction: user.transaction ? this.#transactionMapper.mapOne(user.transaction) : undefined,
     };
   }

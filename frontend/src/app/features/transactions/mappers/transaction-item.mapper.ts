@@ -1,19 +1,25 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { TransactionItemDto } from '../dtos/transaction-item.interface.dto';
 import { TransactionItem } from '../interfaces/transaction-item.interface';
-import { v4 as uuidv4 } from 'uuid';
 import { Mapper } from '../../../shared/interfaces/mapper.interface';
+import { ProductMapper } from '../../products/mappers/product.mapper';
 @Injectable({
   providedIn: 'root',
 })
 export class TransactionItemMapper implements Mapper<TransactionItem, TransactionItemDto> {
+  readonly #productMapper = inject(ProductMapper);
   mapOne(transaction: TransactionItemDto): TransactionItem {
     return {
       id: transaction.id,
-      product: transaction.product,
+      product: this.#productMapper.mapOne(transaction.product),
       quantity: transaction.quantity,
-      unitPrice: transaction.quantity,
+      originalPrice: transaction.original_price,
+      unitPrice: transaction.unit_price,
+      discount: transaction.discount,
+      vatRate: transaction.vat_rate,
+      vatAmount: transaction.vat_amount,
       subtotal: transaction.subtotal,
+      subtotalWithVat: transaction.subtotal_with_vat,
     };
   }
 

@@ -16,6 +16,7 @@ return new class extends Migration
             $table->decimal('discount_applied', 10, 2)->default(0);
             $table->decimal('shipping_cost', 10, 2)->default(0);
             $table->decimal('total', 10, 2);
+            $table->decimal('vat_total', 10, 2)->default(0)->after('discount_applied');
             $table->text('shipping_address');
             $table->string('payment_intent_id')->nullable()->comment('Stripe Payment Intent ID');
             $table->enum('payment_status', ['unpaid', 'paid', 'refunded'])->default('unpaid');
@@ -29,6 +30,8 @@ return new class extends Migration
             $table->foreignUuid('product_id')->constrained('products')->restrictOnDelete();
             $table->integer('quantity');
             $table->decimal('unit_price', 10, 2)->comment('Precio en el momento de la compra');
+            $table->enum('vat_rate', ['10', '21'])->default('10')->after('unit_price');
+            $table->decimal('vat_amount', 10, 2)->default(0)->after('vat_rate');
             $table->decimal('subtotal', 10, 2)->comment('quantity * unit_price');
             $table->timestamps();
         });

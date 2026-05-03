@@ -13,32 +13,43 @@ import { AuthService } from '../../../auth/services/auth.service';
   selector: 'app-home',
   imports: [CardListComponent, PaginationButtonsComponent, ProductFilterComponent],
   template: `
-    <div class="flex h-[calc(100vh-4rem)] overflow-hidden">
-      <aside class="w-64 border-r border-stone-300 p-4">
-        <app-product-filter (filtersChanged)="onFiltersChanged($event)" />
-      </aside>
+    <div class="min-h-screen bg-stone-50">
+      <app-product-filter (filtersChanged)="onFiltersChanged($event)" />
 
-      <div class="flex-1 flex flex-col min-h-0">
-        <div class="flex-1 p-4 overflow-hidden flex min-h-0">
-          <app-card-list
-            class="flex-1"
-            [products]="products()"
-            [isAdmin]="isAdmin()"
-            (add)="addToCart($event)"
-            (removeCart)="removeFromCart($event)"
-            (stock)="updateStock($event)"
-            (isActive)="toggle($event)"
-            (removeProduct)="deleteProduct($event)"
-          />
-        </div>
-        <div class="p-2 border-t border-stone-300">
-          <app-pagination-buttons
-            [(currentPage)]="currentPage"
-            [lastPage]="lastPage()"
-            [pages]="pages()"
-          />
-        </div>
-      </div>
+      <main class="md:ml-72 flex flex-col min-h-screen">
+        <section class="flex-1 overflow-y-auto custom-scrollbar">
+          <div class="max-w-7xl mx-auto">
+            <div class="px-8 pt-10 pb-4">
+              <h2 class="text-sm font-serif font-bold uppercase tracking-[0.3em] text-stone-400">
+                Nuestra Bodega
+              </h2>
+              <div class="h-px w-12 bg-rose-900 mt-2"></div>
+            </div>
+
+            <app-card-list
+              [products]="products()"
+              [isAdmin]="isAdmin()"
+              (add)="addToCart($event)"
+              (removeCart)="removeFromCart($event)"
+              (stock)="updateStock($event)"
+              (isActive)="toggle($event)"
+              (removeProduct)="deleteProduct($event)"
+            />
+          </div>
+        </section>
+
+        <footer
+          class="sticky bottom-0 bg-white/80 backdrop-blur-md border-t border-stone-200 py-4 px-8 z-30"
+        >
+          <div class="max-w-7xl mx-auto flex justify-center">
+            <app-pagination-buttons
+              [(currentPage)]="currentPage"
+              [lastPage]="lastPage()"
+              [pages]="pages()"
+            />
+          </div>
+        </footer>
+      </main>
     </div>
   `,
 })

@@ -42,7 +42,7 @@ class AuthController extends Controller
     public function me(Request $request)
     {
         return new UserResource(
-            $request->user()->load('priceGroup')
+            $request->user()->load('priceGroup.items.product', 'transactions')
         );
     }
 

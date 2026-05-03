@@ -9,6 +9,14 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class TransactionItem extends Model
 {
     use HasUuids;
+
+    protected $fillable = [
+        'transaction_id',
+        'product_id',
+        'quantity',
+        'unit_price',
+        'subtotal',
+    ];
     public function transaction(): BelongsTo
     {
         return $this->belongsTo(Transaction::class);

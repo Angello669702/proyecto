@@ -1,30 +1,52 @@
-<div class="flex items-center justify-center gap-1">
+<div class="flex items-center justify-center gap-2">
   <button
     (click)="prevPage()"
     [disabled]="currentPage() === 1"
-    class="w-7 h-7 text-xs bg-stone-100 border border-stone-300 rounded disabled:opacity-40"
+    class="w-10 h-10 flex items-center justify-center text-sm bg-white border border-stone-200 rounded-full text-stone-600 hover:border-rose-900 hover:text-rose-900 disabled:opacity-30 disabled:cursor-not-allowed transition-all cursor-pointer shadow-sm"
   >
-    «
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="16"
+      height="16"
+      fill="currentColor"
+      viewBox="0 0 256 256"
+    >
+      <path
+        d="M164.24,203.76a6,6,0,1,1-8.48,8.48l-80-80a6,6,0,0,1,0-8.48l80-80a6,6,0,0,1,8.48,8.48L88.49,128Z"
+      ></path>
+    </svg>
   </button>
 
-  @for (page of pages(); track $index) {
-    <button
-      (click)="goToPage(page)"
-      [class]="
-        page === currentPage()
-          ? 'w-7 h-7 text-xs bg-stone-800 text-white rounded'
-          : 'w-7 h-7 text-xs bg-stone-100 border rounded'
-      "
-    >
-      {{ page }}
-    </button>
-  }
+  <div class="flex gap-1.5 bg-stone-100 p-1 rounded-full border border-stone-200 shadow-inner">
+    @for (page of pages(); track $index) {
+      <button
+        (click)="goToPage(page)"
+        [class]="
+          page === currentPage()
+            ? 'w-8 h-8 text-xs font-bold bg-rose-900 text-white rounded-full shadow-md'
+            : 'w-8 h-8 text-xs font-medium text-stone-500 hover:text-rose-900 hover:bg-white rounded-full transition-all cursor-pointer'
+        "
+      >
+        {{ page }}
+      </button>
+    }
+  </div>
 
   <button
     (click)="nextPage()"
     [disabled]="currentPage() === lastPage()"
-    class="w-7 h-7 text-xs bg-stone-100 border border-stone-300 rounded disabled:opacity-40"
+    class="w-10 h-10 flex items-center justify-center text-sm bg-white border border-stone-200 rounded-full text-stone-600 hover:border-rose-900 hover:text-rose-900 disabled:opacity-30 disabled:cursor-not-allowed transition-all cursor-pointer shadow-sm"
   >
-    »
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="16"
+      height="16"
+      fill="currentColor"
+      viewBox="0 0 256 256"
+    >
+      <path
+        d="M181.66,133.66l-80,80a8,8,0,0,1-11.32-11.32L164.69,128,90.34,53.66a8,8,0,0,1,11.32-11.32l80,80A8,8,0,0,1,181.66,133.66Z"
+      ></path>
+    </svg>
   </button>
 </div>

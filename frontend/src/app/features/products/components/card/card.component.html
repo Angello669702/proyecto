@@ -1,131 +1,154 @@
 <div
   [class]="!product().isActive ? 'opacity-60 grayscale' : ''"
-  class="group relative flex flex-col bg-stone-100 border border-stone-300 rounded overflow-hidden text-xs"
+  class="group relative flex flex-col bg-white border border-stone-200 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden"
   [routerLink]="detailRoute()"
 >
-  <div class="absolute top-1 left-1 z-10">
-    <span class="bg-stone-700 text-stone-100 text-[8px] px-1.5 py-0.5 rounded">
+  <div class="absolute top-2 left-2 z-10">
+    <span
+      class="bg-rose-900 text-rose-50 text-[10px] font-medium px-2 py-1 rounded-md shadow-sm tracking-wide"
+    >
       {{ product().category.name }}
     </span>
   </div>
 
   @if (!product().isActive) {
-    <div class="absolute top-1 right-1 z-10">
-      <span class="bg-red-200 text-red-700 text-[8px] px-1.5 py-0.5 rounded"> Inactivo </span>
+    <div class="absolute top-2 right-2 z-10">
+      <span class="bg-stone-200 text-stone-600 text-[10px] font-medium px-2 py-1 rounded-md">
+        Inactivo
+      </span>
     </div>
   }
 
   <div
-    class="h-24 bg-stone-200 border-b border-stone-300 flex items-center justify-center overflow-hidden"
+    class="h-44 bg-stone-50 border-b border-stone-100 flex items-center justify-center overflow-hidden p-4"
   >
     <img
       [src]="product().coverImage"
       [alt]="product().name"
-      class="object-contain h-full w-full p-2"
+      class="object-contain h-full w-full group-hover:scale-105 transition-transform duration-500 ease-out"
     />
   </div>
 
-  <div class="flex flex-col gap-1 p-2 flex-1" (click)="$event.stopPropagation()">
-    <p class="font-semibold text-stone-800 text-[11px] line-clamp-1">
+  <div class="flex flex-col p-4 flex-1" (click)="$event.stopPropagation()">
+    <h3
+      class="font-semibold text-stone-800 text-sm line-clamp-2 leading-tight"
+      [title]="product().name"
+    >
       {{ product().name }}
-    </p>
+    </h3>
 
-    <p class="text-stone-500 text-[10px] line-clamp-2">
-      {{ product().description }}
-    </p>
+    <div class="flex items-end justify-between mt-auto pt-3">
+      <p class="font-serif text-rose-900 text-lg font-bold">
+        {{ product().price | currency: 'EUR' : 'symbol' : '1.2-2' : 'es' }}
+      </p>
+      <span class="text-[10px] font-medium text-stone-500 bg-stone-100 px-2 py-1 rounded-md">
+        Stock: {{ product().stock }}
+      </span>
+    </div>
 
-    <p class="font-mono text-stone-800 text-sm font-bold mt-auto">
-      {{ product().price | currency: 'EUR' : 'symbol' : '1.2-2' : 'es' }}
-    </p>
-
-    <span class="text-[9px] text-stone-400"> Stock: {{ product().stock }} </span>
-
-    @if (!isAdmin()) {
-      <div class="flex gap-1 mt-1">
-        @if (product().stock === 0) {
-          <button disabled class="flex-1 h-6 text-[9px] bg-stone-300 text-stone-400 rounded">
-            Sin stock
-          </button>
-        } @else {
-          <button
-            (click)="addToCart()"
-            class="flex-1 h-6 text-[9px] bg-stone-800 text-white rounded hover:bg-stone-700"
-          >
-            +
-          </button>
-          <button (click)="removeFromCart()" class="w-6 h-6 bg-stone-200 border rounded">−</button>
-        }
-      </div>
-    }
-
-    @if (isAdmin()) {
-      <div class="flex flex-col gap-1 mt-1">
-        <div class="flex items-center gap-1">
-          <button
-            (click)="quantity.set(quantity() - 1)"
-            [disabled]="quantity() <= 1"
-            class="w-6 h-6 bg-stone-200 border rounded text-[10px] disabled:opacity-40"
-          >
-            −
-          </button>
-
-          <input
-            type="number"
-            [value]="quantity()"
-            (change)="quantity.set(+$any($event.target).value)"
-            min="1"
-            class="flex-1 h-6 text-center text-[10px] bg-stone-50 border rounded"
-          />
-
-          <button
-            (click)="quantity.set(quantity() + 1)"
-            class="w-6 h-6 bg-stone-200 border rounded text-[10px]"
-          >
-            +
-          </button>
+    @if (!featured()) {
+      @if (!isAdmin()) {
+        <div class="mt-3">
+          @if (product().stock === 0) {
+            <button
+              disabled
+              class="w-full h-8 text-xs font-medium bg-stone-100 text-stone-400 rounded-md cursor-not-allowed"
+            >
+              Agotado
+            </button>
+          } @else {
+            @if (isProductInCart()) {
+              <button
+                (click)="removeFromCart()"
+                class="cursor-pointer w-full h-8 text-xs font-medium bg-stone-200 text-stone-700 rounded-md hover:bg-stone-300 transition-colors"
+              >
+                Quitar del carrito
+              </button>
+            } @else {
+              <button
+                (click)="addToCart()"
+                class="cursor-pointer w-full h-8 text-xs font-medium bg-rose-900 text-white rounded-md hover:bg-rose-800 transition-colors shadow-sm"
+              >
+                Añadir al carrito
+              </button>
+            }
+          }
         </div>
+      }
 
-        <div class="flex gap-1">
-          <button
-            (click)="removeStock()"
-            [disabled]="quantity() === 0 || product().stock === 0"
-            class="flex-1 h-6 text-[9px] bg-stone-200 border rounded disabled:opacity-40"
-          >
-            −
-          </button>
+      @if (isAdmin()) {
+        <div class="flex flex-col gap-2 mt-4 pt-3 border-t border-stone-100">
+          <div class="flex items-center gap-1">
+            <button
+              (click)="quantity.set(quantity() - 1)"
+              [disabled]="quantity() <= 1"
+              class="cursor-pointer w-8 h-8 bg-stone-100 border border-stone-200 rounded-md text-stone-600 hover:bg-stone-200 disabled:opacity-40 transition-colors font-bold"
+            >
+              −
+            </button>
 
-          <button
-            (click)="addStock()"
-            [disabled]="quantity() === 0"
-            class="flex-1 h-6 text-[9px] bg-stone-800 text-white rounded disabled:opacity-40"
-          >
-            +
-          </button>
+            <input
+              type="number"
+              [value]="quantity()"
+              (change)="quantity.set(+$any($event.target).value)"
+              min="1"
+              class="flex-1 h-8 text-center text-xs font-medium bg-stone-50 border border-stone-200 rounded-md focus:outline-none focus:ring-1 focus:ring-rose-900 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+            />
+
+            <button
+              (click)="quantity.set(quantity() + 1)"
+              class="cursor-pointer w-8 h-8 bg-stone-100 border border-stone-200 rounded-md text-stone-600 hover:bg-stone-200 transition-colors font-bold"
+            >
+              +
+            </button>
+          </div>
+
+          <div class="flex gap-2">
+            <button
+              (click)="removeStock()"
+              [disabled]="quantity() === 0 || product().stock === 0"
+              [class.cursor-pointer]="!(quantity() === 0 || product().stock === 0)"
+              class="flex-1 h-7 text-[10px] font-medium bg-stone-200 text-stone-700 rounded-md hover:bg-stone-300 disabled:opacity-40 transition-colors"
+            >
+              Quitar stock
+            </button>
+
+            <button
+              (click)="addStock()"
+              [disabled]="quantity() === 0"
+              [class.cursor-pointer]="!(quantity() === 0)"
+              class="flex-1 h-7 text-[10px] font-medium bg-stone-800 text-white rounded-md hover:bg-stone-700 disabled:opacity-40 transition-colors"
+            >
+              Añadir stock
+            </button>
+          </div>
+
+          <div class="flex gap-2 mt-1">
+            @if (product().isActive) {
+              <button
+                (click)="toggleProduct()"
+                class="cursor-pointer flex-1 h-7 text-[10px] font-medium bg-stone-100 border border-stone-200 text-stone-600 rounded-md hover:bg-stone-200 transition-colors"
+              >
+                Desactivar
+              </button>
+            } @else {
+              <button
+                (click)="toggleProduct()"
+                class="cursor-pointer flex-1 h-7 text-[10px] font-medium bg-rose-50 border border-rose-200 text-rose-700 rounded-md hover:bg-rose-100 transition-colors"
+              >
+                Activar
+              </button>
+            }
+
+            <button
+              (click)="deleteProduct()"
+              class="cursor-pointer flex-1 h-7 text-[10px] font-medium bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors shadow-sm"
+            >
+              Eliminar
+            </button>
+          </div>
         </div>
-
-        @if (product().isActive) {
-          <button
-            (click)="toggleProduct()"
-            class="w-full h-6 text-[9px] bg-red-100 text-red-600 rounded"
-          >
-            OFF
-          </button>
-        } @else {
-          <button
-            (click)="toggleProduct()"
-            class="w-full h-6 text-[9px] bg-green-100 text-green-700 rounded"
-          >
-            ON
-          </button>
-        }
-
-        <button
-          (click)="deleteProduct()"
-          class="w-full h-6 text-[9px] bg-red-600 text-white rounded"
-        >
-          DEL
-        </button>
-      </div>
+      }
     }
   </div>
 </div>

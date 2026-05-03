@@ -1,57 +1,106 @@
-<div class="flex flex-col gap-6 p-6 bg-stone-100 border border-stone-300 rounded">
-  <h3 class="font-mono text-[10px] uppercase tracking-widest text-red-400">
-    {{ message() }}
-  </h3>
-
-  <form (submit)="login()" [formGroup]="loginForm" class="flex flex-col gap-4">
-    <div class="flex flex-col gap-1">
-      <label for="username" class="font-mono text-[9px] uppercase tracking-widest text-stone-400">
-        Login
-      </label>
-      <input
-        type="text"
-        placeholder="Username"
-        required
-        name="username"
-        formControlName="username"
-        class="h-9 px-3 bg-stone-50 border border-stone-300 rounded text-xs text-stone-800 placeholder:text-stone-300 focus:outline-none focus:border-stone-500 transition-colors"
-      />
-      @let username = loginForm.get('username');
-      @if ((username?.dirty && username?.invalid) || message()) {
-        <span class="font-mono text-[9px] uppercase tracking-wider text-red-400">
-          * Username is Mandatory
-        </span>
-      }
+<div class="min-h-[80vh] flex items-center justify-center px-6 py-12 bg-stone-50">
+  <div
+    class="w-full max-w-md bg-white p-8 lg:p-10 rounded-2xl shadow-xl shadow-stone-200/50 border border-stone-100 animate-fade-in"
+  >
+    <div class="flex flex-col items-center gap-3 mb-8">
+      <div
+        class="w-12 h-12 bg-rose-900 rounded-xl flex items-center justify-center shadow-lg shadow-rose-900/20"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          fill="white"
+          viewBox="0 0 256 256"
+        >
+          <path
+            d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24ZM74.08,197.5a64,64,0,0,1,107.84,0,87.83,87.83,0,0,1-107.84,0ZM128,144a40,40,0,1,1,40-40A40,40,0,0,1,128,144Zm76.35,43a80,80,0,0,0-152.7,0,88,88,0,1,1,152.7,0Z"
+          ></path>
+        </svg>
+      </div>
+      <h2 class="font-serif text-2xl font-bold text-stone-900">Acceso Clientes</h2>
+      <p class="text-stone-400 text-xs uppercase tracking-widest font-medium">
+        Introduce tus credenciales
+      </p>
     </div>
 
-    <div class="flex flex-col gap-1">
-      <label for="password" class="font-mono text-[9px] uppercase tracking-widest text-stone-400">
-        Password
-      </label>
-      <input
-        type="password"
-        placeholder="Password"
-        required
-        name="password"
-        formControlName="password"
-        class="h-9 px-3 bg-stone-50 border border-stone-300 rounded text-xs text-stone-800 placeholder:text-stone-300 focus:outline-none focus:border-stone-500 transition-colors"
-      />
-      @let password = loginForm.get('password');
-      @if ((password?.dirty && password?.invalid) || message()) {
-        <span class="font-mono text-[9px] uppercase tracking-wider text-red-400">
-          * Password is Mandatory
+    @if (message()) {
+      <div
+        class="mb-6 p-3 bg-red-50 border border-red-100 rounded-lg flex items-center gap-3 animate-shake"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="18"
+          height="18"
+          fill="#ef4444"
+          viewBox="0 0 256 256"
+        >
+          <path
+            d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm-8-80V80a8,8,0,0,1,16,0v56a8,8,0,0,1-16,0Zm20,36a12,12,0,1,1-12-12A12,12,0,0,1,140,172Z"
+          ></path>
+        </svg>
+        <span class="text-[11px] font-bold uppercase tracking-wide text-red-600">
+          {{ message() }}
         </span>
-      }
-    </div>
+      </div>
+    }
 
-    <hr class="border-stone-200" />
+    <form (submit)="login()" [formGroup]="loginForm" class="flex flex-col gap-5">
+      <div class="flex flex-col gap-1.5">
+        <label
+          for="username"
+          class="ml-1 text-[10px] font-bold uppercase tracking-widest text-stone-500"
+        >
+          Usuario
+        </label>
+        <div class="relative">
+          <input
+            type="text"
+            placeholder="Ej: restaurante_madrid"
+            required
+            name="username"
+            formControlName="username"
+            class="w-full h-12 px-4 bg-stone-50 border border-stone-200 rounded-xl text-sm text-stone-800 placeholder:text-stone-300 focus:outline-none focus:border-rose-900 focus:ring-1 focus:ring-rose-900 transition-all"
+          />
+        </div>
+        @let username = loginForm.get('username');
+        @if (username?.dirty && username?.invalid) {
+          <span class="ml-1 font-medium text-[10px] text-red-500 italic">
+            * El nombre de usuario es obligatorio
+          </span>
+        }
+      </div>
 
-    <button
-      type="submit"
-      [disabled]="loginForm.invalid"
-      class="w-full h-10 font-mono text-[10px] uppercase tracking-wider bg-stone-800 text-white rounded hover:bg-stone-700 active:scale-95 transition-all duration-150 disabled:opacity-40 disabled:cursor-not-allowed"
-    >
-      Login
-    </button>
-  </form>
+      <div class="flex flex-col gap-1.5">
+        <label
+          for="password"
+          class="ml-1 text-[10px] font-bold uppercase tracking-widest text-stone-500"
+        >
+          Contraseña
+        </label>
+        <input
+          type="password"
+          placeholder="••••••••"
+          required
+          name="password"
+          formControlName="password"
+          class="w-full h-12 px-4 bg-stone-50 border border-stone-200 rounded-xl text-sm text-stone-800 placeholder:text-stone-300 focus:outline-none focus:border-rose-900 focus:ring-1 focus:ring-rose-900 transition-all"
+        />
+        @let password = loginForm.get('password');
+        @if (password?.dirty && password?.invalid) {
+          <span class="ml-1 font-medium text-[10px] text-red-500 italic">
+            * La contraseña es obligatoria
+          </span>
+        }
+      </div>
+
+      <button
+        type="submit"
+        [disabled]="loginForm.invalid"
+        class="w-full h-12 mt-4 bg-rose-900 text-white text-xs font-bold uppercase tracking-[0.2em] rounded-xl hover:bg-rose-950 shadow-lg shadow-rose-900/20 active:scale-[0.98] transition-all disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+      >
+        Iniciar Sesión
+      </button>
+    </form>
+  </div>
 </div>

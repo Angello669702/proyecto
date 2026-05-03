@@ -1,4 +1,4 @@
-import { inject, Injectable, ResourceRef, Signal } from '@angular/core';
+import { computed, inject, Injectable, ResourceRef, signal, Signal } from '@angular/core';
 
 import { CommonCrudService } from '../../../shared/services/common-crud.service';
 import { TransactionDto } from '../dtos/transaction.dto';
@@ -11,11 +11,33 @@ import { CartItem } from '../../../shared/interfaces/cart.interface';
 
 @Injectable({ providedIn: 'root' })
 export class TransactionService extends CommonCrudService<Transaction, TransactionDto> {
-  readonly API_ENDPOINT = '';
+  readonly API_ENDPOINT = 'http://127.0.0.1:8000/api/transactions';
   readonly mapper = inject(TransactionMapper);
   readonly #productService = inject(ProductService);
   readonly defaultModel = { id: '' } as Transaction;
   readonly defaultCartItem = { product: this.#productService.defaultModel, quantity: 0 };
+  #cart = signal<Transaction>(this.defaultModel);
+  cart = computed(() => this.#cart());
+
+  myCart(): ResourceRef<Transaction | undefined> {
+    return rxResource({
+      stream: () => this.#myCart(),
+    });
+  }
+
+  #myCart(): Observable<Transaction> {
+    return this.httpClient.get<{ data: TransactionDto }>(`${this.API_ENDPOINT}/cart`).pipe(
+      tap((transaction) => console.log(transaction)),
+      map(({ data }) => this.mapper.mapOne(data)),
+      tap((transaction) => console.log(transaction)),
+      tap((transaction) => this.#cart.set(transaction)),
+      tap((transaction) => this.#updateTransactions(transaction)),
+      catchError((error) => {
+        console.error('Failed to add an model', error);
+        return throwError(() => error);
+      }),
+    );
+  }
 
   addItem(cartItem: Signal<CartItem>): ResourceRef<Transaction | undefined> {
     return rxResource({
@@ -28,13 +50,11 @@ export class TransactionService extends CommonCrudService<Transaction, Transacti
 
   #addItem(cartItem: CartItem): Observable<Transaction> {
     return this.httpClient
-      .post<TransactionDto>(`${this.API_ENDPOINT}/addItem`, {
-        product_id: cartItem.product.id,
-        quantity: cartItem.quantity,
-      })
+      .post<{ data: TransactionDto }>(`${this.API_ENDPOINT}/add`, cartItem)
       .pipe(
-        map((dto) => this.mapper.mapOne(dto)),
-        tap((transaction) => this.#updateActiveTransaction(transaction)),
+        map(({ data }) => this.mapper.mapOne(data)),
+        tap((transaction) => this.#updateTransactions(transaction)),
+        tap((transaction) => this.#cart.set(transaction)),
         catchError((error) => {
           console.error('Failed to add an model', error);
           return throwError(() => error);
@@ -53,13 +73,11 @@ export class TransactionService extends CommonCrudService<Transaction, Transacti
 
   #removeItem(cartItem: CartItem): Observable<Transaction> {
     return this.httpClient
-      .post<TransactionDto>(`${this.API_ENDPOINT}/removeItem`, {
-        product_id: cartItem.product.id,
-        quantity: cartItem.quantity,
-      })
+      .post<{ data: TransactionDto }>(`${this.API_ENDPOINT}/remove`, cartItem)
       .pipe(
-        map((dto) => this.mapper.mapOne(dto)),
-        tap((transaction) => this.#updateActiveTransaction(transaction)),
+        map(({ data }) => this.mapper.mapOne(data)),
+        tap((transaction) => this.#updateTransactions(transaction)),
+        tap((transaction) => this.#cart.set(transaction)),
         catchError((error) => {
           console.error('Failed to add an model', error);
           return throwError(() => error);
@@ -67,7 +85,7 @@ export class TransactionService extends CommonCrudService<Transaction, Transacti
       );
   }
 
-  #updateActiveTransaction(transaction: Transaction): void {
+  #updateTransactions(transaction: Transaction): void {
     this.modelsSignal.update((transactions) => {
       const exists = transactions.find((stored) => stored.id === transaction.id);
       if (!exists) return [...transactions, transaction];

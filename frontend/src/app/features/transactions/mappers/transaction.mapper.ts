@@ -13,10 +13,11 @@ export class TransactionMapper implements Mapper<Transaction, TransactionDto> {
     return {
       id: transaction.id,
       user: transaction.user,
-      transactionsItems: this.#transactionItemMapper.mapList(transaction.transactions_items),
+      transactionsItems: this.#transactionItemMapper.mapList(transaction.transactions_items ?? []),
       status: transaction.status,
       subtotal: transaction.subtotal,
       discountApplied: transaction.discount_applied,
+      vatTotal: transaction.vat_total,
       shippingCost: transaction.shipping_cost,
       total: transaction.total,
       shippingAddress: transaction.shipping_address,

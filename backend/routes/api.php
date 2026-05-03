@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CategoryController;
+use App\Http\Controllers\Api\TransactionController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\ProductController;
@@ -18,3 +19,16 @@ Route::get('/products/featured', [ProductController::class, 'topSelling']);
 Route::get('/products/{product}', [ProductController::class, 'show']);
 
 Route::get('/categories', [CategoryController::class, 'index']);
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/transactions', [TransactionController::class, 'index']);
+    Route::get('/my-transactions', [TransactionController::class, 'myTransactions']);
+    Route::get('/transactions/cart', [TransactionController::class, 'myCart']);
+    Route::post('/transactions/add', [TransactionController::class, 'addItem']);
+    Route::post('/transactions/remove', [TransactionController::class, 'removeItem']);
+
+
+    Route::get('/transactions/{transaction}', [TransactionController::class, 'show']);
+    Route::patch('/transactions/{transaction}/status', [TransactionController::class, 'updateStatus']);
+    Route::delete('/transactions/{transaction}', [TransactionController::class, 'destroy']);
+});

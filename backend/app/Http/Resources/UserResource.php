@@ -21,10 +21,7 @@ class UserResource extends JsonResource
             'profile_photo' => $this->profile_photo ? asset('storage/' . $this->profile_photo) : null,
             'role'          => $this->role,
             'is_active'     => $this->is_active,
-            'price_group'   => $this->whenLoaded('priceGroup', fn() => [
-                'id'   => $this->priceGroup->id,
-                'name' => $this->priceGroup->name,
-            ]),
+            'price_group' => $this->whenLoaded('priceGroup', fn() => new PriceGroupResource($this->priceGroup)),
             'created_at'    => $this->created_at->toDateTimeString(),
             'updated_at'    => $this->updated_at->toDateTimeString(),
         ];

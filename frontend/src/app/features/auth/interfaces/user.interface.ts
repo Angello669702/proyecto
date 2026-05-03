@@ -18,6 +18,6 @@ export interface User {
   role: UserRole;
   isActive: boolean;
   priceGroup?: PriceGroup;
-  favourites: Product[];
+  favourites?: Product[];
   transaction?: Transaction;
 }

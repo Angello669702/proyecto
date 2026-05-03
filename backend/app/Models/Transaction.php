@@ -10,6 +10,19 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Transaction extends Model
 {
     use HasUuids;
+
+    protected $fillable = [
+        'user_id',
+        'status',
+        'subtotal',
+        'discount_applied',
+        'shipping_cost',
+        'total',
+        'shipping_address',
+        'payment_intent_id',
+        'payment_status',
+        'notes',
+    ];
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

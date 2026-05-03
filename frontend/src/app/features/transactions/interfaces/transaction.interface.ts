@@ -11,6 +11,7 @@ export interface Transaction {
   status: TransactionStatus;
   subtotal: number;
   discountApplied: number;
+  vatTotal: number;
   shippingCost: number;
   total: number;
   shippingAddress: string;

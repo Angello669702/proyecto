@@ -7,10 +7,11 @@ import { CartItem } from '../../../../shared/interfaces/cart.interface';
   selector: 'app-card-list',
   imports: [CardComponent],
   template: `
-    <div class="flex flex-col h-full">
-      <div class="grid grid-cols-2 lg:grid-cols-3 gap-3 h-full">
+    <div class="max-w-7xl mx-auto px-4 py-8">
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-3 gap-8 h-full">
         @for (product of products(); track product.id) {
           <app-card-product
+            class="h-full"
             [product]="product"
             [isAdmin]="isAdmin()"
             (add)="addToCart($event)"
@@ -20,9 +21,17 @@ import { CartItem } from '../../../../shared/interfaces/cart.interface';
             (stock)="updateStock($event)"
           />
         } @empty {
-          <p class="col-span-full text-center text-stone-400 text-sm py-12">
-            No se encontraron productos.
-          </p>
+          <div
+            class="col-span-full flex flex-col items-center justify-center py-24 border-2 border-dashed border-stone-200 rounded-2xl bg-stone-50/50"
+          >
+            <span class="text-4xl mb-4">🍷</span>
+            <p class="text-stone-500 font-serif italic text-lg text-center px-6">
+              Nuestra bodega está descansando. <br />
+              <span class="text-sm font-sans not-italic text-stone-400"
+                >No se encontraron productos en esta selección.</span
+              >
+            </p>
+          </div>
         }
       </div>
     </div>

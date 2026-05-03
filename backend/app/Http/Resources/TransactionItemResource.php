@@ -13,13 +13,13 @@ class TransactionItemResource extends JsonResource
             'id'         => $this->id,
             'quantity'   => $this->quantity,
             'unit_price' => $this->unit_price,
-            'subtotal'   => $this->subtotal,
-            'product'    => $this->whenLoaded('product', fn() => [
-                'id'    => $this->product->id,
-                'name'  => $this->product->name,
-                'sku'   => $this->product->sku,
-                'image' => $this->product->image ? asset('storage/' . $this->product->image) : null,
-            ]),
+            'original_price'=> $this->product->price,
+            'discount'      => $this->product->price - $this->unit_price,
+            'vat_rate'      => (int) $this->vat_rate,
+            'vat_amount'    => $this->vat_amount,
+            'subtotal'      => $this->subtotal,
+            'subtotal_with_vat' => $this->subtotal + $this->vat_amount,
+            'product'    => new ProductResource($this->whenLoaded('product')),
         ];
     }
 }

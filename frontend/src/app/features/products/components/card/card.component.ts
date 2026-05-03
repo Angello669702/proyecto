@@ -1,4 +1,4 @@
-import { Component, computed, input, output, signal } from '@angular/core';
+import { Component, computed, input, model, output, signal } from '@angular/core';
 import { Product } from '../../interfaces/product.interface';
 import { CurrencyPipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
@@ -12,6 +12,8 @@ import { CartItem } from '../../../../shared/interfaces/cart.interface';
 export class CardComponent {
   readonly product = input.required<Product>();
   readonly isAdmin = input<boolean>(false);
+  readonly featured = input<boolean>(false);
+  isProductInCart = model<boolean>(false);
 
   quantity = signal<number>(0);
 

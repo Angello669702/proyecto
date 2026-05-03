@@ -13,7 +13,7 @@ class PriceGroupResource extends JsonResource
             'id'          => $this->id,
             'name'        => $this->name,
             'description' => $this->description,
-            'items'       => $this->whenLoaded('items', fn() =>
+            'price_group_items'       => $this->whenLoaded('items', fn() =>
             $this->items->map(fn($item) => [
                 'product_id'   => $item->product_id,
                 'product_name' => $item->product->name ?? null,

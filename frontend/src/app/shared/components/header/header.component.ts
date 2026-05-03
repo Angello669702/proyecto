@@ -33,7 +33,7 @@ export class HeaderComponent {
 
   transactionsNavigation: Record<string, string[]> = {
     myCart: [TRANSACTION_PAGES.TRANSACTIONS, TRANSACTION_PAGES.CART],
-    allTransactions: [TRANSACTION_PAGES.TRANSACTIONS, TRANSACTION_PAGES.ALL],
+    orders: [TRANSACTION_PAGES.TRANSACTIONS, TRANSACTION_PAGES.ORDERS],
   };
 
   userInitials = computed(() => {

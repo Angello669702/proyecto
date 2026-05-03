@@ -1,79 +1,109 @@
-<div class="flex flex-col gap-4 text-xs">
-  <div class="flex items-center justify-between">
-    <span class="font-mono uppercase tracking-wider text-stone-600"> Filtros </span>
+<aside
+  class="fixed left-0 top-16 h-[calc(100vh-64px)] w-72 bg-stone-50 border-r border-stone-200 p-6 overflow-y-auto z-40 hidden md:flex flex-col gap-6"
+>
+  <div class="flex items-center justify-between border-b border-stone-200 pb-4">
+    <div class="flex items-center gap-2">
+      <span class="text-rose-900">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          fill="currentColor"
+          viewBox="0 0 256 256"
+        >
+          <path
+            d="M200,32H56A16,16,0,0,0,40,48V72a15.86,15.86,0,0,0,4.69,11.31L96,135.31V208a16.06,16.06,0,0,0,8.83,14.31l32,16a16,16,0,0,0,23.17-14.31V135.31l51.31-52A15.86,15.86,0,0,0,216,72V48A16,16,0,0,0,200,32Zm-8,40L140.69,124a16,16,0,0,0-4.69,11.31V216L104,198V135.31a16,16,0,0,0-4.69-11.31L48,72V48H200Z"
+          ></path>
+        </svg>
+      </span>
+      <span class="font-serif text-sm font-bold uppercase tracking-[0.15em] text-stone-800">
+        Refinar Selección
+      </span>
+    </div>
 
     <button
       (click)="isExpanded.set(!isExpanded())"
-      class="text-[10px] text-stone-500 hover:text-stone-800"
+      class="text-[10px] font-bold uppercase text-stone-400 hover:text-rose-900 transition-colors cursor-pointer"
     >
-      {{ isExpanded() ? 'Ocultar' : 'Mostrar' }}
+      {{ isExpanded() ? 'Cerrar' : 'Abrir' }}
     </button>
   </div>
 
   @if (isExpanded()) {
-    <div class="flex flex-col gap-1">
-      <label class="text-[10px] text-stone-400 uppercase">Buscar</label>
-      <input
-        type="text"
-        [value]="searchText()"
-        (input)="searchText.set($any($event.target).value)"
-        placeholder="Nombre producto..."
-        class="h-8 px-2 bg-stone-50 border border-stone-300 rounded text-xs focus:outline-none focus:border-stone-500"
-      />
+    <div class="flex flex-col gap-2">
+      <label class="text-[10px] font-bold text-stone-500 uppercase tracking-widest"
+        >Nombre del Producto</label
+      >
+      <div class="relative">
+        <input
+          type="text"
+          [value]="searchText()"
+          (input)="searchText.set($any($event.target).value)"
+          placeholder="Ej. Ribera del Duero..."
+          class="w-full h-10 pl-3 pr-10 bg-white border border-stone-200 rounded-lg text-xs shadow-sm focus:outline-none focus:ring-1 focus:ring-rose-900 focus:border-rose-900 transition-all"
+        />
+      </div>
     </div>
 
-    <div class="flex flex-col gap-1">
-      <label class="text-[10px] text-stone-400 uppercase">Categorías</label>
-
+    <div class="flex flex-col gap-2">
+      <label class="text-[10px] font-bold text-stone-500 uppercase tracking-widest"
+        >Variedades / Tipos</label
+      >
       <ng-select
+        class="custom-wine-select shadow-sm"
         [items]="allCategories"
         [multiple]="true"
         [closeOnSelect]="false"
         [searchable]="true"
-        placeholder="Seleccionar..."
+        placeholder="Todas las categorías"
         [ngModel]="selectedCategories()"
         (change)="selectedCategories.set($event)"
       >
       </ng-select>
     </div>
 
-    <div class="flex flex-col gap-1">
-      <label class="text-[10px] text-stone-400 uppercase">Precio</label>
-
-      <div class="flex gap-2">
-        <input
-          type="number"
-          placeholder="Min"
-          [value]="minPrice()"
-          (input)="minPrice.set(+$any($event.target).value || null)"
-          class="w-full h-8 px-2 bg-stone-50 border border-stone-300 rounded text-xs focus:outline-none"
-        />
-
-        <input
-          type="number"
-          placeholder="Max"
-          [value]="maxPrice()"
-          (input)="maxPrice.set(+$any($event.target).value || null)"
-          class="w-full h-8 px-2 bg-stone-50 border border-stone-300 rounded text-xs focus:outline-none"
-        />
+    <div class="flex flex-col gap-2">
+      <label class="text-[10px] font-bold text-stone-500 uppercase tracking-widest"
+        >Rango de Precio (€)</label
+      >
+      <div class="flex items-center gap-3">
+        <div class="relative flex-1">
+          <input
+            type="number"
+            placeholder="Min"
+            [value]="minPrice()"
+            (input)="minPrice.set(+$any($event.target).value || null)"
+            class="w-full h-10 px-3 bg-white border border-stone-200 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-rose-900 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+          />
+        </div>
+        <span class="text-stone-300">—</span>
+        <div class="relative flex-1">
+          <input
+            type="number"
+            placeholder="Max"
+            [value]="maxPrice()"
+            (input)="maxPrice.set(+$any($event.target).value || null)"
+            class="w-full h-10 px-3 bg-white border border-stone-200 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-rose-900 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+          />
+        </div>
       </div>
     </div>
 
-    <div class="flex flex-col gap-2 pt-2">
+    <div class="flex flex-col gap-3 pt-6 mt-auto">
       <button
         (click)="applyFilters()"
-        class="w-full h-8 bg-stone-800 text-white text-[10px] uppercase rounded hover:bg-stone-700"
+        class="w-full h-11 bg-rose-900 text-rose-50 text-[11px] font-bold uppercase tracking-widest rounded-lg hover:bg-rose-800 transition-all shadow-md active:scale-[0.98] cursor-pointer"
       >
-        Aplicar
+        Aplicar Filtros
       </button>
 
       <button
         (click)="clearFilters()"
         [disabled]="!hasActiveFilters()"
-        class="w-full h-8 bg-stone-200 text-stone-600 text-[10px] uppercase rounded disabled:opacity-40"
+        class="w-full h-11 bg-transparent text-stone-400 text-[11px] font-bold uppercase tracking-widest rounded-lg border border-stone-200 hover:bg-stone-100 hover:text-stone-600 disabled:opacity-30 disabled:cursor-not-allowed transition-all cursor-pointer"
       >
-        Limpiar
+        Limpiar Todo
       </button>
     </div>
   }
-</div>
+</aside>

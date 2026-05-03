@@ -1,0 +1,217 @@
+<div class="max-w-6xl mx-auto px-6 py-10 lg:py-16">
+  <div class="flex flex-col gap-2 mb-10">
+    <h2 class="text-3xl font-serif font-bold text-stone-900">Tu Pedido</h2>
+    <div class="h-1 w-12 bg-rose-900"></div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-12 items-start">
+    <div class="lg:col-span-2 flex flex-col gap-6">
+      @if (transaction().transactionsItems && transaction().transactionsItems.length > 0) {
+        @for (item of transaction().transactionsItems; track item.id) {
+          <div
+            class="flex items-center gap-6 p-4 bg-white border border-stone-100 rounded-2xl shadow-sm hover:shadow-md transition-shadow"
+          >
+            <div
+              class="w-24 h-24 bg-stone-50 rounded-xl overflow-hidden flex-shrink-0 border border-stone-50"
+            >
+              <img
+                [src]="item.product.coverImage"
+                [alt]="item.product.name"
+                class="w-full h-full object-contain p-2"
+              />
+            </div>
+
+            <div class="flex-1 min-w-0">
+              <p class="text-[10px] font-bold uppercase tracking-widest text-rose-900 mb-1">
+                {{ item.product.category.name }}
+              </p>
+              <h4 class="text-base font-serif font-bold text-stone-900 truncate">
+                {{ item.product.name }}
+              </h4>
+
+              <!-- Precio unitario con/sin descuento -->
+              <div class="mt-1 flex flex-col gap-0.5">
+                @if (item.discount > 0) {
+                  <p class="text-xs line-through text-stone-400">
+                    {{ item.originalPrice | currency: 'EUR' }} / ud. (sin IVA)
+                  </p>
+                  <p class="text-xs text-emerald-600 font-medium">
+                    {{ item.unitPrice | currency: 'EUR' }} / ud. (sin IVA) · -{{
+                      item.discount | currency: 'EUR'
+                    }}
+                    dto.
+                  </p>
+                } @else {
+                  <p class="text-xs text-stone-500">
+                    {{ item.unitPrice | currency: 'EUR' }} / ud. (sin IVA)
+                  </p>
+                }
+                <p class="text-xs text-stone-400">
+                  {{ item.unitPrice * (1 + item.vatRate / 100) | currency: 'EUR' }} / ud. (IVA
+                  {{ item.vatRate }}% incl.)
+                </p>
+              </div>
+
+              <!-- Desglose subtotal del item -->
+              <div class="mt-2 pt-2 border-t border-stone-100 flex flex-col gap-0.5">
+                <div class="flex justify-between text-xs text-stone-400">
+                  <span>Base (× {{ item.quantity }})</span>
+                  <span>{{ item.subtotal | currency: 'EUR' }}</span>
+                </div>
+                <div class="flex justify-between text-xs text-stone-400">
+                  <span>IVA {{ item.vatRate }}%</span>
+                  <span>{{ item.vatAmount | currency: 'EUR' }}</span>
+                </div>
+                <div class="flex justify-between text-xs font-bold text-stone-700">
+                  <span>Total línea</span>
+                  <span>{{ item.subtotalWithVat | currency: 'EUR' }}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex flex-col items-end gap-3 ml-4">
+              <div class="flex items-center bg-stone-100 rounded-lg p-1 border border-stone-200">
+                <button
+                  (click)="removeItem({ product: item.product, quantity: 1 })"
+                  class="w-8 h-8 flex items-center justify-center text-stone-600 hover:bg-white hover:text-rose-900 rounded-md transition-all cursor-pointer font-bold"
+                >
+                  −
+                </button>
+                <input
+                  type="number"
+                  [value]="item.quantity"
+                  (change)="
+                    addItem({
+                      product: item.product,
+                      quantity: +$any($event.target).value - item.quantity,
+                    })
+                  "
+                  class="w-10 text-center bg-transparent border-none text-xs font-bold text-stone-800 focus:ring-0"
+                />
+                <button
+                  (click)="addItem({ product: item.product, quantity: 1 })"
+                  class="w-8 h-8 flex items-center justify-center text-stone-600 hover:bg-white hover:text-rose-900 rounded-md transition-all cursor-pointer font-bold"
+                >
+                  +
+                </button>
+              </div>
+            </div>
+          </div>
+        }
+      } @else {
+        <div
+          class="py-20 flex flex-col items-center justify-center text-center bg-stone-50 rounded-3xl border-2 border-dashed border-stone-200 gap-4"
+        >
+          <div
+            class="w-16 h-16 bg-stone-100 rounded-full flex items-center justify-center text-stone-300"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="32"
+              height="32"
+              fill="currentColor"
+              viewBox="0 0 256 256"
+            >
+              <path
+                d="M222.14,105.85l-26.37,85.69A22,22,0,0,1,174.49,207H81.51a22,22,0,0,1-21.28-15.46L33.86,105.85a22,22,0,0,1,21.28-28.54H200.86a22,22,0,0,1,21.28,28.54Z"
+                opacity="0.2"
+              ></path>
+              <path
+                d="M200.86,71.31H170.13l-37.16-49.55a6,6,0,0,0-9.6,0L85.87,71.31H55.14a28,28,0,0,0-27.09,36.32l26.37,85.69A28,28,0,0,0,81.51,213h93a28,28,0,0,0,27.09-19.68l26.37-85.69a28,28,0,0,0-27.11-36.32ZM128,34.64,155.5,71.31H100.5ZM213.5,103.88l-26.37,85.69a16,16,0,0,1-15.48,11.43h-93a16,16,0,0,1-15.48-11.43L56.81,103.88A16,16,0,0,1,72.29,83.31H183.71A16,16,0,0,1,213.5,103.88Z"
+              ></path>
+            </svg>
+          </div>
+          <p class="text-stone-400 font-medium italic">Tu carrito está vacío.</p>
+          <button
+            [routerLink]="['/products/catalog']"
+            class="text-xs font-bold uppercase tracking-widest text-rose-900 hover:underline"
+          >
+            Ir al catálogo →
+          </button>
+        </div>
+      }
+    </div>
+
+    <aside class="sticky top-24 bg-stone-50 border border-stone-200 rounded-3xl p-8 shadow-sm">
+      <h3 class="text-lg font-serif font-bold text-stone-900 mb-6">Resumen</h3>
+
+      <div class="flex flex-col gap-3 mb-8">
+        <!-- Base imponible y descuento -->
+        <div class="flex justify-between text-sm">
+          <span class="text-stone-500">Base imponible</span>
+          <span class="text-stone-900 font-medium">{{
+            transaction().subtotal || 0 | currency: 'EUR'
+          }}</span>
+        </div>
+        @if ((transaction().discountApplied || 0) > 0) {
+          <div class="flex justify-between text-sm">
+            <span class="text-stone-500">Descuento</span>
+            <span class="text-emerald-600 font-medium"
+              >-{{ transaction().discountApplied || 0 | currency: 'EUR' }}</span
+            >
+          </div>
+          <div class="flex justify-between text-sm">
+            <span class="text-stone-500">Base con dto.</span>
+            <span class="text-stone-900 font-medium">{{
+              (transaction().subtotal || 0) - (transaction().discountApplied || 0) | currency: 'EUR'
+            }}</span>
+          </div>
+        }
+
+        <div class="flex justify-between text-sm">
+          <span class="text-stone-500">IVA</span>
+          <span class="text-stone-900 font-medium">{{
+            transaction().vatTotal || 0 | currency: 'EUR'
+          }}</span>
+        </div>
+
+        <div class="flex justify-between text-sm">
+          <span class="text-stone-500">Envío</span>
+          <span class="text-stone-900 font-medium">{{
+            transaction().shippingCost || 0 | currency: 'EUR'
+          }}</span>
+        </div>
+
+        <div class="h-px bg-stone-200 my-1"></div>
+
+        <div class="flex justify-between text-sm">
+          <span class="text-stone-500">Total sin IVA</span>
+          <span class="text-stone-700 font-medium">
+            {{
+              (transaction().subtotal || 0) -
+                (transaction().discountApplied || 0) +
+                (transaction().shippingCost || 0) | currency: 'EUR'
+            }}
+          </span>
+        </div>
+
+        <div class="flex justify-between items-baseline">
+          <span class="text-base font-bold text-stone-900">Total (IVA incl.)</span>
+          <span class="text-2xl font-serif font-bold text-rose-950">{{
+            transaction().total || 0 | currency: 'EUR'
+          }}</span>
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-3">
+        <button
+          [disabled]="
+            transaction().transactionsItems ? transaction().transactionsItems.length === 0 : true
+          "
+          class="w-full h-12 bg-rose-900 text-white text-xs font-bold uppercase tracking-widest rounded-xl hover:bg-rose-950 transition-all shadow-lg shadow-rose-900/20 active:scale-[0.98] cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
+        >
+          Proceder al Pago
+        </button>
+
+        @if (transaction().status === 'delivered') {
+          <button
+            (click)="repeatTransaction()"
+            class="w-full h-12 bg-white text-rose-900 border-2 border-rose-900 text-xs font-bold uppercase tracking-widest rounded-xl hover:bg-rose-50 transition-all active:scale-[0.98] cursor-pointer"
+          >
+            Repetir este pedido
+          </button>
+        }
+      </div>
+    </aside>
+  </div>
+</div>

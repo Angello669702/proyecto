@@ -43,7 +43,7 @@ class ProductController extends Controller
             $query->where('price', '<=', $request->max_price);
         }
 
-        return ProductResource::collection($query->paginate(6));
+        return ProductResource::collection($query->paginate(9));
     }
     public function show(Product $product)
     {

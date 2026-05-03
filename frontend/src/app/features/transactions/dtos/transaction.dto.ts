@@ -7,10 +7,11 @@ import { TransactionItemDto } from './transaction-item.interface.dto';
 export interface TransactionDto {
   id: UUID;
   user: User;
-  transactions_items: TransactionItemDto[];
+  transactions_items?: TransactionItemDto[];
   status: TransactionStatus;
   subtotal: number;
   discount_applied: number;
+  vat_total: number;
   shipping_cost: number;
   total: number;
   shipping_address: string;

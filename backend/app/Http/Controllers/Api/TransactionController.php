@@ -13,15 +13,19 @@ use Illuminate\Support\Facades\DB;
 class TransactionController extends Controller
 {
     // ADMIN — lista todas las transactions con sus items y usuario
-    public function index()
+    public function index(Request $request)
     {
+        if ($request->user()->role !== 'admin') {
+            return response()->json(['message' => 'No autorizado'], 403);
+        }
+
         $transactions = Transaction::with('user', 'items.product')
             ->paginate(20);
 
         return TransactionResource::collection($transactions);
     }
 
-    // ADMIN + CLIENTE — detalle de una transaction concreta
+        // ADMIN + CLIENTE — detalle de una transaction concreta
     public function show(Transaction $transaction)
     {
         return new TransactionResource($transaction->load('user', 'items.product'));
@@ -30,28 +34,54 @@ class TransactionController extends Controller
     // CLIENTE — obtiene su carrito activo (pending)
     public function myCart(Request $request)
     {
-        $transaction = $request->user()
-            ->transactions()
+        $user = $request->user();
+
+        $transaction = $user->transactions()
             ->with('items.product')
             ->where('status', 'pending')
             ->first();
 
         if (!$transaction) {
-            return response()->json(['message' => 'No tienes ningún pedido activo'], 404);
+            $transaction = Transaction::create([
+                'user_id'          => $user->id,
+                'status'           => 'pending',
+                'subtotal'         => 0,
+                'discount_applied' => 0,
+                'shipping_cost'    => 0,
+                'total'            => 0,
+                'shipping_address' => $user->address ?? '',
+                'payment_status'   => 'unpaid',
+            ]);
+
+            $transaction->load('items.product');
         }
 
         return new TransactionResource($transaction);
+    }
+
+    public function myTransactions(Request $request)
+    {
+        $transactions = $request->user()
+            ->transactions()
+            ->with('items.product')
+            ->orderByDesc('created_at')
+            ->paginate(20);
+
+        return TransactionResource::collection($transactions);
     }
 
     // CLIENTE — añade un producto al carrito, creando la transaction si no existe
     public function addItem(Request $request)
     {
         $request->validate([
-            'product_id' => ['required', 'integer', 'exists:products,id'],
+            'product'    => ['required', 'array'],
+            'product.id' => ['required', 'string', 'exists:products,id'],
             'quantity'   => ['required', 'integer', 'min:1'],
         ]);
 
-        $product = Product::findOrFail($request->product_id);
+        $productId = $request->input('product.id');
+
+        $product = Product::findOrFail($productId);
 
         if (!$product->is_active) {
             return response()->json(['message' => 'El producto no está disponible'], 422);
@@ -66,7 +96,6 @@ class TransactionController extends Controller
         try {
             $user = $request->user();
 
-            // Busca carrito existente o crea uno nuevo
             $transaction = $user->transactions()
                 ->where('status', 'pending')
                 ->first();
@@ -113,38 +142,72 @@ class TransactionController extends Controller
             $this->recalculate($transaction);
 
             DB::commit();
+            $transaction->refresh();
             return new TransactionResource($transaction->load('user', 'items.product'));
 
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json(['message' => 'Error al añadir el producto', 'error' => $e->getMessage()], 500);
+            return response()->json([
+                'message' => 'Error al añadir el producto',
+                'error'   => $e->getMessage(),
+                'file'    => $e->getFile(),
+                'line'    => $e->getLine(),
+            ], 500);
         }
     }
 
     // CLIENTE — elimina un item del carrito
-    public function removeItem(Request $request, TransactionItem $item)
+    public function removeItem(Request $request)
     {
-        $transaction = $item->transaction;
+        $request->validate([
+            'product'    => ['required', 'array'],
+            'product.id' => ['required', 'string', 'exists:products,id'],
+            'quantity'   => ['required', 'integer', 'min:1'],
+        ]);
 
-        if ($transaction->user_id !== $request->user()->id) {
-            return response()->json(['message' => 'No autorizado'], 403);
+        $productId = $request->input('product.id');
+
+        $user = $request->user();
+
+        $transaction = $user->transactions()
+            ->where('status', 'pending')
+            ->first();
+
+        if (!$transaction) {
+            return response()->json(['message' => 'No tienes ningún carrito activo'], 404);
         }
 
-        if ($transaction->status !== 'pending') {
-            return response()->json(['message' => 'No se puede modificar un pedido que no está pendiente'], 422);
+        $item = $transaction->items()
+            ->where('product_id', $productId)
+            ->first();
+
+        if (!$item) {
+            return response()->json(['message' => 'El producto no está en el carrito'], 404);
         }
 
-        $item->delete();
+        DB::beginTransaction();
 
-        // Si no quedan items, borra la transaction entera
-        if ($transaction->items()->count() === 0) {
-            $transaction->delete();
-            return response()->json(['message' => 'Carrito eliminado al quedar vacío'], 200);
+        try {
+            $newQuantity = $item->quantity - $request->quantity;
+
+            if ($newQuantity <= 0) {
+                $item->delete();
+            } else {
+                $item->update([
+                    'quantity' => $newQuantity,
+                    'subtotal' => $item->unit_price * $newQuantity,
+                ]);
+            }
+
+            $this->recalculate($transaction);
+
+            DB::commit();
+            return new TransactionResource($transaction->load('user', 'items.product'));
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['message' => 'Error al eliminar el producto', 'error' => $e->getMessage()], 500);
         }
-
-        $this->recalculate($transaction);
-
-        return new TransactionResource($transaction->load('user', 'items.product'));
     }
 
     // ADMIN + CLIENTE — borra una transaction completa (carrito o pedido cancelado)
@@ -179,10 +242,21 @@ class TransactionController extends Controller
     // Recalcula subtotal y total de la transaction
     private function recalculate(Transaction $transaction): void
     {
+        $transaction->load('items.product');
+
         $subtotal = $transaction->items()->sum('subtotal');
+
+        $discountApplied = $transaction->items->sum(
+            fn($item) => ($item->product->price - $item->unit_price) * $item->quantity
+        );
+
+        $vatTotal = $transaction->items()->sum('vat_amount');
+
         $transaction->update([
-            'subtotal' => $subtotal,
-            'total'    => $subtotal - $transaction->discount_applied + $transaction->shipping_cost,
+            'subtotal'         => $subtotal,
+            'discount_applied' => $discountApplied,
+            'vat_total'        => $vatTotal,
+            'total'            => $subtotal - $discountApplied + $vatTotal + $transaction->shipping_cost,
         ]);
     }
 }
