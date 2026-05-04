@@ -5,6 +5,8 @@ import { AuthService } from '../../../features/auth/services/auth.service';
 import { TokenStorageService } from '../../../features/auth/services/token.service';
 import { AUTH_PAGES } from '../../../features/auth/auth.routes';
 import { Router } from '@angular/router';
+import { FEATURE_PAGES } from '../../../app.routes';
+import { REGISTRATION_PAGES } from '../../../features/registration/registration.routes';
 
 @Component({
   selector: 'app-header',
@@ -22,18 +24,23 @@ export class HeaderComponent {
   isAdmin = this.#authService.isAdmin;
 
   authNavigation: Record<string, string[]> = {
-    login: [AUTH_PAGES.AUTH, AUTH_PAGES.LOGIN],
+    login: ['/', AUTH_PAGES.AUTH, AUTH_PAGES.LOGIN],
   };
 
   productsNavigation: Record<string, string[]> = {
-    catalog: [PRODUCT_PAGES.PRODUCTS, PRODUCT_PAGES.CATALOG],
-    newProduct: [PRODUCT_PAGES.PRODUCTS, PRODUCT_PAGES.NEW],
-    updateProduct: [PRODUCT_PAGES.PRODUCTS, PRODUCT_PAGES.UPDATE],
+    catalog: ['/', FEATURE_PAGES.PRODUCTS, PRODUCT_PAGES.CATALOG],
+    newProduct: ['/', FEATURE_PAGES.PRODUCTS, PRODUCT_PAGES.NEW],
+    updateProduct: ['/', FEATURE_PAGES.PRODUCTS, PRODUCT_PAGES.UPDATE],
   };
 
   transactionsNavigation: Record<string, string[]> = {
-    myCart: [TRANSACTION_PAGES.TRANSACTIONS, TRANSACTION_PAGES.CART],
-    orders: [TRANSACTION_PAGES.TRANSACTIONS, TRANSACTION_PAGES.ORDERS],
+    cart: ['/', FEATURE_PAGES.TRANSACTIONS, TRANSACTION_PAGES.CART],
+    orders: ['/', FEATURE_PAGES.TRANSACTIONS, TRANSACTION_PAGES.ORDERS],
+  };
+
+  registrationsNavigation: Record<string, string[]> = {
+    register: ['/', FEATURE_PAGES.REGISTRATIONS, REGISTRATION_PAGES.REGISTER],
+    all: ['/', FEATURE_PAGES.REGISTRATIONS, REGISTRATION_PAGES.ALL],
   };
 
   userInitials = computed(() => {

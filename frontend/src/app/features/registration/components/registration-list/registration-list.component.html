@@ -1,0 +1,151 @@
+<div class="bg-white rounded-2xl border border-stone-200 shadow-sm overflow-hidden">
+  <div class="px-8 py-6 border-b border-stone-100 flex justify-between items-center bg-stone-50/50">
+    <div>
+      <h3 class="font-serif text-xl font-bold text-stone-900">Solicitudes de Acceso</h3>
+      <p class="text-stone-500 text-[10px] font-bold mt-1 uppercase tracking-[0.2em]">
+        Listado de registros y validaciones
+      </p>
+    </div>
+    <div class="h-1.5 w-12 bg-rose-900"></div>
+  </div>
+
+  <div class="overflow-x-auto">
+    <table class="w-full border-collapse">
+      <thead>
+        <tr class="bg-stone-50">
+          <th
+            class="px-8 py-4 text-left text-[10px] font-bold text-stone-400 uppercase tracking-[0.2em] border-b border-stone-100"
+          >
+            Empresa / NIF
+          </th>
+          <th
+            class="px-8 py-4 text-left text-[10px] font-bold text-stone-400 uppercase tracking-[0.2em] border-b border-stone-100"
+          >
+            Representante
+          </th>
+          <th
+            class="px-8 py-4 text-left text-[10px] font-bold text-stone-400 uppercase tracking-[0.2em] border-b border-stone-100"
+          >
+            Localización
+          </th>
+          <th
+            class="px-8 py-4 text-center text-[10px] font-bold text-stone-400 uppercase tracking-[0.2em] border-b border-stone-100"
+          >
+            Estado
+          </th>
+          <th
+            class="px-8 py-4 text-left text-[10px] font-bold text-stone-400 uppercase tracking-[0.2em] border-b border-stone-100"
+          >
+            Revisado Por
+          </th>
+          <th
+            class="px-8 py-4 text-right text-[10px] font-bold text-stone-400 uppercase tracking-[0.2em] border-b border-stone-100"
+          >
+            Acciones
+          </th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-stone-100">
+        @for (registration of registrations(); track registration.id) {
+          <tr class="hover:bg-stone-50/30 transition-colors group">
+            <td class="px-8 py-5">
+              <div class="flex flex-col">
+                <span class="text-stone-900 font-serif font-bold text-base leading-tight">{{
+                  registration.companyName
+                }}</span>
+                <span class="text-stone-400 text-[10px] font-mono mt-0.5 tracking-wider">{{
+                  registration.nif
+                }}</span>
+              </div>
+            </td>
+
+            <td class="px-8 py-5">
+              <div class="flex flex-col">
+                <span class="text-stone-600 text-sm font-medium tracking-tight">{{
+                  registration.contactName
+                }}</span>
+                <span class="text-stone-400 text-xs">{{ registration.email }}</span>
+              </div>
+            </td>
+
+            <td class="px-8 py-5">
+              <span class="text-stone-500 text-xs italic">{{ registration.address }}</span>
+            </td>
+
+            <td class="px-8 py-5 text-center">
+              <span
+                class="inline-flex items-center px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-widest border transition-colors"
+                [class.bg-amber-50]="registration.status === RegistrationStatus.PENDING"
+                [class.text-amber-700]="registration.status === RegistrationStatus.PENDING"
+                [class.border-amber-200]="registration.status === RegistrationStatus.PENDING"
+                [class.bg-emerald-50]="registration.status === RegistrationStatus.APPROVED"
+                [class.text-emerald-700]="registration.status === RegistrationStatus.APPROVED"
+                [class.border-emerald-200]="registration.status === RegistrationStatus.APPROVED"
+                [class.bg-rose-50]="registration.status === RegistrationStatus.REJECTED"
+                [class.text-rose-700]="registration.status === RegistrationStatus.REJECTED"
+                [class.border-rose-200]="registration.status === RegistrationStatus.REJECTED"
+              >
+                {{ registration.status }}
+              </span>
+            </td>
+
+            <td class="px-8 py-5">
+              @if (registration.reviewer) {
+                <div class="flex flex-col">
+                  <span class="text-stone-700 text-xs font-bold">{{
+                    registration.reviewer.fullName
+                  }}</span>
+                  <span class="text-[10px] text-stone-400">{{
+                    registration.reviewedAt | date: 'short'
+                  }}</span>
+                </div>
+              } @else {
+                <span class="text-stone-300 text-[10px] uppercase tracking-tighter"
+                  >Sin revisar</span
+                >
+              }
+            </td>
+
+            <td class="px-8 py-5 text-right">
+              <div class="flex justify-end items-center gap-2">
+                @if (registration.status === RegistrationStatus.PENDING) {
+                  <button
+                    (click)="sendReject(registration)"
+                    class="h-8 px-3 text-stone-400 hover:text-rose-800 text-[9px] font-bold uppercase tracking-widest hover:bg-rose-50 rounded-lg transition-all"
+                  >
+                    Rechazar
+                  </button>
+                  <button
+                    (click)="sendAprove(registration)"
+                    class="h-8 px-4 bg-stone-900 text-white text-[9px] font-bold uppercase tracking-widest rounded-lg hover:bg-rose-900 transition-all shadow-sm"
+                  >
+                    Aprobar
+                  </button>
+                } @else {
+                  <div
+                    class="w-8 h-8 rounded-full bg-stone-50 flex items-center justify-center text-stone-300"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      class="size-4"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M5 13l4 4L19 7"
+                      />
+                    </svg>
+                  </div>
+                }
+              </div>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>

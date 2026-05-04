@@ -15,6 +15,7 @@ export class TransactionService extends CommonCrudService<Transaction, Transacti
   readonly mapper = inject(TransactionMapper);
   readonly #productService = inject(ProductService);
   readonly defaultModel = { id: '' } as Transaction;
+  readonly defaultDto = { id: '' } as TransactionDto;
   readonly defaultCartItem = { product: this.#productService.defaultModel, quantity: 0 };
   #cart = signal<Transaction>(this.defaultModel);
   cart = computed(() => this.#cart());

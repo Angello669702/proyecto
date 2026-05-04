@@ -1,5 +1,5 @@
 export enum RegistrationStatus {
-  PENDIGN = 'pendig',
+  PENDING = 'pending',
   APPROVED = 'approved',
   REJECTED = 'rejected',
 }

@@ -5,6 +5,7 @@ export enum FEATURE_PAGES {
   PRODUCTS = 'products',
   AUTH = 'auth',
   TRANSACTIONS = 'transactions',
+  REGISTRATIONS = 'registrations',
 }
 
 export const routes: Routes = [
@@ -28,6 +29,11 @@ export const routes: Routes = [
         canActivate: [authGuard],
       },
       {
+        path: FEATURE_PAGES.REGISTRATIONS,
+        loadChildren: () =>
+          import('./features/registration/registration.routes').then((r) => r.REGISTRATION_ROUTES),
+      },
+      {
         path: FEATURE_PAGES.AUTH,
         loadChildren: () => import('./features/auth/auth.routes').then((r) => r.AUTH_ROUTES),
       },
@@ -39,5 +45,5 @@ export const routes: Routes = [
     ],
   },
 
-  { path: '**', redirectTo: FEATURE_PAGES.AUTH },
+  { path: '**', redirectTo: 'home' },
 ];

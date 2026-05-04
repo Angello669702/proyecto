@@ -18,7 +18,9 @@ export class AuthService extends AuthServiceAbstract {
   #tokenStorageService = inject(TokenStorageService);
   #currentUser = signal<User>(this.defaultUser);
   currentUser = computed(() => this.#currentUser());
-  isAdmin = computed(() => this.currentUser().role === 'admin');
+  isAdmin = computed(() =>
+    this.#tokenStorageService.isLogged() ? this.currentUser().role === 'admin' : false,
+  );
 
   userResource = rxResource({
     stream: () => (this.#tokenStorageService.token() ? this.#getUser() : NEVER),

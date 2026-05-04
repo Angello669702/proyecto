@@ -2,8 +2,8 @@ import { Routes } from '@angular/router';
 import { unloggedGuard } from '../auth/guards/unlogged.guard';
 
 export enum REGISTRATION_PAGES {
-  REGISTRATIONS = '/registrations',
   REGISTER = 'register',
+  ALL = 'all',
 }
 
 export const REGISTRATION_ROUTES: Routes = [
@@ -16,14 +16,19 @@ export const REGISTRATION_ROUTES: Routes = [
         redirectTo: REGISTRATION_PAGES.REGISTER,
       },
       {
-        path: REGISTRATION_PAGES.REGISTRATIONS,
+        path: REGISTRATION_PAGES.REGISTER,
         loadComponent: () =>
-          import('./pages/registration/registration.page.component').then(
-            (c) => c.RegistrationPageComponent,
-          ),
+          import('./pages/register/register.page.component').then((c) => c.RegisterPageComponent),
         canActivate: [unloggedGuard],
+      },
+      {
+        path: REGISTRATION_PAGES.ALL,
+        loadComponent: () =>
+          import('./pages/registrations/registrations.page.component').then(
+            (c) => c.RegistrationsPageComponent,
+          ),
       },
     ],
   },
-  { path: '**', redirectTo: REGISTRATION_PAGES.REGISTRATIONS },
+  { path: '**', redirectTo: REGISTRATION_PAGES.REGISTER },
 ];

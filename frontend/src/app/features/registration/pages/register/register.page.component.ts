@@ -2,22 +2,23 @@ import { Component, effect, inject, signal } from '@angular/core';
 import { RegistrationService } from '../../services/registration.service';
 import { Router } from '@angular/router';
 import { RegistrationFormComponent } from '../../components/registration-form/registration-form.component';
-import { Registration, RegistrationRequest } from '../../interfaces/registration.interface';
-import { v4 as uuidv4 } from 'uuid';
-import { RegistrationStatus } from '../../enums/registration-status.enum';
+import { RegistrationRequest } from '../../interfaces/registration.interface';
+import { RegistrationMapper } from '../../mappers/registration.mapper';
+import { RegistrationDto } from '../../dtos/registration.interface.dto';
 
 @Component({
   selector: 'app-home',
   imports: [RegistrationFormComponent],
-  template: ` <app-registration-form (submit)="register($event)" /> `,
+  template: ` <app-registration-form (register)="register($event)" /> `,
 })
-export class RegistrationPageComponent {
+export class RegisterPageComponent {
   readonly #registrationService = inject(RegistrationService);
   readonly #router = inject(Router);
+  readonly #mapper = inject(RegistrationMapper);
 
   messagge = signal<string>('');
 
-  registration = signal<Registration>(this.#registrationService.defaultModel);
+  registration = signal<RegistrationDto>(this.#registrationService.defaultDto);
   registrationResource = this.#registrationService.add(this.registration);
 
   navigateEffect = effect(() => {
@@ -27,6 +28,6 @@ export class RegistrationPageComponent {
   });
 
   register(registration: RegistrationRequest) {
-    this.registration.set({ id: uuidv4(), ...registration, status: RegistrationStatus.PENDIGN });
+    this.registration.set(this.#mapper.toDto(registration));
   }
 }

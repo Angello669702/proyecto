@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\RegistrationRequestRequest;
 use App\Http\Resources\RegistrationRequestResource;
+use App\Mail\WelcomeMail;
 use App\Models\RegistrationRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -16,7 +17,10 @@ class RegistrationRequestController extends Controller
     public function index(Request $request)
     {
         $requests = RegistrationRequest::with('reviewedBy')
-            ->when($request->status, fn($q) => $q->where('status', $request->status))
+            ->when(
+                $request->status && $request->status !== 'all',
+                fn($q) => $q->where('status', $request->status)
+            )
             ->orderBy('created_at', 'desc')
             ->paginate(20);
 
@@ -42,8 +46,18 @@ class RegistrationRequestController extends Controller
 
         $password = Str::random(12);
 
+        $username = Str::slug($registrationRequest->contact_name, '');
+        $baseUsername = $username;
+        $counter = 1;
+
+        while (User::where('name', $username)->exists()) {
+            $username = $baseUsername . $counter;
+            $counter++;
+        }
+
         $user = User::create([
-            'name'         => $registrationRequest->contact_name,
+            'name'    => $username,
+            'full_name'    => $registrationRequest->contact_name,
             'company_name' => $registrationRequest->company_name,
             'nif'          => $registrationRequest->nif,
             'email'        => $registrationRequest->email,
@@ -60,12 +74,9 @@ class RegistrationRequestController extends Controller
             'reviewed_at' => now(),
         ]);
 
-        // TODO: Mail::to($user->email)->send(new WelcomeMail($user, $password));
+        Mail::to($user->email)->send(new WelcomeMail($user, $password));
 
-        return response()->json([
-            'message' => 'Solicitud aprobada y usuario creado correctamente',
-            'user'    => new \App\Http\Resources\UserResource($user),
-        ], 201);
+        return new RegistrationRequestResource($registrationRequest->load('reviewedBy'));
     }
 
     public function reject(Request $request, RegistrationRequest $registrationRequest)

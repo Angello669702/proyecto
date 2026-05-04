@@ -7,6 +7,7 @@ import { CATEGORY_PAGES } from '../../features/categories/category.routes';
 import { REGISTRATION_PAGES } from '../../features/registration/registration.routes';
 import { RouterLink } from '@angular/router';
 import { CardComponent } from '../../features/products/components/card/card.component';
+import { FEATURE_PAGES } from '../../app.routes';
 @Component({
   selector: 'app-home',
   imports: [RouterLink, CardComponent],
@@ -131,14 +132,14 @@ export class HomePageComponent {
   isLogged = this.#tokenStorageservice.isLogged;
 
   categories = this.#categoryService.models;
-  categoryResource = this.#categoryService.load(this.page);
+  categoryResource = this.#categoryService.loadPaginated(this.page);
 
   featuredProductsResource = this.#productService.loadFeatureProducts();
   featuredProducts = this.featuredProductsResource.value;
 
   navigation: Record<string, string[]> = {
-    catalog: [PRODUCT_PAGES.PRODUCTS, PRODUCT_PAGES.CATALOG],
-    categories: [CATEGORY_PAGES.CATEGORY],
-    registration: [REGISTRATION_PAGES.REGISTER],
+    catalog: ['/', FEATURE_PAGES.PRODUCTS, PRODUCT_PAGES.CATALOG],
+    categories: ['/', CATEGORY_PAGES.CATEGORY],
+    registration: ['/', FEATURE_PAGES.REGISTRATIONS, REGISTRATION_PAGES.REGISTER],
   };
 }

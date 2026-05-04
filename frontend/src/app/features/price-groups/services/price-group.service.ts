@@ -10,4 +10,5 @@ export class PriceGroupService extends CommonCrudService<PriceGroup, PriceGroupD
   readonly API_ENDPOINT = '';
   readonly mapper = inject(PriceGroupMapper);
   readonly defaultModel = { id: '' } as PriceGroup;
+  readonly defaultDto = { id: '' } as PriceGroupDto;
 }

@@ -7,24 +7,24 @@ import { PaginatedResponse } from '../interfaces/paginated.interface';
 @Injectable({ providedIn: 'root' })
 export abstract class CommonCrudService<
   TModel extends { id: string },
-  TDto,
+  TDto extends { id: string },
 > extends CommonCrudServiceAbstract<TModel, TDto> {
   protected modelsSignal = signal<TModel[]>([]);
   models = computed(() => this.modelsSignal());
   #lastPage = signal<number>(0);
   lastPage = computed(() => this.#lastPage());
 
-  load(
+  loadPaginated(
     page: Signal<number>,
     params?: Signal<Record<string, string>>,
   ): ResourceRef<TModel[] | undefined> {
     return rxResource({
       params: () => ({ page: page(), extra: params?.() ?? {} }),
-      stream: ({ params }) => this.#load(params.page, params.extra),
+      stream: ({ params }) => this.#loadPaginated(params.page, params.extra),
     });
   }
 
-  #load(page: number, params: Record<string, string>): Observable<TModel[]> {
+  #loadPaginated(page: number, params: Record<string, string>): Observable<TModel[]> {
     return this.httpClient
       .get<PaginatedResponse<TDto[]>>(this.API_ENDPOINT, {
         params: {
@@ -43,15 +43,40 @@ export abstract class CommonCrudService<
       );
   }
 
-  add(model: Signal<TModel>): ResourceRef<TModel | undefined> {
+  load(params?: Signal<Record<string, string>>): ResourceRef<TModel[] | undefined> {
     return rxResource({
-      params: () => model(),
-      stream: ({ params: model }) => (this.isDefaultModel(model) ? NEVER : this.#add(model)),
+      params: () => ({ extra: params?.() ?? {} }),
+      stream: ({ params }) => this.#load(params.extra),
+    });
+  }
+
+  #load(params: Record<string, string>): Observable<TModel[]> {
+    return this.httpClient
+      .get<{ data: TDto[] }>(this.API_ENDPOINT, {
+        params: {
+          ...params,
+        },
+      })
+      .pipe(
+        tap((models) => console.log(models)),
+        map((response) => this.mapper.mapList(response.data)),
+        tap((models) => this.modelsSignal.set(models)),
+        catchError((error) => {
+          console.error('Failed to load models', error);
+          return throwError(() => error);
+        }),
+      );
+  }
+
+  add(dto: Signal<TDto>): ResourceRef<TModel | undefined> {
+    return rxResource({
+      params: () => dto(),
+      stream: ({ params: dto }) => (this.isDefaultDto(dto) ? NEVER : this.#add(dto)),
       equal: (model1, model2) => model1.id === model2.id,
     });
   }
 
-  #add(model: TModel): Observable<TModel> {
+  #add(model: TDto): Observable<TModel> {
     return this.httpClient.post<TDto>(this.API_ENDPOINT, model).pipe(
       map((dto) => this.mapper.mapOne(dto)),
       tap((newModel) => this.modelsSignal.update((currentModels) => [...currentModels, newModel])),

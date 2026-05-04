@@ -8,7 +8,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
   templateUrl: './registration-form.component.html',
 })
 export class RegistrationFormComponent {
-  submit = output<RegistrationRequest>();
+  register = output<RegistrationRequest>();
   readonly #formBuilder = inject(FormBuilder);
   message = signal<string>('');
 
@@ -26,7 +26,7 @@ export class RegistrationFormComponent {
     if (this.registrationForm.invalid) {
       this.message.set('Please correct all errors and resubmit the form');
     } else {
-      this.submit.emit(this.registrationForm.value);
+      this.register.emit(this.registrationForm.value);
     }
   }
 }

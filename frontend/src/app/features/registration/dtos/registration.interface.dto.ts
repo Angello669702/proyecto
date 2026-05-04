@@ -1,4 +1,5 @@
 import { UUID } from '../../../shared/types/uuid.type';
+import { UserDto } from '../../auth/dtos/user.interface.dto';
 import { User } from '../../auth/interfaces/user.interface';
 import { RegistrationStatus } from '../enums/registration-status.enum';
 
@@ -12,6 +13,6 @@ export interface RegistrationDto {
   address: string;
   notes?: string;
   status: RegistrationStatus;
-  reviewed_by?: User;
+  reviewed_by?: UserDto;
   reviewed_at?: Date;
 }

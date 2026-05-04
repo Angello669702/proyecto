@@ -14,6 +14,7 @@ export class ProductService extends CommonCrudService<Product, ProductDto> {
   readonly API_ENDPOINT = 'http://127.0.0.1:8000/api/products';
   readonly mapper = inject(ProductMapper);
   readonly defaultModel = { id: '' } as Product;
+  readonly defaultDto = { id: '' } as ProductDto;
   readonly defaultCartItem = { product: this.defaultModel, quantity: 0 };
 
   buildParams(filters: Signal<ProductFilter>): Signal<Record<string, string>> {

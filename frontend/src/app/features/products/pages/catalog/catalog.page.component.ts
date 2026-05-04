@@ -13,11 +13,11 @@ import { AuthService } from '../../../auth/services/auth.service';
   selector: 'app-home',
   imports: [CardListComponent, PaginationButtonsComponent, ProductFilterComponent],
   template: `
-    <div class="min-h-screen bg-stone-50">
+    <div class="min-h-screen bg-stone-50 pt-16">
       <app-product-filter (filtersChanged)="onFiltersChanged($event)" />
 
-      <main class="md:ml-72 flex flex-col min-h-screen">
-        <section class="flex-1 overflow-y-auto custom-scrollbar">
+      <main class="md:ml-72 flex flex-col min-h-[calc(100vh-64px)]">
+        <section class="flex-1 pb-10">
           <div class="max-w-7xl mx-auto">
             <div class="px-8 pt-10 pb-4">
               <h2 class="text-sm font-serif font-bold uppercase tracking-[0.3em] text-stone-400">
@@ -71,7 +71,7 @@ export class CatalogPageComponent {
   });
 
   readonly products = this.#productService.models;
-  productsResource = this.#productService.load(
+  productsResource = this.#productService.loadPaginated(
     this.currentPage,
     this.#productService.buildParams(this.filters),
   );

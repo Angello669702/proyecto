@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CategoryController;
+use App\Http\Controllers\Api\RegistrationRequestController;
 use App\Http\Controllers\Api\TransactionController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -19,6 +20,15 @@ Route::get('/products/featured', [ProductController::class, 'topSelling']);
 Route::get('/products/{product}', [ProductController::class, 'show']);
 
 Route::get('/categories', [CategoryController::class, 'index']);
+
+Route::post('/registrations', [RegistrationRequestController::class, 'store']);
+
+
+Route::middleware(['auth:sanctum', 'admin'])->group(function () {
+    Route::get('/registrations', [RegistrationRequestController::class, 'index']);
+    Route::put('/registrations/{registrationRequest}/approve', [RegistrationRequestController::class, 'approve']);
+    Route::put('/registrations/{registrationRequest}/reject', [RegistrationRequestController::class, 'reject']);
+});
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/transactions', [TransactionController::class, 'index']);

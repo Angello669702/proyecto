@@ -2,7 +2,6 @@ import { Routes } from '@angular/router';
 import { productResolver } from './guards/product.resolver';
 
 export enum PRODUCT_PAGES {
-  PRODUCTS = '/products',
   CATALOG = 'catalog',
   NEW = 'new',
   UPDATE = 'update',

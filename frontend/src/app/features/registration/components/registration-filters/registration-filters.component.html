@@ -1,0 +1,66 @@
+<div class="flex flex-col sm:flex-row items-center justify-between gap-6 mb-8">
+  <div class="flex flex-col gap-1">
+    <span class="text-[10px] font-bold text-stone-400 uppercase tracking-[0.3em]">
+      Listado de Solicitudes
+    </span>
+    <h2 class="font-serif text-2xl font-bold text-stone-900">Filtrar por Estado</h2>
+  </div>
+
+  <div class="flex p-1.5 bg-stone-100 rounded-xl border border-stone-200">
+    <button
+      (click)="applyFilter('all')"
+      class="px-5 py-2 text-[10px] font-bold uppercase tracking-widest rounded-lg transition-all cursor-pointer"
+      [class]="
+        currentFilter() === 'all'
+          ? 'bg-white text-stone-900 shadow-sm'
+          : 'text-stone-500 hover:text-stone-700'
+      "
+    >
+      Todos
+    </button>
+
+    <button
+      (click)="applyFilter(RegistrationStatus.PENDING)"
+      class="px-5 py-2 text-[10px] font-bold uppercase tracking-widest rounded-lg transition-all cursor-pointer hover:text-amber-600"
+      [class]="
+        currentFilter() === RegistrationStatus.PENDING
+          ? 'bg-white text-amber-600 shadow-sm'
+          : 'text-stone-500'
+      "
+    >
+      Pendientes
+    </button>
+
+    <button
+      (click)="applyFilter(RegistrationStatus.APPROVED)"
+      class="px-5 py-2 text-[10px] font-bold uppercase tracking-widest rounded-lg transition-all cursor-pointer hover:text-emerald-600"
+      [class]="
+        currentFilter() === RegistrationStatus.APPROVED
+          ? 'bg-white text-emerald-600 shadow-sm'
+          : 'text-stone-500'
+      "
+    >
+      Aprobados
+    </button>
+
+    <button
+      (click)="applyFilter(RegistrationStatus.REJECTED)"
+      class="px-5 py-2 text-[10px] font-bold uppercase tracking-widest rounded-lg transition-all cursor-pointer hover:text-rose-900"
+      [class]="
+        currentFilter() === RegistrationStatus.REJECTED
+          ? 'bg-white text-rose-900 shadow-sm'
+          : 'text-stone-500'
+      "
+    >
+      Rechazados
+    </button>
+  </div>
+</div>
+
+<div class="flex items-center gap-4 mb-8">
+  <div class="h-px flex-1 bg-stone-200"></div>
+  <div class="size-1.5 rounded-full bg-rose-900/30"></div>
+  <div class="size-1.5 rounded-full bg-rose-900"></div>
+  <div class="size-1.5 rounded-full bg-rose-900/30"></div>
+  <div class="h-px flex-1 bg-stone-200"></div>
+</div>
