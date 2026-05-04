@@ -1,5 +1,5 @@
 import { Component, inject, output, signal } from '@angular/core';
-import { Registration } from '../../interfaces/registration.interface';
+import { Registration, RegistrationRequest } from '../../interfaces/registration.interface';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 
 @Component({
@@ -8,7 +8,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
   templateUrl: './registration-form.component.html',
 })
 export class RegistrationFormComponent {
-  submit = output<Registration>();
+  submit = output<RegistrationRequest>();
   readonly #formBuilder = inject(FormBuilder);
   message = signal<string>('');
 
@@ -19,7 +19,7 @@ export class RegistrationFormComponent {
     email: ['', [Validators.required]],
     phone: ['', [Validators.required]],
     address: ['', [Validators.required]],
-    notes: ['', [Validators.required]],
+    notes: [''],
   });
 
   submitForm() {
