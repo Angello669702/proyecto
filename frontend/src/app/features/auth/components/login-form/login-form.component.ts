@@ -8,7 +8,7 @@ import { AuthRequest } from '../../interfaces/auth.interface';
   templateUrl: './login-form.component.html',
 })
 export class LoginFormComponent {
-  sendLogin = output<AuthRequest>();
+  submit = output<AuthRequest>();
   readonly #formBuilder = inject(FormBuilder);
   message = signal<string>('');
 
@@ -21,7 +21,7 @@ export class LoginFormComponent {
     if (this.loginForm.invalid) {
       this.message.set('Please correct all errors and resubmit the form');
     } else {
-      this.sendLogin.emit(this.loginForm.value);
+      this.submit.emit(this.loginForm.value);
     }
   }
 }

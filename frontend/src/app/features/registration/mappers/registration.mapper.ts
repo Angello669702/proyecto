@@ -18,8 +18,8 @@ export class RegistrationMapper implements Mapper<Registration, RegistrationDto>
       address: registration.address,
       notes: registration.notes ?? '',
       status: registration.status,
-      reviewer: registration.reviewed_by,
-      reviewedAt: registration.reviewed_at,
+      reviewer: registration.reviewed_by ?? undefined,
+      reviewedAt: registration.reviewed_at ?? undefined,
     };
   }
 

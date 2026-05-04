@@ -1,6 +1,5 @@
 import { Component, inject, signal } from '@angular/core';
 import { TokenStorageService } from '../../features/auth/services/token.service';
-import { CurrencyPipe } from '@angular/common';
 import { CategoryService } from '../../features/categories/services/category.service';
 import { ProductService } from '../../features/products/services/product.service';
 import { PRODUCT_PAGES } from '../../features/products/product.routes';
@@ -81,7 +80,7 @@ import { CardComponent } from '../../features/products/components/card/card.comp
                 />
               }
               <div
-                class="absolute inset-0 bg-gradient-to-t from-stone-900/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"
+                class="absolute inset-0 bg-linear-to-t from-stone-900/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"
               ></div>
               <span
                 class="relative z-10 font-serif text-lg font-bold text-stone-800 group-hover:text-white transition-colors"
@@ -140,6 +139,6 @@ export class HomePageComponent {
   navigation: Record<string, string[]> = {
     catalog: [PRODUCT_PAGES.PRODUCTS, PRODUCT_PAGES.CATALOG],
     categories: [CATEGORY_PAGES.CATEGORY],
-    registration: [REGISTRATION_PAGES.REGISTRATION],
+    registration: [REGISTRATION_PAGES.REGISTER],
   };
 }

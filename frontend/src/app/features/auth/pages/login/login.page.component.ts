@@ -34,7 +34,7 @@ import { Router } from '@angular/router';
         </div>
       }
 
-      <app-login-form class="w-full max-w-md" (sendLogin)="login($event)" />
+      <app-login-form class="w-full max-w-md" (submit)="login($event)" />
     </div>
   `,
 })

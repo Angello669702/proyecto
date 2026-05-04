@@ -12,6 +12,6 @@ export interface RegistrationDto {
   address: string;
   notes?: string;
   status: RegistrationStatus;
-  reviewed_by: User;
-  reviewed_at: Date;
+  reviewed_by?: User;
+  reviewed_at?: Date;
 }

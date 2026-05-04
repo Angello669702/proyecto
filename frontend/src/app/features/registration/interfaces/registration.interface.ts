@@ -10,8 +10,18 @@ export interface Registration {
   email: string;
   phone: string;
   address: string;
-  notes: string;
+  notes?: string;
   status: RegistrationStatus;
-  reviewer: User;
-  reviewedAt: Date;
+  reviewer?: User;
+  reviewedAt?: Date;
+}
+
+export interface RegistrationRequest {
+  companyName: string;
+  nif: string;
+  contactName: string;
+  email: string;
+  phone: string;
+  address: string;
+  notes?: string;
 }
