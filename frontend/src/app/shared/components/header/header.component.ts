@@ -19,31 +19,31 @@ export class HeaderComponent {
   readonly #tokenService = inject(TokenStorageService);
   readonly #router = inject(Router);
 
-  isLoggued = this.#tokenService.isLogged;
-  user = this.#authService.currentUser;
-  isAdmin = this.#authService.isAdmin;
+  readonly isLoggued = this.#tokenService.isLogged;
+  readonly user = this.#authService.currentUser;
+  readonly isAdmin = this.#authService.isAdmin;
 
-  authNavigation: Record<string, string[]> = {
+  readonly authNavigation: Record<string, string[]> = {
     login: ['/', AUTH_PAGES.AUTH, AUTH_PAGES.LOGIN],
   };
 
-  productsNavigation: Record<string, string[]> = {
+  readonly productsNavigation: Record<string, string[]> = {
     catalog: ['/', FEATURE_PAGES.PRODUCTS, PRODUCT_PAGES.CATALOG],
     newProduct: ['/', FEATURE_PAGES.PRODUCTS, PRODUCT_PAGES.NEW],
     updateProduct: ['/', FEATURE_PAGES.PRODUCTS, PRODUCT_PAGES.UPDATE],
   };
 
-  transactionsNavigation: Record<string, string[]> = {
+  readonly transactionsNavigation: Record<string, string[]> = {
     cart: ['/', FEATURE_PAGES.TRANSACTIONS, TRANSACTION_PAGES.CART],
     orders: ['/', FEATURE_PAGES.TRANSACTIONS, TRANSACTION_PAGES.ORDERS],
   };
 
-  registrationsNavigation: Record<string, string[]> = {
+  readonly registrationsNavigation: Record<string, string[]> = {
     register: ['/', FEATURE_PAGES.REGISTRATIONS, REGISTRATION_PAGES.REGISTER],
     all: ['/', FEATURE_PAGES.REGISTRATIONS, REGISTRATION_PAGES.ALL],
   };
 
-  userInitials = computed(() => {
+  readonly userInitials = computed(() => {
     const user = this.user();
     if (this.#authService.isDefaultUser(user)) return;
     return user.fullName
