@@ -14,4 +14,8 @@ export class PriceGroupItemMapper implements Mapper<PriceGroupItem, PriceGroupIt
   mapList(priceGroupItems: PriceGroupItemDto[]): PriceGroupItem[] {
     return priceGroupItems.map((priceGroupItem) => this.mapOne(priceGroupItem));
   }
+
+  toDto(priceGroupItem: PriceGroupItem): PriceGroupItemDto {
+    return priceGroupItem;
+  }
 }

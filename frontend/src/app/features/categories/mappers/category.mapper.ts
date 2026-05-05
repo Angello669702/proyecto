@@ -19,4 +19,14 @@ export class CategoryMapper implements Mapper<Category, CategoryDto> {
   mapList(categories: CategoryDto[]): Category[] {
     return categories.map((category) => this.mapOne(category));
   }
+
+  toDto(category: Category): CategoryDto {
+    return {
+      id: category.id,
+      name: category.name,
+      description: category.description,
+      image: category.image,
+      is_active: category.isActive,
+    };
+  }
 }

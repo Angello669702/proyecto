@@ -24,7 +24,8 @@ export class HeaderComponent {
   readonly isAdmin = this.#authService.isAdmin;
 
   readonly authNavigation: Record<string, string[]> = {
-    login: ['/', AUTH_PAGES.AUTH, AUTH_PAGES.LOGIN],
+    login: ['/', FEATURE_PAGES.AUTH, AUTH_PAGES.LOGIN],
+    profile: ['/', FEATURE_PAGES.AUTH, AUTH_PAGES.PROFILE],
   };
 
   readonly productsNavigation: Record<string, string[]> = {

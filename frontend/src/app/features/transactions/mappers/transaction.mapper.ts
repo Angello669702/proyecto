@@ -30,4 +30,24 @@ export class TransactionMapper implements Mapper<Transaction, TransactionDto> {
   mapList(transactions: TransactionDto[]): Transaction[] {
     return transactions.map((transaction) => this.mapOne(transaction));
   }
+
+  toDto(transaction: Transaction): TransactionDto {
+    return {
+      id: transaction.id,
+      user: transaction.user,
+      transactions_items: transaction.transactionsItems.map((item) =>
+        this.#transactionItemMapper.toDto(item),
+      ),
+      status: transaction.status,
+      subtotal: transaction.subtotal,
+      discount_applied: transaction.discountApplied,
+      vat_total: transaction.vatTotal,
+      shipping_cost: transaction.shippingCost,
+      total: transaction.total,
+      shipping_address: transaction.shippingAddress,
+      payment_intent_id: transaction.paymentIntentId,
+      payment_status: transaction.paymentStatus,
+      notes: transaction.notes,
+    };
+  }
 }

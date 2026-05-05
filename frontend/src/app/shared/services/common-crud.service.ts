@@ -3,11 +3,12 @@ import { catchError, map, NEVER, Observable, tap, throwError } from 'rxjs';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { CommonCrudServiceAbstract } from './common-crud.service.abstract';
 import { PaginatedResponse } from '../interfaces/paginated.interface';
+import { UUID } from '../types/uuid.type';
 
 @Injectable({ providedIn: 'root' })
 export abstract class CommonCrudService<
   TModel extends { id: string },
-  TDto extends { id: string },
+  TDto,
 > extends CommonCrudServiceAbstract<TModel, TDto> {
   protected modelsSignal = signal<TModel[]>([]);
   models = computed(() => this.modelsSignal());
@@ -68,17 +69,17 @@ export abstract class CommonCrudService<
       );
   }
 
-  add(dto: Signal<TDto>): ResourceRef<TModel | undefined> {
+  add(model: Signal<TModel>): ResourceRef<TModel | undefined> {
     return rxResource({
-      params: () => dto(),
-      stream: ({ params: dto }) => (this.isDefaultDto(dto) ? NEVER : this.#add(dto)),
+      params: () => model(),
+      stream: ({ params: model }) => (this.isDefaultModel(model) ? NEVER : this.#add(model)),
       equal: (model1, model2) => model1.id === model2.id,
     });
   }
 
-  #add(model: TDto): Observable<TModel> {
-    return this.httpClient.post<TDto>(this.API_ENDPOINT, model).pipe(
-      map((dto) => this.mapper.mapOne(dto)),
+  #add(model: TModel): Observable<TModel> {
+    return this.httpClient.post<TDto>(this.API_ENDPOINT, this.mapper.toDto(model)).pipe(
+      map((model) => this.mapper.mapOne(model)),
       tap((newModel) => this.modelsSignal.update((currentModels) => [...currentModels, newModel])),
       catchError((error) => {
         console.error('Failed to add an model', error);
@@ -87,17 +88,17 @@ export abstract class CommonCrudService<
     );
   }
 
-  update(model: Signal<TModel>): ResourceRef<TModel | undefined> {
+  update(model: Signal<TModel>, id: UUID): ResourceRef<TModel | undefined> {
     return rxResource({
       params: () => model(),
-      stream: ({ params: model }) => (this.isDefaultModel(model) ? NEVER : this.#update(model)),
+      stream: ({ params: model }) => (this.isDefaultModel(model) ? NEVER : this.#update(model, id)),
       equal: (model1, model2) => model1.id === model2.id,
     });
   }
 
-  #update(model: TModel): Observable<TModel> {
-    return this.httpClient.put<TDto>(`${this.API_ENDPOINT}/${model.id}`, model).pipe(
-      map((dto) => this.mapper.mapOne(dto)),
+  #update(model: TModel, id: UUID): Observable<TModel> {
+    return this.httpClient.put<TDto>(`${this.API_ENDPOINT}/${id}`, this.mapper.toDto(model)).pipe(
+      map((model) => this.mapper.mapOne(model)),
       tap((updatedModel) =>
         this.modelsSignal.update((currentModels) =>
           currentModels.map((currentModel) =>

@@ -10,9 +10,7 @@ import { TransactionMapper } from '../../transactions/mappers/transaction.mapper
   providedIn: 'root',
 })
 export class UserMapper implements Mapper<User, UserDto> {
-  readonly #priceGroupMapper = inject(PriceGroupMapper);
   readonly #productMapper = inject(ProductMapper);
-  readonly #transactionMapper = inject(TransactionMapper);
 
   mapOne(user: UserDto): User {
     return {
@@ -28,13 +26,31 @@ export class UserMapper implements Mapper<User, UserDto> {
       profilePhoto: user.profile_photo ?? '',
       role: user.role,
       isActive: user.is_active,
-      priceGroup: user.price_group ? this.#priceGroupMapper.mapOne(user.price_group) : undefined,
       favourites: user.favourites ? this.#productMapper.mapList(user.favourites) : undefined,
-      transaction: user.transaction ? this.#transactionMapper.mapOne(user.transaction) : undefined,
     };
   }
 
   mapList(users: UserDto[]): User[] {
     return users.map((user) => this.mapOne(user));
+  }
+
+  toDto(user: User): UserDto {
+    return {
+      id: user.id,
+      name: user.name,
+      full_name: user.fullName,
+      email: user.email,
+      password: user.password,
+      company_name: user.companyName,
+      nif: user.nif,
+      phone: user.phone,
+      address: user.address,
+      profile_photo: user.profilePhoto,
+      role: user.role,
+      is_active: user.isActive,
+      favourites: user.favourites
+        ? user.favourites.map((fav) => this.#productMapper.toDto(fav))
+        : undefined,
+    };
   }
 }

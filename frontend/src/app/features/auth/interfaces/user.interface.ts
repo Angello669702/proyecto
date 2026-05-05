@@ -17,7 +17,23 @@ export interface User {
   profilePhoto: string;
   role: UserRole;
   isActive: boolean;
-  priceGroup?: PriceGroup;
   favourites?: Product[];
-  transaction?: Transaction;
+}
+
+export interface UserRequest {
+  name: string;
+  fullName: string;
+  email: string;
+  password: string;
+  companyName: string;
+  nif: string;
+  phone: string;
+  address: string;
+  profilePhoto: string;
+  role: UserRole;
+}
+
+export interface ChangePassword {
+  currentPassword: string;
+  newPassword: string;
 }

@@ -1,8 +1,9 @@
 import { Routes } from '@angular/router';
+import { authGuard } from './guards/auth.guard';
 
 export enum AUTH_PAGES {
-  AUTH = 'auth',
   LOGIN = 'login',
+  PROFILE = 'profile',
 }
 
 export const AUTH_ROUTES: Routes = [
@@ -14,6 +15,13 @@ export const AUTH_ROUTES: Routes = [
         pathMatch: 'full',
         loadComponent: () =>
           import('./pages/login/login.page.component').then((c) => c.LoginPageComponent),
+      },
+      {
+        path: AUTH_PAGES.PROFILE,
+        pathMatch: 'full',
+        loadComponent: () =>
+          import('./pages/profile/profile.page.component').then((c) => c.ProfilePageComponent),
+        canActivate: [authGuard],
       },
     ],
   },

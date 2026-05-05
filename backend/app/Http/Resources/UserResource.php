@@ -12,16 +12,20 @@ class UserResource extends JsonResource
         return [
             'id'            => $this->id,
             'name'          => $this->name,
-            'full_name'          => $this->full_name,
+            'full_name'     => $this->full_name,
             'company_name'  => $this->company_name,
             'nif'           => $this->nif,
             'email'         => $this->email,
             'phone'         => $this->phone,
             'address'       => $this->address,
-            'profile_photo' => $this->profile_photo ? asset('storage/' . $this->profile_photo) : null,
+            'profile_photo' => $this->profile_photo
+                ? asset('storage/' . $this->profile_photo)
+                : null,
             'role'          => $this->role,
             'is_active'     => $this->is_active,
-            'price_group' => $this->whenLoaded('priceGroup', fn() => new PriceGroupResource($this->priceGroup)),
+            'favourites'    => $this->whenLoaded('favorites',
+                fn() => ProductResource::collection($this->favorites)
+            ),
             'created_at'    => $this->created_at->toDateTimeString(),
             'updated_at'    => $this->updated_at->toDateTimeString(),
         ];

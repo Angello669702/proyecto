@@ -2,9 +2,8 @@ import { Component, effect, inject, signal } from '@angular/core';
 import { RegistrationService } from '../../services/registration.service';
 import { Router } from '@angular/router';
 import { RegistrationFormComponent } from '../../components/registration-form/registration-form.component';
-import { RegistrationRequest } from '../../interfaces/registration.interface';
+import { Registration, RegistrationRequest } from '../../interfaces/registration.interface';
 import { RegistrationMapper } from '../../mappers/registration.mapper';
-import { RegistrationDto } from '../../dtos/registration.interface.dto';
 
 @Component({
   selector: 'app-home',
@@ -18,7 +17,7 @@ export class RegisterPageComponent {
 
   messagge = signal<string>('');
 
-  registration = signal<RegistrationDto>(this.#registrationService.defaultDto);
+  registration = signal<Registration>(this.#registrationService.defaultModel);
   registrationResource = this.#registrationService.add(this.registration);
 
   navigateEffect = effect(() => {
@@ -28,6 +27,6 @@ export class RegisterPageComponent {
   });
 
   register(registration: RegistrationRequest) {
-    this.registration.set(this.#mapper.toDto(registration));
+    this.registration.set(registration as Registration);
   }
 }

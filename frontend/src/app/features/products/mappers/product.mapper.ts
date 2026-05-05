@@ -27,4 +27,20 @@ export class ProductMapper implements Mapper<Product, ProductDto> {
   mapList(products: ProductDto[]): Product[] {
     return products.map((product) => this.mapOne(product));
   }
+
+  toDto(product: Product): ProductDto {
+    return {
+      id: product.id,
+      category: product.category,
+      name: product.name,
+      sku: product.sku,
+      description: product.description,
+      cover_image: product.coverImage,
+      images: product.images,
+      price: product.price,
+      stock: product.stock,
+      stock_alert_threshold: product.stockAlertThreshold,
+      is_active: product.isActive,
+    };
+  }
 }

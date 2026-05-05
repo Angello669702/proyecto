@@ -17,7 +17,5 @@ export interface UserDto {
   profile_photo?: string;
   role: UserRole;
   is_active: boolean;
-  price_group?: PriceGroupDto;
   favourites?: ProductDto[];
-  transaction?: TransactionDto;
 }

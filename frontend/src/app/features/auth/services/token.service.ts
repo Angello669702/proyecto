@@ -6,7 +6,9 @@ import { Injectable, computed, signal } from '@angular/core';
 export class TokenStorageService {
   #isLogged = signal(false);
   readonly isLogged = computed(() => this.#isLogged());
-  #token = signal<string>(localStorage.getItem('token') || '');
+  #token = signal<string>(
+    typeof localStorage !== 'undefined' ? localStorage.getItem('token') || '' : '',
+  );
   token = computed(() => this.#token());
 
   constructor() {

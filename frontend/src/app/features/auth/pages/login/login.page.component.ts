@@ -5,7 +5,7 @@ import { AuthRequest } from '../../interfaces/auth.interface';
 import { Router } from '@angular/router';
 
 @Component({
-  selector: 'app-home',
+  selector: 'app-login',
   imports: [LoginFormComponent],
   template: `
     <div class="min-h-screen flex flex-col items-center justify-center bg-stone-50 px-6">
