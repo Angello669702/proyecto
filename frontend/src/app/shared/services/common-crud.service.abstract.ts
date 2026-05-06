@@ -13,6 +13,11 @@ export abstract class CommonCrudServiceAbstract<TModel extends { id: string }, T
   abstract load(): ResourceRef<TModel[] | undefined>;
   abstract add(model: Signal<TModel>): ResourceRef<TModel | undefined>;
   abstract update(model: Signal<TModel>, id: UUID): ResourceRef<TModel | undefined>;
+  abstract addFormData(formData: Signal<FormData | null>): ResourceRef<TModel | undefined>;
+  abstract updateFormData(
+    formData: Signal<FormData | null>,
+    id: Signal<UUID>,
+  ): ResourceRef<TModel | undefined>;
   abstract remove(model: Signal<TModel>): ResourceRef<TModel | undefined>;
   abstract find(id: Signal<string>): ResourceRef<TModel | undefined>;
 

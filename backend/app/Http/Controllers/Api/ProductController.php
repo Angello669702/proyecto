@@ -5,8 +5,10 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ProductRequest;
 use App\Http\Resources\ProductResource;
+use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
@@ -14,7 +16,7 @@ class ProductController extends Controller
     {
         $query = Product::with('category', 'images');
 
-        $isAdmin = auth()->user()?->role === 'admin';
+        $isAdmin = auth('sanctum')->user()?->role === 'admin';
 
         if (!$isAdmin) {
             $query->where('is_active', true);
@@ -52,20 +54,118 @@ class ProductController extends Controller
 
     public function store(ProductRequest $request)
     {
-        $product = Product::create($request->validated());
+        $category = Category::where('name', $request->category)->first();
+
+        if (!$category) {
+            return response()->json([
+                'message' => 'La categoría seleccionada no existe.'
+            ], 422);
+        }
+
+        $product = Product::create([
+            'category_id' => $category->id,
+            'name' => $request->name,
+            'sku' => $request->sku,
+            'description' => $request->description,
+            'price' => $request->price,
+            'stock' => $request->stock,
+            'stock_alert_threshold' => $request->stock_alert_threshold ?? 10,
+            'is_active' => $request->boolean('is_active', true),
+        ]);
+
+        if ($request->hasFile('cover_image')) {
+            $coverPath = $request->file('cover_image')->store('products/covers', 'public');
+
+            $product->images()->create([
+                'path' => $coverPath,
+                'order' => 0,
+                'is_cover' => true,
+            ]);
+        }
+
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $index => $image) {
+                $imagePath = $image->store('products/gallery', 'public');
+
+                $product->images()->create([
+                    'path' => $imagePath,
+                    'order' => $index + 1,
+                    'is_cover' => false,
+                ]);
+            }
+        }
+
         return new ProductResource($product->load('category', 'images'));
     }
 
     public function update(ProductRequest $request, Product $product)
     {
-        $product->update($request->validated());
+        $category = Category::where('name', $request->category)->first();
+
+        if (!$category) {
+            return response()->json([
+                'message' => 'La categoría seleccionada no existe.'
+            ], 422);
+        }
+
+        $product->update([
+            'category_id' => $category->id,
+            'name' => $request->name,
+            'sku' => $request->sku,
+            'description' => $request->description,
+            'price' => $request->price,
+            'stock' => $request->stock,
+            'stock_alert_threshold' => $request->stock_alert_threshold ?? $product->stock_alert_threshold,
+            'is_active' => $request->boolean('is_active', $product->is_active),
+        ]);
+
+        if ($request->hasFile('cover_image')) {
+            $oldCover = $product->images()->where('is_cover', true)->first();
+            if ($oldCover) {
+                Storage::disk('public')->delete($oldCover->path);
+                $oldCover->delete();
+            }
+
+            $coverPath = $request->file('cover_image')->store('products/covers', 'public');
+
+            $product->images()->create([
+                'path' => $coverPath,
+                'order' => 0,
+                'is_cover' => true,
+            ]);
+        }
+
+        if ($request->hasFile('images')) {
+            $oldImages = $product->images()->where('is_cover', false)->get();
+            foreach ($oldImages as $oldImage) {
+                Storage::disk('public')->delete($oldImage->path);
+                $oldImage->delete();
+            }
+
+            foreach ($request->file('images') as $index => $image) {
+                $imagePath = $image->store('products/gallery', 'public');
+
+                $product->images()->create([
+                    'path' => $imagePath,
+                    'order' => $index + 1,
+                    'is_cover' => false,
+                ]);
+            }
+        }
+
         return new ProductResource($product->load('category', 'images'));
     }
 
     public function destroy(Product $product)
     {
+        foreach ($product->images as $image) {
+            Storage::disk('public')->delete($image->path);
+            $image->delete();
+        }
+
         $product->delete();
-        return response()->json(['message' => 'Producto eliminado correctamente'], 200);
+
+        return response()->json(['message' => 'Producto eliminado'], 200);
     }
 
     public function topSelling()

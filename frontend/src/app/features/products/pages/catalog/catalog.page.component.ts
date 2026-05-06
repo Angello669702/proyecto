@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { CardListComponent } from '../../components/card-list/card-list.component';
 import { TransactionService } from '../../../transactions/services/transaction.service';
 import { Product } from '../../interfaces/product.interface';
@@ -8,13 +8,23 @@ import { PaginationButtonsComponent } from '../../../../shared/components/pagina
 import { ProductFilterComponent } from '../../components/product-filter/product-filter.component';
 import { ProductFilter } from '../../interfaces/product-filter.interface';
 import { AuthService } from '../../../auth/services/auth.service';
+import { ActivatedRoute } from '@angular/router';
+import { LoadingGridComponent } from '../../../../shared/components/loading/loading-grid.component';
 
 @Component({
-  selector: 'app-home',
-  imports: [CardListComponent, PaginationButtonsComponent, ProductFilterComponent],
+  selector: 'app-catalog',
+  imports: [
+    CardListComponent,
+    PaginationButtonsComponent,
+    ProductFilterComponent,
+    LoadingGridComponent,
+  ],
   template: `
     <div class="min-h-screen bg-stone-50 pt-16">
-      <app-product-filter (filtersChanged)="onFiltersChanged($event)" />
+      <app-product-filter
+        [initialFilters]="filters()"
+        (filtersChanged)="onFiltersChanged($event)"
+      />
 
       <main class="md:ml-72 flex flex-col min-h-[calc(100vh-64px)]">
         <section class="flex-1 pb-10">
@@ -26,16 +36,22 @@ import { AuthService } from '../../../auth/services/auth.service';
               <div class="h-px w-12 bg-rose-900 mt-2"></div>
             </div>
 
-            <app-card-list
-              [products]="products()"
-              [isAdmin]="isAdmin()"
-              [productsInCart]="productsInCart()"
-              (add)="addToCart($event)"
-              (removeCart)="removeFromCart($event)"
-              (stock)="updateStock($event)"
-              (isActive)="toggle($event)"
-              (removeProduct)="deleteProduct($event)"
-            />
+            @if (productsResource.isLoading()) {
+              <div class="px-8">
+                <app-loading-grid [length]="9" />
+              </div>
+            } @else {
+              <app-card-list
+                [products]="products()"
+                [isAdmin]="isAdmin()"
+                [productsInCart]="productsInCart()"
+                (add)="addToCart($event)"
+                (removeCart)="removeFromCart($event)"
+                (stock)="updateStock($event)"
+                (isActive)="toggle($event)"
+                (removeProduct)="deleteProduct($event)"
+              />
+            }
           </div>
         </section>
 
@@ -60,6 +76,18 @@ export class CatalogPageComponent {
 
   isAdmin = inject(AuthService).isAdmin;
 
+  readonly route = inject(ActivatedRoute);
+  getRouteParams = effect(() => {
+    this.route.queryParams.subscribe((params) => {
+      if (params['categories']) {
+        this.filters.update((filters) => ({
+          ...filters,
+          categories: [params['categories']],
+        }));
+      }
+    });
+  });
+
   currentPage = signal<number>(1);
   lastPage = this.#productService.lastPage;
   pages = computed(() => Array.from({ length: this.lastPage() }, (_, i) => i + 1));
@@ -71,8 +99,11 @@ export class CatalogPageComponent {
     searchText: '',
   });
 
+  cartResource = this.#transactionService.myCart();
+  cart = this.#transactionService.cart;
+
   productsInCart = computed(() => {
-    return this.#transactionService.cart().transactionsItems.map((item) => item.product);
+    return this.cart().transactionsItems.map((item) => item.product);
   });
 
   readonly products = this.#productService.models;
@@ -100,7 +131,10 @@ export class CatalogPageComponent {
   }
 
   removeFromCart(product: Product) {
-    this.productToRemoveFromCart.set({ product: product, quantity: 1 });
+    this.productToRemoveFromCart.set({
+      product: product,
+      quantity: this.getProductQuantity(product),
+    });
   }
 
   updateStock(cartItem: CartItem) {
@@ -112,11 +146,19 @@ export class CatalogPageComponent {
   }
 
   toggle(product: Product) {
-    this.productToRemove.set(product);
+    this.productToToggle.set(product);
   }
 
   onFiltersChanged(filters: ProductFilter) {
     this.filters.set(filters);
     this.currentPage.set(1);
+  }
+
+  getProductQuantity(product: Product): number {
+    return (
+      this.cart().transactionsItems.find(
+        (transactionItem) => (transactionItem.product.id = product.id),
+      )?.quantity ?? 1
+    );
   }
 }

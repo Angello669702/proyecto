@@ -17,6 +17,11 @@ class ProductImage extends Model
         'is_cover',
     ];
 
+    protected $casts = [
+        'is_cover' => 'boolean',
+        'order' => 'integer',
+    ];
+
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);

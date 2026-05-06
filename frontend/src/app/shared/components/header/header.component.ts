@@ -30,8 +30,7 @@ export class HeaderComponent {
 
   readonly productsNavigation: Record<string, string[]> = {
     catalog: ['/', FEATURE_PAGES.PRODUCTS, PRODUCT_PAGES.CATALOG],
-    newProduct: ['/', FEATURE_PAGES.PRODUCTS, PRODUCT_PAGES.NEW],
-    updateProduct: ['/', FEATURE_PAGES.PRODUCTS, PRODUCT_PAGES.UPDATE],
+    new: ['/', FEATURE_PAGES.PRODUCTS, PRODUCT_PAGES.NEW],
   };
 
   readonly transactionsNavigation: Record<string, string[]> = {

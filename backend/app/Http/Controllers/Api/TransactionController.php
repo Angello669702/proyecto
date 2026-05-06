@@ -155,8 +155,6 @@ class TransactionController extends Controller
             ], 500);
         }
     }
-
-    // CLIENTE — elimina un item del carrito
     public function removeItem(Request $request)
     {
         $request->validate([
@@ -210,12 +208,10 @@ class TransactionController extends Controller
         }
     }
 
-    // ADMIN + CLIENTE — borra una transaction completa (carrito o pedido cancelado)
     public function destroy(Request $request, Transaction $transaction)
     {
         $user = $request->user();
 
-        // Un cliente solo puede borrar su propio carrito
         if ($user->role !== 'admin' && $transaction->user_id !== $user->id) {
             return response()->json(['message' => 'No autorizado'], 403);
         }
@@ -228,7 +224,6 @@ class TransactionController extends Controller
         return response()->json(['message' => 'Pedido eliminado correctamente'], 200);
     }
 
-    // ADMIN — cambia el estado de un pedido
     public function updateStatus(Request $request, Transaction $transaction)
     {
         $request->validate([
@@ -239,7 +234,6 @@ class TransactionController extends Controller
         return new TransactionResource($transaction->load('user', 'items.product'));
     }
 
-    // Recalcula subtotal y total de la transaction
     private function recalculate(Transaction $transaction): void
     {
         $transaction->load('items.product');

@@ -1,4 +1,4 @@
-import { Component, output, signal } from '@angular/core';
+import { Component, effect, input, output, signal } from '@angular/core';
 import { Category } from '../../../categories/interfaces/category.interface';
 import { ProductFilter } from '../../interfaces/product-filter.interface';
 import { CategoryEnum } from '../../enums/category.enum';
@@ -12,7 +12,14 @@ import { NgSelectComponent } from '@ng-select/ng-select';
   styleUrl: './product-filter.component.css',
 })
 export class ProductFilterComponent {
+  initialFilters = input<ProductFilter>();
   filtersChanged = output<ProductFilter>();
+
+  fillFilters = effect(() => {
+    if (this.initialFilters()) {
+      this.selectedCategories.set(this.initialFilters()!.categories);
+    }
+  });
 
   allCategories = Object.values(CategoryEnum);
 

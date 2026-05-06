@@ -20,11 +20,18 @@ Route::get('/products', [ProductController::class, 'index']);
 Route::get('/products/featured', [ProductController::class, 'topSelling']);
 Route::get('/products/{product}', [ProductController::class, 'show']);
 
+Route::middleware(['auth:sanctum', 'admin'])->group(function () {
+    Route::post('/products', [ProductController::class, 'store']);
+    Route::put('/products/{product}', [ProductController::class, 'update']);
+    Route::delete('/products/{product}', [ProductController::class, 'destroy']);
+
+    Route::put('/products/{product}/stock', [ProductController::class, 'updateStock']);
+    Route::put('/products/{product}/toggle', [ProductController::class, 'toggle']);
+});
+
 Route::get('/categories', [CategoryController::class, 'index']);
 
 Route::post('/registrations', [RegistrationRequestController::class, 'store']);
-
-
 
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/user', [UserController::class, 'updateProfile']);

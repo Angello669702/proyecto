@@ -3,14 +3,15 @@ import { TokenStorageService } from '../../features/auth/services/token.service'
 import { CategoryService } from '../../features/categories/services/category.service';
 import { ProductService } from '../../features/products/services/product.service';
 import { PRODUCT_PAGES } from '../../features/products/product.routes';
-import { CATEGORY_PAGES } from '../../features/categories/category.routes';
 import { REGISTRATION_PAGES } from '../../features/registration/registration.routes';
 import { RouterLink } from '@angular/router';
 import { CardComponent } from '../../features/products/components/card/card.component';
 import { FEATURE_PAGES } from '../../app.routes';
+import { CategoryCardComponent } from '../../features/categories/components/category-card/category-card.component';
+import { LoadingGridComponent } from '../components/loading/loading-grid.component';
 @Component({
   selector: 'app-home',
-  imports: [RouterLink, CardComponent],
+  imports: [RouterLink, CardComponent, CategoryCardComponent, LoadingGridComponent],
   template: `
     <section class="relative bg-stone-50 border-b border-stone-200 overflow-hidden">
       <div
@@ -44,12 +45,14 @@ import { FEATURE_PAGES } from '../../app.routes';
           >
             Explorar Catálogo
           </button>
-          <button
-            [routerLink]="navigation['registration']"
-            class="h-12 px-10 bg-white text-stone-700 text-xs font-bold uppercase tracking-widest rounded-xl border border-stone-200 hover:bg-stone-50 transition-all active:scale-95 cursor-pointer"
-          >
-            Solicitar Acceso
-          </button>
+          @if (!isLogged()) {
+            <button
+              [routerLink]="navigation['registration']"
+              class="h-12 px-10 bg-white text-stone-700 text-xs font-bold uppercase tracking-widest rounded-xl border border-stone-200 hover:bg-stone-50 transition-all active:scale-95 cursor-pointer"
+            >
+              Solicitar Acceso
+            </button>
+          }
         </div>
       </div>
     </section>
@@ -69,28 +72,15 @@ import { FEATURE_PAGES } from '../../app.routes';
           </button>
         </div>
 
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          @for (category of categories().slice(0, 4); track category.id) {
-            <button
-              class="group relative h-32 flex items-center justify-center overflow-hidden rounded-2xl border border-stone-100 bg-stone-50 transition-all hover:shadow-xl cursor-pointer"
-            >
-              @if (category.image) {
-                <img
-                  [src]="category.image"
-                  class="absolute inset-0 w-full h-full object-cover opacity-30 group-hover:scale-110 transition-transform duration-700"
-                />
-              }
-              <div
-                class="absolute inset-0 bg-linear-to-t from-stone-900/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"
-              ></div>
-              <span
-                class="relative z-10 font-serif text-lg font-bold text-stone-800 group-hover:text-white transition-colors"
-              >
-                {{ category.name }}
-              </span>
-            </button>
-          }
-        </div>
+        @if (categoryResource.isLoading()) {
+          <app-loading-grid [length]="4" />
+        } @else {
+          <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            @for (category of categories().slice(0, 4); track category.id) {
+              <app-card-category [category]="category" />
+            }
+          </div>
+        }
       </div>
     </section>
 
@@ -103,11 +93,15 @@ import { FEATURE_PAGES } from '../../app.routes';
           <h2 class="font-serif text-3xl font-bold text-stone-900">Productos Destacados</h2>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          @for (product of featuredProducts()?.slice(0, 4); track product.id) {
-            <app-card-product [product]="product" [featured]="true" />
-          }
-        </div>
+        @if (featuredProductsResource.isLoading()) {
+          <app-loading-grid [length]="4" />
+        } @else {
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            @for (product of featuredProducts()?.slice(0, 4); track product.id) {
+              <app-card-product [product]="product" [featured]="true" />
+            }
+          </div>
+        }
 
         <div class="flex justify-center mt-16">
           <button
@@ -132,14 +126,14 @@ export class HomePageComponent {
   isLogged = this.#tokenStorageservice.isLogged;
 
   categories = this.#categoryService.models;
-  categoryResource = this.#categoryService.loadPaginated(this.page);
+  categoryResource = this.#categoryService.load();
 
   featuredProductsResource = this.#productService.loadFeatureProducts();
   featuredProducts = this.featuredProductsResource.value;
 
   navigation: Record<string, string[]> = {
     catalog: ['/', FEATURE_PAGES.PRODUCTS, PRODUCT_PAGES.CATALOG],
-    categories: ['/', CATEGORY_PAGES.CATEGORY],
+    categories: ['/', FEATURE_PAGES.CATEGORIES],
     registration: ['/', FEATURE_PAGES.REGISTRATIONS, REGISTRATION_PAGES.REGISTER],
   };
 }

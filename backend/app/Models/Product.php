@@ -12,6 +12,18 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 class Product extends Model
 {
     use HasUuids;
+
+    protected $fillable = [
+        'category_id',
+        'name',
+        'sku',
+        'description',
+        'price',
+        'vat_rate',
+        'stock',
+        'stock_alert_threshold',
+        'is_active',
+    ];
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);

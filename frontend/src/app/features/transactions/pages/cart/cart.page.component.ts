@@ -1,21 +1,25 @@
-import { Component, computed, effect, inject, signal } from '@angular/core';
-import { AuthService } from '../../../auth/services/auth.service';
+import { Component, inject, signal } from '@angular/core';
 import { CartItem } from '../../../../shared/interfaces/cart.interface';
-import { ProductFilter } from '../../../products/interfaces/product-filter.interface';
-import { Product } from '../../../products/interfaces/product.interface';
-import { ProductService } from '../../../products/services/product.service';
 import { TransactionService } from '../../services/transaction.service';
 import { CartComponent } from '../../components/cart/cart.component';
-import { Transaction } from '../../interfaces/transaction.interface';
+import { LoadingComponent } from '../../../../shared/components/loading/loading.component';
 
 @Component({
   selector: 'app-home',
-  imports: [CartComponent],
-  template: ` <app-cart
-    [transaction]="transaction()"
-    (add)="addToCart($event)"
-    (remove)="removeFromCart($event)"
-  />`,
+  imports: [CartComponent, LoadingComponent],
+  template: `
+    <div class="min-h-screen bg-stone-50 pt-20 px-6">
+      @if (cartResource.isLoading()) {
+        <app-loading />
+      } @else {
+        <app-cart
+          [transaction]="transaction()"
+          (add)="addToCart($event)"
+          (remove)="removeFromCart($event)"
+        />
+      }
+    </div>
+  `,
 })
 export class CartPageComponent {
   readonly #transactionService = inject(TransactionService);

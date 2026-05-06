@@ -113,6 +113,52 @@ export abstract class CommonCrudService<
     );
   }
 
+  addFormData(formData: Signal<FormData | null>): ResourceRef<TModel | undefined> {
+    return rxResource({
+      params: () => formData(),
+      stream: ({ params }) => (params === null ? NEVER : this.#addFormData(params)),
+    });
+  }
+
+  #addFormData(formData: FormData): Observable<TModel> {
+    return this.httpClient.post<TDto>(this.API_ENDPOINT, formData).pipe(
+      map((model) => this.mapper.mapOne(model)),
+      tap((newModel) => this.modelsSignal.update((currentModels) => [...currentModels, newModel])),
+      catchError((error) => {
+        console.error('Failed to add an model', error);
+        return throwError(() => error);
+      }),
+    );
+  }
+
+  updateFormData(
+    formData: Signal<FormData | null>,
+    id: Signal<UUID>,
+  ): ResourceRef<TModel | undefined> {
+    return rxResource({
+      params: () => ({ data: formData(), id: id() }),
+      stream: ({ params }) =>
+        params.data === null ? NEVER : this.#updateFormData(params.data, params.id),
+    });
+  }
+
+  #updateFormData(formData: FormData, id: UUID): Observable<TModel> {
+    return this.httpClient.put<TDto>(`${this.API_ENDPOINT}/${id}`, formData).pipe(
+      map((model) => this.mapper.mapOne(model)),
+      tap((updatedModel) =>
+        this.modelsSignal.update((currentModels) =>
+          currentModels.map((currentModel) =>
+            currentModel.id === updatedModel.id ? updatedModel : currentModel,
+          ),
+        ),
+      ),
+      catchError((error) => {
+        console.error('Failed to update a model', error);
+        return throwError(() => error);
+      }),
+    );
+  }
+
   remove(model: Signal<TModel>): ResourceRef<TModel | undefined> {
     return rxResource({
       params: () => model(),

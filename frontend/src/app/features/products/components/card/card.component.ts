@@ -25,13 +25,14 @@ export class CardComponent {
   stock = output<CartItem>();
 
   readonly detailRoute = computed(() => `/products/${this.product().id}`);
+  readonly updateRoute = computed(() => `/products/update/${this.product().id}`);
 
   addToCart() {
     this.add.emit(this.product());
   }
 
   removeFromCart() {
-    this.removeProduct.emit(this.product());
+    this.removeCart.emit(this.product());
   }
 
   deleteProduct() {

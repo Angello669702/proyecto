@@ -129,7 +129,7 @@
             </button>
 
             <button
-              routerLink="/cart"
+              [routerLink]="['/', 'transactions', 'cart']"
               class="h-12 bg-white text-rose-900 border-2 border-rose-900 text-xs font-bold uppercase tracking-widest rounded-xl hover:bg-rose-50 transition-all active:scale-[0.98] cursor-pointer"
             >
               Finalizar Compra

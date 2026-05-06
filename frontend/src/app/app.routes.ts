@@ -6,6 +6,7 @@ export enum FEATURE_PAGES {
   AUTH = 'auth',
   TRANSACTIONS = 'transactions',
   REGISTRATIONS = 'registrations',
+  CATEGORIES = 'categories',
 }
 
 export const routes: Routes = [
@@ -15,12 +16,17 @@ export const routes: Routes = [
       {
         path: '',
         pathMatch: 'full',
-        redirectTo: FEATURE_PAGES.AUTH,
+        redirectTo: '/home',
       },
       {
         path: FEATURE_PAGES.PRODUCTS,
         loadChildren: () =>
           import('./features/products/product.routes').then((r) => r.PRODUCT_ROUTES),
+      },
+      {
+        path: FEATURE_PAGES.CATEGORIES,
+        loadChildren: () =>
+          import('./features/categories/categories.routes').then((r) => r.CATEGORIES_ROUTES),
       },
       {
         path: FEATURE_PAGES.TRANSACTIONS,
