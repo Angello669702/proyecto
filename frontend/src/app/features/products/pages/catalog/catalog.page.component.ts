@@ -29,6 +29,7 @@ import { AuthService } from '../../../auth/services/auth.service';
             <app-card-list
               [products]="products()"
               [isAdmin]="isAdmin()"
+              [productsInCart]="productsInCart()"
               (add)="addToCart($event)"
               (removeCart)="removeFromCart($event)"
               (stock)="updateStock($event)"
@@ -68,6 +69,10 @@ export class CatalogPageComponent {
     minPrice: null,
     maxPrice: null,
     searchText: '',
+  });
+
+  productsInCart = computed(() => {
+    return this.#transactionService.cart().transactionsItems.map((item) => item.product);
   });
 
   readonly products = this.#productService.models;

@@ -2,6 +2,7 @@ import { Component, input, output } from '@angular/core';
 import { CardComponent } from '../card/card.component';
 import { Product } from '../../interfaces/product.interface';
 import { CartItem } from '../../../../shared/interfaces/cart.interface';
+import { UUID } from '../../../../shared/types/uuid.type';
 
 @Component({
   selector: 'app-card-list',
@@ -14,6 +15,7 @@ import { CartItem } from '../../../../shared/interfaces/cart.interface';
             class="h-full"
             [product]="product"
             [isAdmin]="isAdmin()"
+            [isProductInCart]="isProductInCart(product)"
             (add)="addToCart($event)"
             (removeCart)="removeFromCart($event)"
             (isActive)="toggleProduct($event)"
@@ -40,6 +42,7 @@ import { CartItem } from '../../../../shared/interfaces/cart.interface';
 export class CardListComponent {
   readonly products = input.required<Product[]>();
   readonly isAdmin = input<boolean>(false);
+  readonly productsInCart = input<Product[]>([]);
 
   add = output<Product>();
   removeCart = output<Product>();
@@ -66,5 +69,9 @@ export class CardListComponent {
 
   updateStock(cartItem: CartItem) {
     this.stock.emit(cartItem);
+  }
+
+  isProductInCart(product: Product) {
+    return this.productsInCart().some((productInCart) => productInCart.id === product.id);
   }
 }
