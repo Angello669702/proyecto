@@ -26,6 +26,7 @@ export class ProductService extends CommonCrudService<Product, ProductDto> {
       if (filter.minPrice !== null) params['min_price'] = String(filter.minPrice);
       if (filter.maxPrice !== null) params['max_price'] = String(filter.maxPrice);
       if (filter.categories.length > 0) params['categories'] = filter.categories.join(',');
+      if (filter.favouritesOnly) params['favourites_only'] = 'true';
 
       return params;
     });
@@ -87,7 +88,7 @@ export class ProductService extends CommonCrudService<Product, ProductDto> {
 
   #favourite(product: Product): Observable<Product> {
     return this.httpClient
-      .post<{ data: ProductDto }>(`${this.API_ENDPOINT}/favourite`, this.mapper.toDto(product))
+      .post<{ data: ProductDto }>(`${this.API_ENDPOINT}/favourite`, { id: product.id })
       .pipe(
         map(({ data }) => this.mapper.mapOne(data)),
         catchError((error) => {

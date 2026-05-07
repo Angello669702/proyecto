@@ -12,26 +12,27 @@ use Illuminate\Support\Facades\DB;
 
 class TransactionController extends Controller
 {
-    // ADMIN — lista todas las transactions con sus items y usuario
     public function index(Request $request)
     {
-        if ($request->user()->role !== 'admin') {
-            return response()->json(['message' => 'No autorizado'], 403);
+        $user = $request->user();
+
+        $query = $user->role === 'admin'
+            ? Transaction::with('user', 'items.product')
+            : $user->transactions()->with('items.product');
+
+        if ($request->filled('status') && $request->input('status') !== 'all') {
+            $query->where('status', $request->input('status'));
         }
 
-        $transactions = Transaction::with('user', 'items.product')
-            ->paginate(20);
+        $transactions = $query->orderBy('status')->paginate(20);
 
         return TransactionResource::collection($transactions);
     }
-
-        // ADMIN + CLIENTE — detalle de una transaction concreta
     public function show(Transaction $transaction)
     {
         return new TransactionResource($transaction->load('user', 'items.product'));
     }
 
-    // CLIENTE — obtiene su carrito activo (pending)
     public function myCart(Request $request)
     {
         $user = $request->user();
@@ -59,18 +60,6 @@ class TransactionController extends Controller
         return new TransactionResource($transaction);
     }
 
-    public function myTransactions(Request $request)
-    {
-        $transactions = $request->user()
-            ->transactions()
-            ->with('items.product')
-            ->orderByDesc('created_at')
-            ->paginate(20);
-
-        return TransactionResource::collection($transactions);
-    }
-
-    // CLIENTE — añade un producto al carrito, creando la transaction si no existe
     public function addItem(Request $request)
     {
         $request->validate([
@@ -113,12 +102,10 @@ class TransactionController extends Controller
                 ]);
             }
 
-            // Si el producto ya está en el carrito, suma la cantidad
             $existingItem = $transaction->items()
                 ->where('product_id', $product->id)
                 ->first();
 
-            // Precio especial si el usuario tiene price group
             $unitPrice = $user->priceGroup
                 ? ($user->priceGroup->items()->where('product_id', $product->id)->value('price') ?? $product->price)
                 : $product->price;
@@ -138,7 +125,6 @@ class TransactionController extends Controller
                 ]);
             }
 
-            // Recalcula totales de la transaction
             $this->recalculate($transaction);
 
             DB::commit();
@@ -231,6 +217,90 @@ class TransactionController extends Controller
         ]);
 
         $transaction->update(['status' => $request->status]);
+        return new TransactionResource($transaction->load('user', 'items.product'));
+    }
+
+    public function repeat(Request $request)
+    {
+        $request->validate([
+            'id' => ['required', 'uuid', 'exists:transactions,id'],
+        ]);
+
+        $user = $request->user();
+
+        $source = Transaction::with('items.product')
+            ->where('id', $request->id)
+            ->where('user_id', $user->id)
+            ->where('status', 'delivered')
+            ->firstOrFail();
+
+        DB::beginTransaction();
+
+        try {
+            $user->transactions()->where('status', 'pending')->delete();
+
+            $cart = Transaction::create([
+                'user_id'          => $user->id,
+                'status'           => 'pending',
+                'subtotal'         => 0,
+                'discount_applied' => 0,
+                'shipping_cost'    => 0,
+                'vat_total'        => 0,
+                'total'            => 0,
+                'shipping_address' => $user->address ?? '',
+                'payment_status'   => 'unpaid',
+            ]);
+
+            foreach ($source->items as $item) {
+                $product = $item->product;
+
+                if (!$product->is_active || $product->stock < $item->quantity) {
+                    continue;
+                }
+
+                $unitPrice = $user->priceGroup
+                    ? ($user->priceGroup->items()->where('product_id', $product->id)->value('price') ?? $product->price)
+                    : $product->price;
+
+                $cart->items()->create([
+                    'product_id' => $product->id,
+                    'quantity'   => $item->quantity,
+                    'unit_price' => $unitPrice,
+                    'subtotal'   => $unitPrice * $item->quantity,
+                    'vat_rate'   => $product->vat_rate,
+                    'vat_amount' => ($unitPrice * $item->quantity) * ($product->vat_rate / 100),
+                ]);
+            }
+
+            $this->recalculate($cart);
+
+            DB::commit();
+
+            return new TransactionResource($cart->load('user', 'items.product'));
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'message' => 'Error al repetir el pedido',
+                'error'   => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function changeStatus(Request $request)
+    {
+        $request->validate([
+            'id'     => ['required', 'uuid', 'exists:transactions,id'],
+            'status' => ['required', 'in:pending,preparing,shipped,delivered,cancelled'],
+        ]);
+
+        if ($request->user()->role !== 'admin') {
+            return response()->json(['message' => 'No autorizado'], 403);
+        }
+
+        $transaction = Transaction::findOrFail($request->id);
+        $transaction->update(['status' => $request->status]);
+
         return new TransactionResource($transaction->load('user', 'items.product'));
     }
 

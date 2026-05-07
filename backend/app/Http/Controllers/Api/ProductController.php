@@ -26,16 +26,16 @@ class ProductController extends Controller
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                ->orWhere('description', 'like', "%{$search}%");
+                    ->orWhere('description', 'like', "%{$search}%");
             });
         }
 
         if ($request->filled('categories')) {
-        $categoryNames = explode(',', $request->categories);
-        $query->whereHas('category', function ($q) use ($categoryNames) {
-            $q->whereIn('name', $categoryNames);
-        });
-    }
+            $categoryNames = explode(',', $request->categories);
+            $query->whereHas('category', function ($q) use ($categoryNames) {
+                $q->whereIn('name', $categoryNames);
+            });
+        }
 
         if ($request->filled('min_price')) {
             $query->where('price', '>=', $request->min_price);
@@ -43,6 +43,16 @@ class ProductController extends Controller
 
         if ($request->filled('max_price')) {
             $query->where('price', '<=', $request->max_price);
+        }
+
+        if ($request->filled('favourites_only') && $request->favourites_only === 'true') {
+            $user = auth('sanctum')->user();
+            if ($user) {
+                $favouriteIds = $user->favourites()->pluck('products.id');
+                $query->whereIn('id', $favouriteIds);
+            } else {
+                $query->whereRaw('0 = 1');
+            }
         }
 
         return ProductResource::collection($query->paginate(9));
@@ -158,6 +168,12 @@ class ProductController extends Controller
 
     public function destroy(Product $product)
     {
+        if ($product->transactionItems()->exists()) {
+            return response()->json([
+                'message' => 'No se puede eliminar el producto porque está asociado a pedidos existentes. Puedes desactivarlo en su lugar.',
+            ], 409);
+        }
+
         foreach ($product->images as $image) {
             Storage::disk('public')->delete($image->path);
             $image->delete();
@@ -190,6 +206,31 @@ class ProductController extends Controller
         }
 
         return ProductResource::collection($products);
+    }
+
+    public function favourite(Request $request)
+    {
+        $data = $request->validate([
+            'id' => ['required', 'uuid', 'exists:products,id'],
+        ]);
+
+        $user = $request->user();
+
+        $product = Product::with('category', 'images')->findOrFail($data['id']);
+
+        $exists = $user->favourites()
+            ->where('product_id', $product->id)
+            ->exists();
+
+        if ($exists) {
+            $user->favourites()->detach($product->id);
+        } else {
+            $user->favourites()->attach($product->id);
+        }
+
+        return new ProductResource(
+            $product->load('category', 'images')
+        );
     }
 
     public function updateStock(Request $request, Product $product)

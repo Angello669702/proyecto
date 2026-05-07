@@ -10,6 +10,8 @@ import { ProductFilter } from '../../interfaces/product-filter.interface';
 import { AuthService } from '../../../auth/services/auth.service';
 import { ActivatedRoute } from '@angular/router';
 import { LoadingGridComponent } from '../../../../shared/components/loading/loading-grid.component';
+import { TokenStorageService } from '../../../auth/services/token.service';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-catalog',
@@ -44,7 +46,9 @@ import { LoadingGridComponent } from '../../../../shared/components/loading/load
               <app-card-list
                 [products]="products()"
                 [isAdmin]="isAdmin()"
+                [isLogged]="isLogged()"
                 [productsInCart]="productsInCart()"
+                [favourites]="currentUser().favourites ?? []"
                 (add)="addToCart($event)"
                 (removeCart)="removeFromCart($event)"
                 (favourite)="toggleFavourite($event)"
@@ -52,6 +56,15 @@ import { LoadingGridComponent } from '../../../../shared/components/loading/load
                 (isActive)="toggle($event)"
                 (removeProduct)="deleteProduct($event)"
               />
+              <div
+                class="fixed bottom-6 right-6 z-50 bg-white border border-rose-200 text-rose-700 text-xs font-semibold px-4 py-3 rounded-lg shadow-lg max-w-sm transition-all duration-300"
+                [class.opacity-0]="!showRemoveError()"
+                [class.opacity-100]="showRemoveError()"
+                [class.translate-y-2]="!showRemoveError()"
+                [class.translate-y-0]="showRemoveError()"
+              >
+                {{ removeError() }}
+              </div>
             }
           </div>
         </section>
@@ -74,8 +87,15 @@ import { LoadingGridComponent } from '../../../../shared/components/loading/load
 export class CatalogPageComponent {
   readonly #productService = inject(ProductService);
   readonly #transactionService = inject(TransactionService);
+  readonly #authService = inject(AuthService);
 
-  isAdmin = inject(AuthService).isAdmin;
+  #isAdmin = this.#authService.isAdmin;
+  #currentUser = this.#authService.currentUser;
+  #isLogged = inject(TokenStorageService).isLogged;
+
+  isAdmin = computed(() => this.#isAdmin());
+  currentUser = computed(() => this.#currentUser());
+  isLogged = computed(() => this.#isLogged());
 
   readonly route = inject(ActivatedRoute);
   getRouteParams = effect(() => {
@@ -98,12 +118,14 @@ export class CatalogPageComponent {
     minPrice: null,
     maxPrice: null,
     searchText: '',
+    favouritesOnly: false,
   });
 
-  cartResource = this.#transactionService.myCart();
-  cart = this.#transactionService.cart;
+  cartResource = this.isLogged() ? this.#transactionService.myCart() : undefined;
+  cart = this.isLogged() ? this.#transactionService.cart : undefined;
 
   productsInCart = computed(() => {
+    if (!this.cart) return [];
     return this.cart().transactionsItems.map((item) => item.product);
   });
 
@@ -124,11 +146,36 @@ export class CatalogPageComponent {
 
   addToCartResource = this.#transactionService.addItem(this.productToAddToCart);
   removeFromCartResource = this.#transactionService.removeItem(this.productToRemoveFromCart);
-  favouriteResource = this.#productService.remove(this.productFavourite);
+  favouriteResource = this.#productService.favourite(this.productFavourite);
+
+  updateFavourites = effect(() => {
+    if (this.favouriteResource.status() === 'resolved') {
+      this.#authService.updateFavourites(this.productFavourite());
+    }
+  });
 
   updateStockResource = this.#productService.updateStock(this.productToUpdateStock);
   removeProductResource = this.#productService.remove(this.productToRemove);
   toggleProductResource = this.#productService.toggle(this.productToToggle);
+
+  showRemoveError = signal(false);
+
+  removeErrorEffect = effect(() => {
+    const error = this.removeProductResource.error();
+    if (!error) return;
+
+    this.showRemoveError.set(true);
+    setTimeout(() => this.showRemoveError.set(false), 5000);
+  });
+
+  removeError = computed(() => {
+    const error = this.removeProductResource.error();
+    if (!error) return null;
+    if (error instanceof HttpErrorResponse) {
+      return error.status === 409 ? error.error.message : 'Error al eliminar el producto';
+    }
+    return 'Error al eliminar el producto';
+  });
 
   addToCart(product: Product) {
     this.productToAddToCart.set({ product: product, quantity: 1 });
@@ -163,6 +210,7 @@ export class CatalogPageComponent {
   }
 
   getProductQuantity(product: Product): number {
+    if (!this.cart) return 0;
     return (
       this.cart().transactionsItems.find(
         (transactionItem) => (transactionItem.product.id = product.id),

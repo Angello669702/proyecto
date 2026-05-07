@@ -4,17 +4,22 @@ import { CurrencyPipe, NgClass } from '@angular/common';
 import { Transaction } from '../../interfaces/transaction.interface';
 import { TransactionStatus } from '../../enums/transaction-status.enum';
 import { PaymentStatus } from '../../enums/payment-status.enum';
+import { NgSelectModule } from '@ng-select/ng-select';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-transactions-table',
-  imports: [RouterLink, CurrencyPipe, NgClass],
+  imports: [RouterLink, CurrencyPipe, NgClass, NgSelectModule, FormsModule],
   templateUrl: './transactions-table.component.html',
 })
 export class TransactionsTableComponent {
   transactions = input.required<Transaction[]>();
   isAdmin = input<boolean>(false);
+  loading = input<boolean>(false);
   repeat = output<Transaction>();
   statusChange = output<{ transaction: Transaction; status: TransactionStatus }>();
+
+  allStatuses = Object.values(TransactionStatus);
 
   cartRoute = ['/', 'transactions', 'cart'];
 
@@ -28,12 +33,8 @@ export class TransactionsTableComponent {
     this.repeat.emit(transaction);
   }
 
-  onStatusChange(transaction: Transaction, event: Event): void {
-    const select = event.target as HTMLSelectElement;
-    this.statusChange.emit({
-      transaction,
-      status: select.value as TransactionStatus,
-    });
+  onStatusChange(transaction: Transaction, status: TransactionStatus): void {
+    if (status) this.statusChange.emit({ transaction, status });
   }
 
   getStatusLabel(status: TransactionStatus): string {

@@ -15,7 +15,9 @@ import { UUID } from '../../../../shared/types/uuid.type';
             class="h-full"
             [product]="product"
             [isAdmin]="isAdmin()"
+            [isLogged]="isLogged()"
             [isProductInCart]="isProductInCart(product)"
+            [isFavourite]="isFavourite(product)"
             (add)="addToCart($event)"
             (removeCart)="removeFromCart($event)"
             (favourite)="toggleFavourite($event)"
@@ -43,7 +45,9 @@ import { UUID } from '../../../../shared/types/uuid.type';
 export class CardListComponent {
   readonly products = input.required<Product[]>();
   readonly isAdmin = input<boolean>(false);
+  readonly isLogged = input<boolean>(false);
   readonly productsInCart = input<Product[]>([]);
+  readonly favourites = input<Product[]>([]);
 
   add = output<Product>();
   removeCart = output<Product>();
@@ -79,5 +83,9 @@ export class CardListComponent {
 
   isProductInCart(product: Product) {
     return this.productsInCart().some((productInCart) => productInCart.id === product.id);
+  }
+
+  isFavourite(product: Product) {
+    return this.favourites().some((favouriteProduct) => favouriteProduct.id === product.id);
   }
 }

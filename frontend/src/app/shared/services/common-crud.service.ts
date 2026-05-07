@@ -59,7 +59,6 @@ export abstract class CommonCrudService<
         },
       })
       .pipe(
-        tap((models) => console.log(models)),
         map((response) => this.mapper.mapList(response.data)),
         tap((models) => this.modelsSignal.set(models)),
         catchError((error) => {

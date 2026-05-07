@@ -1,3 +1,4 @@
+// product-filter.component.ts
 import { Component, effect, input, output, signal } from '@angular/core';
 import { Category } from '../../../categories/interfaces/category.interface';
 import { ProductFilter } from '../../interfaces/product-filter.interface';
@@ -18,6 +19,7 @@ export class ProductFilterComponent {
   fillFilters = effect(() => {
     if (this.initialFilters()) {
       this.selectedCategories.set(this.initialFilters()!.categories);
+      this.favouritesOnly.set(this.initialFilters()!.favouritesOnly ?? false);
     }
   });
 
@@ -27,6 +29,7 @@ export class ProductFilterComponent {
   minPrice = signal<number | null>(null);
   maxPrice = signal<number | null>(null);
   searchText = signal<string>('');
+  favouritesOnly = signal<boolean>(false);
 
   isExpanded = signal(false);
 
@@ -35,6 +38,7 @@ export class ProductFilterComponent {
     this.minPrice.set(null);
     this.maxPrice.set(null);
     this.searchText.set('');
+    this.favouritesOnly.set(false);
     this.applyFilters();
   }
 
@@ -43,7 +47,8 @@ export class ProductFilterComponent {
       this.selectedCategories().length > 0 ||
       this.minPrice() !== null ||
       this.maxPrice() !== null ||
-      this.searchText().trim() !== ''
+      this.searchText().trim() !== '' ||
+      this.favouritesOnly()
     );
   }
 
@@ -53,6 +58,7 @@ export class ProductFilterComponent {
       minPrice: this.minPrice(),
       maxPrice: this.maxPrice(),
       searchText: this.searchText(),
+      favouritesOnly: this.favouritesOnly(),
     });
   }
 }

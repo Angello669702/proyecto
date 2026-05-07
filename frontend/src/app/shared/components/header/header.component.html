@@ -23,7 +23,7 @@
     >
       Catálogo
     </a>
-    @if (!isAdmin()) {
+    @if (!isAdmin() && isLogged()) {
       <a
         routerLinkActive="bg-white text-rose-900 shadow-sm"
         class="px-5 py-2 text-[11px] font-semibold uppercase tracking-widest text-stone-500 hover:text-rose-800 rounded-md transition-all duration-300 cursor-pointer"
@@ -31,7 +31,7 @@
       >
         Carrito
       </a>
-    } @else {
+    } @else if (isAdmin()) {
       <a
         routerLinkActive="bg-white text-rose-900 shadow-sm"
         class="px-5 py-2 text-[11px] font-semibold uppercase tracking-widest text-stone-500 hover:text-rose-800 rounded-md transition-all duration-300 cursor-pointer"
@@ -47,9 +47,18 @@
         Agregar Producto
       </a>
     }
+    @if (isLogged()) {
+      <a
+        routerLinkActive="bg-white text-rose-900 shadow-sm"
+        class="px-5 py-2 text-[11px] font-semibold uppercase tracking-widest text-stone-500 hover:text-rose-800 rounded-md transition-all duration-300 cursor-pointer"
+        (click)="navigate(transactionsNavigation['orders'])"
+      >
+        Pedidos
+      </a>
+    }
   </nav>
 
-  @if (!isLoggued()) {
+  @if (!isLogged()) {
     <div class="w-48 flex justify-end">
       <button
         class="px-6 py-2 text-[10px] font-bold uppercase tracking-widest border-2 border-rose-900 text-rose-900 rounded-full hover:bg-rose-900 hover:text-white transition-all duration-300 cursor-pointer shadow-sm active:scale-95"

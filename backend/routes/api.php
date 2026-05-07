@@ -9,10 +9,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\ProductController;
 
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
-
 Route::post('/auth/login', [AuthController::class, 'login']);
 Route::get('/auth/user', [AuthController::class, 'me'])->middleware('auth:sanctum');;
 
@@ -27,7 +23,14 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
 
     Route::put('/products/{product}/stock', [ProductController::class, 'updateStock']);
     Route::put('/products/{product}/toggle', [ProductController::class, 'toggle']);
+
 });
+
+Route::post('/products/favourite', [ProductController::class, 'favourite'])->middleware((['auth:sanctum']));
+
+Route::post('/transactions/repeat', [TransactionController::class, 'repeat'])->middleware((['auth:sanctum']));
+
+Route::post('/transactions/change-status', [TransactionController::class, 'changeStatus'])->middleware((['auth:sanctum', 'admin']));
 
 Route::get('/categories', [CategoryController::class, 'index']);
 
@@ -46,7 +49,6 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/transactions', [TransactionController::class, 'index']);
-    Route::get('/my-transactions', [TransactionController::class, 'myTransactions']);
     Route::get('/transactions/cart', [TransactionController::class, 'myCart']);
     Route::post('/transactions/add', [TransactionController::class, 'addItem']);
     Route::post('/transactions/remove', [TransactionController::class, 'removeItem']);

@@ -29,9 +29,7 @@ export class TransactionService extends CommonCrudService<Transaction, Transacti
 
   #myCart(): Observable<Transaction> {
     return this.httpClient.get<{ data: TransactionDto }>(`${this.API_ENDPOINT}/cart`).pipe(
-      tap((transaction) => console.log(transaction)),
       map(({ data }) => this.mapper.mapOne(data)),
-      tap((transaction) => console.log(transaction)),
       tap((transaction) => this.#cart.set(transaction)),
       tap((transaction) => this.#updateTransactions(transaction)),
       catchError((error) => {
@@ -39,6 +37,10 @@ export class TransactionService extends CommonCrudService<Transaction, Transacti
         return throwError(() => error);
       }),
     );
+  }
+
+  buildParams(filter: Signal<TransactionStatus | 'all'>): Signal<Record<string, string>> {
+    return computed(() => ({ status: filter() }));
   }
 
   addItem(cartItem: Signal<CartItem>): ResourceRef<Transaction | undefined> {
@@ -75,7 +77,7 @@ export class TransactionService extends CommonCrudService<Transaction, Transacti
 
   #repeat(transaction: Transaction): Observable<Transaction> {
     return this.httpClient
-      .post<{ data: TransactionDto }>(`${this.API_ENDPOINT}/repeat`, this.mapper.toDto(transaction))
+      .post<{ data: TransactionDto }>(`${this.API_ENDPOINT}/repeat`, { id: transaction.id })
       .pipe(
         map(({ data }) => this.mapper.mapOne(data)),
         tap((transaction) => this.#updateTransactions(transaction)),
@@ -105,7 +107,10 @@ export class TransactionService extends CommonCrudService<Transaction, Transacti
     return this.httpClient
       .post<{
         data: TransactionDto;
-      }>(`${this.API_ENDPOINT}/repeat`, { transaction: this.mapper.toDto(transaction.transaction), status: transaction.status })
+      }>(`${this.API_ENDPOINT}/change-status`, {
+        id: transaction.transaction.id,
+        status: transaction.status,
+      })
       .pipe(
         map(({ data }) => this.mapper.mapOne(data)),
         tap((transaction) => this.#updateTransactions(transaction)),

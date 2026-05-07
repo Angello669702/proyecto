@@ -5,4 +5,5 @@ export interface ProductFilter {
   minPrice: number | null;
   maxPrice: number | null;
   searchText: string;
+  favouritesOnly?: boolean;
 }

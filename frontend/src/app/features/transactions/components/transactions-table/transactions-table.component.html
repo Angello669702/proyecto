@@ -163,7 +163,7 @@
                   [routerLink]="[...cartRoute, transaction.id]"
                   class="h-8 px-3 flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-stone-600 border border-stone-200 rounded-lg hover:border-rose-900 hover:text-rose-900 transition-all cursor-pointer whitespace-nowrap"
                 >
-                  <span class="text-xs">👁</span> Ver
+                  Ver
                 </a>
               }
 
@@ -177,23 +177,14 @@
               }
 
               @if (isAdmin() && transaction.status !== 'cancelled') {
-                <div class="relative">
-                  <select
-                    class="h-8 pl-3 pr-7 text-[10px] font-bold uppercase tracking-wider text-stone-700 border border-stone-200 rounded-lg bg-white hover:border-rose-900 hover:text-rose-900 transition-all cursor-pointer appearance-none focus:outline-none focus:border-rose-900"
-                    [value]="transaction.status"
-                    (change)="onStatusChange(transaction, $event)"
-                  >
-                    <option value="pending">Pendiente</option>
-                    <option value="preparing">Preparando</option>
-                    <option value="shipped">Enviado</option>
-                    <option value="delivered">Entregado</option>
-                    <option value="cancelled">Cancelar</option>
-                  </select>
-                  <span
-                    class="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-stone-400 text-xs"
-                    >▾</span
-                  >
-                </div>
+                <ng-select
+                  [items]="allStatuses"
+                  [ngModel]="transaction.status"
+                  (ngModelChange)="onStatusChange(transaction, $event)"
+                  [clearable]="false"
+                  [searchable]="false"
+                  style="min-width: 130px"
+                />
               }
 
               @if (isAdmin() && transaction.status === 'cancelled') {

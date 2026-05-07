@@ -31,18 +31,20 @@ class AuthController extends Controller
 
         $user = Auth::user();
 
+        $user->load('favourites');
+
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
             'token' => $token,
-            'user' => $user
+            'user' => new UserResource($user)
         ]);
     }
 
     public function me(Request $request)
     {
         return new UserResource(
-            $request->user()->load('priceGroup.items.product', 'transactions')
+            $request->user()->load(['favourites', 'priceGroup.items.product', 'transactions'])
         );
     }
 

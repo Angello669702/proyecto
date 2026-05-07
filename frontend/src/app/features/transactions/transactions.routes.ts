@@ -19,6 +19,11 @@ export const TRANSACTION_ROUTES: Routes = [
         loadComponent: () =>
           import('./pages/cart/cart.page.component').then((c) => c.CartPageComponent),
       },
+      {
+        path: TRANSACTION_PAGES.ORDERS,
+        loadComponent: () =>
+          import('./pages/orders/orders.page.component').then((c) => c.OrdersPageComponent),
+      },
     ],
   },
   { path: '**', redirectTo: TRANSACTION_PAGES.CART },

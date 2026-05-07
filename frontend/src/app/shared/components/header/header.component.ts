@@ -19,9 +19,13 @@ export class HeaderComponent {
   readonly #tokenService = inject(TokenStorageService);
   readonly #router = inject(Router);
 
-  readonly isLoggued = this.#tokenService.isLogged;
-  readonly user = this.#authService.currentUser;
-  readonly isAdmin = this.#authService.isAdmin;
+  readonly #isLogged = this.#tokenService.isLogged;
+  readonly #user = this.#authService.currentUser;
+  readonly #isAdmin = this.#authService.isAdmin;
+
+  isLogged = computed(() => this.#isLogged());
+  user = computed(() => this.#user());
+  isAdmin = computed(() => this.#isAdmin());
 
   readonly authNavigation: Record<string, string[]> = {
     login: ['/', FEATURE_PAGES.AUTH, AUTH_PAGES.LOGIN],

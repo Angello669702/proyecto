@@ -23,8 +23,8 @@ class UserResource extends JsonResource
                 : null,
             'role'          => $this->role,
             'is_active'     => $this->is_active,
-            'favourites'    => $this->whenLoaded('favorites',
-                fn() => ProductResource::collection($this->favorites)
+            'favourites'    => $this->whenLoaded('favourites',
+                fn() => ProductResource::collection($this->favourites)
             ),
             'created_at'    => $this->created_at->toDateTimeString(),
             'updated_at'    => $this->updated_at->toDateTimeString(),

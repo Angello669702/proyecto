@@ -11,6 +11,35 @@
     </span>
   </div>
 
+  @if (isLogged()) {
+    <button
+      (click)="toggleFavourite(); $event.stopPropagation()"
+      class="absolute top-2 right-2 z-20 w-9 h-9 rounded-full backdrop-blur-md border flex items-center justify-center transition-all duration-200 shadow-sm cursor-pointer"
+      [class.bg-rose-900]="isFavourite()"
+      [class.border-rose-900]="isFavourite()"
+      [class.text-white]="isFavourite()"
+      [class.bg-white/90]="!isFavourite()"
+      [class.border-stone-200]="!isFavourite()"
+      [class.text-stone-400]="!isFavourite()"
+      [class.hover:text-rose-900]="!isFavourite()"
+      [class.hover:border-rose-200]="!isFavourite()"
+      [class.hover:bg-rose-50]="!isFavourite()"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="w-4 h-4 transition-transform duration-200"
+        [class.scale-110]="isFavourite()"
+        fill="currentColor"
+        viewBox="0 0 24 24"
+        stroke="none"
+      >
+        <path
+          d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
+        />
+      </svg>
+    </button>
+  }
+
   @if (!product().isActive) {
     <div class="absolute top-2 right-2 z-10">
       <span class="bg-stone-200 text-stone-600 text-[10px] font-medium px-2 py-1 rounded-md">
@@ -59,14 +88,14 @@
           } @else {
             @if (isProductInCart()) {
               <button
-                (click)="removeFromCart()"
+                (click)="isLogged() ? removeFromCart() : navigate(loginRoute())"
                 class="cursor-pointer w-full h-8 text-xs font-medium bg-stone-200 text-stone-700 rounded-md hover:bg-stone-300 transition-colors"
               >
                 Quitar del carrito
               </button>
             } @else {
               <button
-                (click)="addToCart()"
+                (click)="isLogged() ? addToCart() : navigate(loginRoute())"
                 class="cursor-pointer w-full h-8 text-xs font-medium bg-rose-900 text-white rounded-md hover:bg-rose-800 transition-colors shadow-sm"
               >
                 Añadir al carrito

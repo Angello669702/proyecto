@@ -1,7 +1,7 @@
-import { Component, computed, input, model, output, signal } from '@angular/core';
+import { Component, computed, inject, input, model, output, signal } from '@angular/core';
 import { Product } from '../../interfaces/product.interface';
 import { CurrencyPipe } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { CartItem } from '../../../../shared/interfaces/cart.interface';
 
 @Component({
@@ -12,8 +12,12 @@ import { CartItem } from '../../../../shared/interfaces/cart.interface';
 export class CardComponent {
   readonly product = input.required<Product>();
   readonly isAdmin = input<boolean>(false);
+  readonly isLogged = input<boolean>(false);
   readonly featured = input<boolean>(false);
+  readonly isFavourite = input<boolean>(false);
   isProductInCart = model<boolean>(false);
+
+  readonly #router = inject(Router);
 
   quantity = signal<number>(0);
 
@@ -25,8 +29,9 @@ export class CardComponent {
   isActive = output<Product>();
   stock = output<CartItem>();
 
-  readonly detailRoute = computed(() => `/products/${this.product().id}`);
-  readonly updateRoute = computed(() => `/products/update/${this.product().id}`);
+  readonly detailRoute = computed(() => ['/', 'products', '/', this.product().id]);
+  readonly updateRoute = computed(() => ['/', 'products', '/', 'update', '/', this.product().id]);
+  readonly loginRoute = computed(() => ['/', 'auth', '/', 'login']);
 
   addToCart() {
     this.add.emit(this.product());
@@ -54,5 +59,9 @@ export class CardComponent {
 
   removeStock() {
     this.stock.emit({ product: this.product(), quantity: -this.quantity() });
+  }
+
+  navigate(route: string[]) {
+    this.#router.navigate(route);
   }
 }

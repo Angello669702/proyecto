@@ -8,6 +8,7 @@ import { TokenStorageService } from './token.service';
 import { AuthRequest, AuthResponse } from '../interfaces/auth.interface';
 import { UserDto } from '../dtos/user.interface.dto';
 import { UserMapper } from '../mappers/user.mapper';
+import { Product } from '../../products/interfaces/product.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -51,6 +52,20 @@ export class AuthService extends AuthServiceAbstract {
       params: () => loginRequest(),
       stream: ({ params: formData }) =>
         this.isLoginEmpty(formData) ? NEVER : this.#login(formData),
+    });
+  }
+
+  updateFavourites(product: Product): void {
+    this.#currentUser.update((user) => {
+      if (!user || !user.favourites) return user;
+      const isFavourite = user.favourites.some((favourite) => favourite.id === product.id);
+      const updatedFavourites = isFavourite
+        ? user.favourites.filter((favourite) => favourite.id !== product.id)
+        : [...user.favourites, product];
+      return {
+        ...user,
+        favourites: updatedFavourites,
+      };
     });
   }
 }
