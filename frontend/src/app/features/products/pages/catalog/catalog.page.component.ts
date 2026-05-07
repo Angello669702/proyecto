@@ -47,6 +47,7 @@ import { LoadingGridComponent } from '../../../../shared/components/loading/load
                 [productsInCart]="productsInCart()"
                 (add)="addToCart($event)"
                 (removeCart)="removeFromCart($event)"
+                (favourite)="toggleFavourite($event)"
                 (stock)="updateStock($event)"
                 (isActive)="toggle($event)"
                 (removeProduct)="deleteProduct($event)"
@@ -106,7 +107,8 @@ export class CatalogPageComponent {
     return this.cart().transactionsItems.map((item) => item.product);
   });
 
-  readonly products = this.#productService.models;
+  readonly #products = this.#productService.models;
+  products = computed(() => this.#products());
   productsResource = this.#productService.loadPaginated(
     this.currentPage,
     this.#productService.buildParams(this.filters),
@@ -114,6 +116,7 @@ export class CatalogPageComponent {
 
   productToAddToCart = signal<CartItem>(this.#transactionService.defaultCartItem);
   productToRemoveFromCart = signal<CartItem>(this.#transactionService.defaultCartItem);
+  productFavourite = signal<Product>(this.#productService.defaultModel);
 
   productToUpdateStock = signal<CartItem>(this.#productService.defaultCartItem);
   productToRemove = signal<Product>(this.#productService.defaultModel);
@@ -121,6 +124,7 @@ export class CatalogPageComponent {
 
   addToCartResource = this.#transactionService.addItem(this.productToAddToCart);
   removeFromCartResource = this.#transactionService.removeItem(this.productToRemoveFromCart);
+  favouriteResource = this.#productService.remove(this.productFavourite);
 
   updateStockResource = this.#productService.updateStock(this.productToUpdateStock);
   removeProductResource = this.#productService.remove(this.productToRemove);
@@ -135,6 +139,10 @@ export class CatalogPageComponent {
       product: product,
       quantity: this.getProductQuantity(product),
     });
+  }
+
+  toggleFavourite(product: Product) {
+    this.productFavourite.set(product);
   }
 
   updateStock(cartItem: CartItem) {

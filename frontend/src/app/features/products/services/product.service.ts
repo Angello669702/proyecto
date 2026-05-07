@@ -76,6 +76,27 @@ export class ProductService extends CommonCrudService<Product, ProductDto> {
       );
   }
 
+  favourite(product: Signal<Product>): ResourceRef<Product | undefined> {
+    return rxResource({
+      params: () => product(),
+      stream: ({ params: product }) =>
+        this.isDefaultModel(product) ? NEVER : this.#favourite(product),
+      equal: (product1, product2) => product1.id === product2.id,
+    });
+  }
+
+  #favourite(product: Product): Observable<Product> {
+    return this.httpClient
+      .post<{ data: ProductDto }>(`${this.API_ENDPOINT}/favourite`, this.mapper.toDto(product))
+      .pipe(
+        map(({ data }) => this.mapper.mapOne(data)),
+        catchError((error) => {
+          console.error('Failed to add an model', error);
+          return throwError(() => error);
+        }),
+      );
+  }
+
   toggle(product: Signal<Product>): ResourceRef<Product | undefined> {
     return rxResource({
       params: () => product(),

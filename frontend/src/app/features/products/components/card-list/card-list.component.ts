@@ -18,6 +18,7 @@ import { UUID } from '../../../../shared/types/uuid.type';
             [isProductInCart]="isProductInCart(product)"
             (add)="addToCart($event)"
             (removeCart)="removeFromCart($event)"
+            (favourite)="toggleFavourite($event)"
             (isActive)="toggleProduct($event)"
             (removeProduct)="deleteProduct($event)"
             (stock)="updateStock($event)"
@@ -46,6 +47,7 @@ export class CardListComponent {
 
   add = output<Product>();
   removeCart = output<Product>();
+  favourite = output<Product>();
 
   removeProduct = output<Product>();
   isActive = output<Product>();
@@ -57,6 +59,10 @@ export class CardListComponent {
 
   removeFromCart(product: Product) {
     this.removeCart.emit(product);
+  }
+
+  toggleFavourite(product: Product) {
+    this.favourite.emit(product);
   }
 
   deleteProduct(product: Product) {

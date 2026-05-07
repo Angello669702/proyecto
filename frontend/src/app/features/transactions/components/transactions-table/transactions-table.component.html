@@ -1,0 +1,358 @@
+<div class="w-full overflow-x-auto">
+  <table class="w-full border-collapse text-sm">
+    <thead>
+      <tr class="border-b-2 border-stone-200">
+        <th
+          class="py-3 px-4 text-left text-[10px] font-bold uppercase tracking-[0.2em] text-stone-400 w-8"
+        ></th>
+        @if (isAdmin()) {
+          <th
+            class="py-3 px-4 text-left text-[10px] font-bold uppercase tracking-[0.2em] text-stone-400"
+          >
+            Cliente
+          </th>
+        }
+        <th
+          class="py-3 px-4 text-left text-[10px] font-bold uppercase tracking-[0.2em] text-stone-400"
+        >
+          Pedido
+        </th>
+        <th
+          class="py-3 px-4 text-left text-[10px] font-bold uppercase tracking-[0.2em] text-stone-400"
+        >
+          Productos
+        </th>
+        <th
+          class="py-3 px-4 text-right text-[10px] font-bold uppercase tracking-[0.2em] text-stone-400"
+        >
+          Subtotal
+        </th>
+        <th
+          class="py-3 px-4 text-right text-[10px] font-bold uppercase tracking-[0.2em] text-stone-400"
+        >
+          IVA
+        </th>
+        <th
+          class="py-3 px-4 text-right text-[10px] font-bold uppercase tracking-[0.2em] text-stone-400"
+        >
+          Envío
+        </th>
+        <th
+          class="py-3 px-4 text-right text-[10px] font-bold uppercase tracking-[0.2em] text-stone-400"
+        >
+          Total
+        </th>
+        <th
+          class="py-3 px-4 text-center text-[10px] font-bold uppercase tracking-[0.2em] text-stone-400"
+        >
+          Estado
+        </th>
+        <th
+          class="py-3 px-4 text-center text-[10px] font-bold uppercase tracking-[0.2em] text-stone-400"
+        >
+          Pago
+        </th>
+        <th
+          class="py-3 px-4 text-right text-[10px] font-bold uppercase tracking-[0.2em] text-stone-400"
+        >
+          Acciones
+        </th>
+      </tr>
+    </thead>
+
+    <tbody>
+      @for (transaction of transactions(); track transaction.id) {
+        <tr
+          class="border-b border-stone-100 hover:bg-stone-50/70 transition-colors group"
+          [class.bg-rose-50/30]="expandedRow() === transaction.id"
+        >
+          <td class="py-4 px-4">
+            <button
+              (click)="toggleRow(transaction.id)"
+              class="w-6 h-6 rounded-full border border-stone-200 flex items-center justify-center text-stone-400 hover:border-rose-900 hover:text-rose-900 transition-all cursor-pointer text-xs"
+              [class.rotate-180]="expandedRow() === transaction.id"
+              [class.border-rose-900]="expandedRow() === transaction.id"
+              [class.text-rose-900]="expandedRow() === transaction.id"
+              style="
+                transition:
+                  transform 0.2s ease,
+                  color 0.2s,
+                  border-color 0.2s;
+              "
+            >
+              ↓
+            </button>
+          </td>
+
+          @if (isAdmin()) {
+            <td class="py-4 px-4">
+              <div class="flex flex-col gap-0.5">
+                <span class="font-semibold text-stone-800 text-xs">{{
+                  transaction.user.name
+                }}</span>
+                <span class="text-[11px] text-stone-400">{{ transaction.user.email }}</span>
+              </div>
+            </td>
+          }
+
+          <td class="py-4 px-4">
+            <span class="font-mono text-[11px] text-stone-400 bg-stone-100 px-2 py-0.5 rounded">
+              #{{ transaction.id.slice(0, 8).toUpperCase() }}
+            </span>
+          </td>
+
+          <td class="py-4 px-4">
+            <span class="text-stone-700 font-medium">
+              {{ transaction.transactionsItems.length }}
+              <span class="text-stone-400 font-normal text-xs">
+                {{ transaction.transactionsItems.length === 1 ? 'art.' : 'arts.' }}
+              </span>
+            </span>
+          </td>
+
+          <td class="py-4 px-4 text-right text-stone-600 tabular-nums">
+            {{ transaction.subtotal | currency: 'EUR' : 'symbol' : '1.2-2' : 'es' }}
+          </td>
+
+          <td class="py-4 px-4 text-right text-stone-400 tabular-nums text-xs">
+            {{ transaction.vatTotal | currency: 'EUR' : 'symbol' : '1.2-2' : 'es' }}
+          </td>
+
+          <td class="py-4 px-4 text-right text-stone-400 tabular-nums text-xs">
+            @if (transaction.shippingCost === 0) {
+              <span class="text-emerald-600 font-semibold text-[10px] uppercase tracking-wide"
+                >Gratis</span
+              >
+            } @else {
+              {{ transaction.shippingCost | currency: 'EUR' : 'symbol' : '1.2-2' : 'es' }}
+            }
+          </td>
+
+          <td class="py-4 px-4 text-right">
+            <span class="font-serif font-bold text-stone-900 text-base">
+              {{ transaction.total | currency: 'EUR' : 'symbol' : '1.2-2' : 'es' }}
+            </span>
+          </td>
+
+          <td class="py-4 px-4 text-center">
+            <span
+              class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider"
+              [ngClass]="getStatusClasses(transaction.status)"
+            >
+              <span
+                class="w-1.5 h-1.5 rounded-full"
+                [ngClass]="getStatusDotClasses(transaction.status)"
+              ></span>
+              {{ getStatusLabel(transaction.status) }}
+            </span>
+          </td>
+
+          <td class="py-4 px-4 text-center">
+            <span
+              class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider"
+              [ngClass]="getPaymentStatusClasses(transaction.paymentStatus)"
+            >
+              {{ getPaymentStatusLabel(transaction.paymentStatus) }}
+            </span>
+          </td>
+
+          <td class="py-4 px-4">
+            <div class="flex items-center justify-end gap-2">
+              @if (!isAdmin() && transaction.status === 'pending') {
+                <a
+                  [routerLink]="[...cartRoute, transaction.id]"
+                  class="h-8 px-3 flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-stone-600 border border-stone-200 rounded-lg hover:border-rose-900 hover:text-rose-900 transition-all cursor-pointer whitespace-nowrap"
+                >
+                  <span class="text-xs">👁</span> Ver
+                </a>
+              }
+
+              @if (!isAdmin() && transaction.status === 'delivered') {
+                <button
+                  (click)="repeatTransaction(transaction)"
+                  class="h-8 px-3 flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-white bg-rose-900 rounded-lg hover:bg-rose-950 transition-all active:scale-95 cursor-pointer whitespace-nowrap shadow-sm shadow-rose-900/20"
+                >
+                  <span class="text-xs">↺</span> Repetir
+                </button>
+              }
+
+              @if (isAdmin() && transaction.status !== 'cancelled') {
+                <div class="relative">
+                  <select
+                    class="h-8 pl-3 pr-7 text-[10px] font-bold uppercase tracking-wider text-stone-700 border border-stone-200 rounded-lg bg-white hover:border-rose-900 hover:text-rose-900 transition-all cursor-pointer appearance-none focus:outline-none focus:border-rose-900"
+                    [value]="transaction.status"
+                    (change)="onStatusChange(transaction, $event)"
+                  >
+                    <option value="pending">Pendiente</option>
+                    <option value="preparing">Preparando</option>
+                    <option value="shipped">Enviado</option>
+                    <option value="delivered">Entregado</option>
+                    <option value="cancelled">Cancelar</option>
+                  </select>
+                  <span
+                    class="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-stone-400 text-xs"
+                    >▾</span
+                  >
+                </div>
+              }
+
+              @if (isAdmin() && transaction.status === 'cancelled') {
+                <span class="text-[10px] text-stone-300 uppercase tracking-wider italic"
+                  >Sin acciones</span
+                >
+              }
+            </div>
+          </td>
+        </tr>
+
+        @if (expandedRow() === transaction.id) {
+          <tr class="bg-rose-50/20 border-b border-stone-100">
+            <td [colSpan]="isAdmin() ? 11 : 10" class="px-8 py-6">
+              <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="lg:col-span-2">
+                  <p class="text-[10px] font-bold uppercase tracking-[0.25em] text-stone-400 mb-4">
+                    — Líneas del pedido
+                  </p>
+                  <div class="flex flex-col gap-2">
+                    @for (item of transaction.transactionsItems; track item.id) {
+                      <div
+                        class="flex items-center gap-4 py-2.5 px-3 rounded-lg bg-white border border-stone-100"
+                      >
+                        <div
+                          class="w-10 h-10 rounded-lg bg-stone-100 overflow-hidden shrink-0 flex items-center justify-center text-stone-300 text-lg"
+                        >
+                          @if (item.product.coverImage) {
+                            <img
+                              [src]="item.product.coverImage"
+                              [alt]="item.product.name"
+                              class="w-full h-full object-cover"
+                            />
+                          } @else {
+                            ◈
+                          }
+                        </div>
+                        <div class="flex-1 min-w-0">
+                          <p class="font-semibold text-stone-800 text-xs truncate">
+                            {{ item.product.name }}
+                          </p>
+                          <p class="text-[11px] text-stone-400 mt-0.5">
+                            {{ item.quantity }} ud ×
+                            {{ item.unitPrice | currency: 'EUR' : 'symbol' : '1.2-2' : 'es' }}
+                            @if (item.discount > 0) {
+                              <span class="ml-1.5 text-rose-700 font-bold"
+                                >-{{ item.discount }}%</span
+                              >
+                            }
+                          </p>
+                        </div>
+                        <div class="text-right shrink-0">
+                          <p class="font-semibold text-stone-800 tabular-nums text-xs">
+                            {{ item.subtotalWithVat | currency: 'EUR' : 'symbol' : '1.2-2' : 'es' }}
+                          </p>
+                          <p class="text-[10px] text-stone-400 tabular-nums">
+                            IVA {{ item.vatRate }}%
+                          </p>
+                        </div>
+                      </div>
+                    }
+                  </div>
+                </div>
+
+                <div class="flex flex-col gap-5">
+                  <div>
+                    <p
+                      class="text-[10px] font-bold uppercase tracking-[0.25em] text-stone-400 mb-3"
+                    >
+                      — Resumen
+                    </p>
+                    <div
+                      class="bg-white rounded-lg border border-stone-100 p-4 flex flex-col gap-2"
+                    >
+                      <div class="flex justify-between text-xs text-stone-500">
+                        <span>Subtotal</span>
+                        <span class="tabular-nums">{{
+                          transaction.subtotal | currency: 'EUR' : 'symbol' : '1.2-2' : 'es'
+                        }}</span>
+                      </div>
+                      @if (transaction.discountApplied > 0) {
+                        <div class="flex justify-between text-xs text-rose-700">
+                          <span>Descuento</span>
+                          <span class="tabular-nums"
+                            >-{{
+                              transaction.discountApplied
+                                | currency: 'EUR' : 'symbol' : '1.2-2' : 'es'
+                            }}</span
+                          >
+                        </div>
+                      }
+                      <div class="flex justify-between text-xs text-stone-500">
+                        <span>IVA total</span>
+                        <span class="tabular-nums">{{
+                          transaction.vatTotal | currency: 'EUR' : 'symbol' : '1.2-2' : 'es'
+                        }}</span>
+                      </div>
+                      <div class="flex justify-between text-xs text-stone-500">
+                        <span>Envío</span>
+                        @if (transaction.shippingCost === 0) {
+                          <span class="text-emerald-600 font-semibold">Gratis</span>
+                        } @else {
+                          <span class="tabular-nums">{{
+                            transaction.shippingCost | currency: 'EUR' : 'symbol' : '1.2-2' : 'es'
+                          }}</span>
+                        }
+                      </div>
+                      <div class="border-t border-stone-100 pt-2 mt-1 flex justify-between">
+                        <span class="font-bold text-stone-800 text-sm">Total</span>
+                        <span class="font-serif font-bold text-stone-900 text-base tabular-nums">
+                          {{ transaction.total | currency: 'EUR' : 'symbol' : '1.2-2' : 'es' }}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <p
+                      class="text-[10px] font-bold uppercase tracking-[0.25em] text-stone-400 mb-3"
+                    >
+                      — Envío & notas
+                    </p>
+                    <div
+                      class="bg-white rounded-lg border border-stone-100 p-4 flex flex-col gap-3"
+                    >
+                      <div>
+                        <p class="text-[10px] uppercase tracking-wider text-stone-400 mb-1">
+                          Dirección
+                        </p>
+                        <p class="text-xs text-stone-700 leading-relaxed">
+                          {{ transaction.shippingAddress || '—' }}
+                        </p>
+                      </div>
+                      @if (transaction.notes) {
+                        <div>
+                          <p class="text-[10px] uppercase tracking-wider text-stone-400 mb-1">
+                            Notas
+                          </p>
+                          <p class="text-xs text-stone-600 italic leading-relaxed">
+                            {{ transaction.notes }}
+                          </p>
+                        </div>
+                      }
+                      <div>
+                        <p class="text-[10px] uppercase tracking-wider text-stone-400 mb-1">
+                          ID pago
+                        </p>
+                        <p class="font-mono text-[10px] text-stone-400 break-all">
+                          {{ transaction.paymentIntentId || '—' }}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </td>
+          </tr>
+        }
+      }
+    </tbody>
+  </table>
+</div>

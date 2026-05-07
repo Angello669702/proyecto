@@ -8,6 +8,7 @@ import { rxResource } from '@angular/core/rxjs-interop';
 import { NEVER, Observable, map, tap, catchError, throwError } from 'rxjs';
 import { ProductService } from '../../products/services/product.service';
 import { CartItem } from '../../../shared/interfaces/cart.interface';
+import { TransactionStatus } from '../enums/transaction-status.enum';
 
 @Injectable({ providedIn: 'root' })
 export class TransactionService extends CommonCrudService<Transaction, TransactionDto> {
@@ -52,6 +53,59 @@ export class TransactionService extends CommonCrudService<Transaction, Transacti
   #addItem(cartItem: CartItem): Observable<Transaction> {
     return this.httpClient
       .post<{ data: TransactionDto }>(`${this.API_ENDPOINT}/add`, cartItem)
+      .pipe(
+        map(({ data }) => this.mapper.mapOne(data)),
+        tap((transaction) => this.#updateTransactions(transaction)),
+        tap((transaction) => this.#cart.set(transaction)),
+        catchError((error) => {
+          console.error('Failed to add an model', error);
+          return throwError(() => error);
+        }),
+      );
+  }
+
+  repeat(transaction: Signal<Transaction>): ResourceRef<Transaction | undefined> {
+    return rxResource({
+      params: () => transaction(),
+      stream: ({ params: transaction }) =>
+        this.isDefaultModel(transaction) ? NEVER : this.#repeat(transaction),
+      equal: (transaction1, transaction2) => transaction1.id === transaction2.id,
+    });
+  }
+
+  #repeat(transaction: Transaction): Observable<Transaction> {
+    return this.httpClient
+      .post<{ data: TransactionDto }>(`${this.API_ENDPOINT}/repeat`, this.mapper.toDto(transaction))
+      .pipe(
+        map(({ data }) => this.mapper.mapOne(data)),
+        tap((transaction) => this.#updateTransactions(transaction)),
+        tap((transaction) => this.#cart.set(transaction)),
+        catchError((error) => {
+          console.error('Failed to add an model', error);
+          return throwError(() => error);
+        }),
+      );
+  }
+
+  changeStatus(
+    transaction: Signal<{ transaction: Transaction; status: TransactionStatus }>,
+  ): ResourceRef<Transaction | undefined> {
+    return rxResource({
+      params: () => transaction(),
+      stream: ({ params: transaction }) =>
+        this.isDefaultModel(transaction.transaction) ? NEVER : this.#changeStatus(transaction),
+      equal: (transaction1, transaction2) => transaction1.id === transaction2.id,
+    });
+  }
+
+  #changeStatus(transaction: {
+    transaction: Transaction;
+    status: TransactionStatus;
+  }): Observable<Transaction> {
+    return this.httpClient
+      .post<{
+        data: TransactionDto;
+      }>(`${this.API_ENDPOINT}/repeat`, { transaction: this.mapper.toDto(transaction.transaction), status: transaction.status })
       .pipe(
         map(({ data }) => this.mapper.mapOne(data)),
         tap((transaction) => this.#updateTransactions(transaction)),

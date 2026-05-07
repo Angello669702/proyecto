@@ -19,6 +19,7 @@ export class CardComponent {
 
   add = output<Product>();
   removeCart = output<Product>();
+  favourite = output<Product>();
 
   removeProduct = output<Product>();
   isActive = output<Product>();
@@ -33,6 +34,10 @@ export class CardComponent {
 
   removeFromCart() {
     this.removeCart.emit(this.product());
+  }
+
+  toggleFavourite() {
+    this.favourite.emit(this.product());
   }
 
   deleteProduct() {
