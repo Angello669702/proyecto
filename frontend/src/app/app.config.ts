@@ -5,6 +5,7 @@ import { routes } from './app.routes';
 import { registerLocaleData } from '@angular/common';
 import { tokenInterceptor } from './features/auth/interceptors/auth.interceptor';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { acceptJsonInterceptor } from './shared/interceptors/accept-json.interceptor';
 
 registerLocaleData(localeEs, 'es');
 
@@ -12,7 +13,7 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes, withComponentInputBinding()),
-    provideHttpClient(withInterceptors([tokenInterceptor])),
+    provideHttpClient(withInterceptors([tokenInterceptor, acceptJsonInterceptor])),
     { provide: LOCALE_ID, useValue: 'es' },
   ],
 };
