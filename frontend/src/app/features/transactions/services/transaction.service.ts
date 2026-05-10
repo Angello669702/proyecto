@@ -12,7 +12,7 @@ import { TransactionStatus } from '../enums/transaction-status.enum';
 
 @Injectable({ providedIn: 'root' })
 export class TransactionService extends CommonCrudService<Transaction, TransactionDto> {
-  readonly API_ENDPOINT = 'http://127.0.0.1:8000/api/transactions';
+  readonly API_ENDPOINT = 'http://51.91.110.54:8000/api/transactions';
   readonly mapper = inject(TransactionMapper);
   readonly #productService = inject(ProductService);
   readonly defaultModel = { id: '' } as Transaction;
@@ -41,7 +41,7 @@ export class TransactionService extends CommonCrudService<Transaction, Transacti
 
   createCheckoutSession(): Observable<{ url: string }> {
     return this.httpClient
-      .post<{ url: string }>('http://127.0.0.1:8000/api/stripe/checkout', {})
+      .post<{ url: string }>('http://51.91.110.54:8000/api/stripe/checkout', {})
       .pipe(
         catchError((error) => {
           console.error('Failed to create checkout session', error);

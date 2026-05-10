@@ -11,7 +11,7 @@ import { ProductFilter } from '../interfaces/product-filter.interface';
 
 @Injectable({ providedIn: 'root' })
 export class ProductService extends CommonCrudService<Product, ProductDto> {
-  readonly API_ENDPOINT = 'http://127.0.0.1:8000/api/products';
+  readonly API_ENDPOINT = 'http://51.91.110.54:8000/api/products';
   readonly mapper = inject(ProductMapper);
   readonly defaultModel = { id: '' } as Product;
   readonly defaultDto = { id: '' } as ProductDto;

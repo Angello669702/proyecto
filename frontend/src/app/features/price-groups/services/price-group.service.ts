@@ -13,7 +13,7 @@ import { UserService } from '../../auth/services/user.service';
 
 @Injectable({ providedIn: 'root' })
 export class PriceGroupService extends CommonCrudService<PriceGroup, PriceGroupDto> {
-  readonly API_ENDPOINT = 'http://127.0.0.1:8000/api/price-groups';
+  readonly API_ENDPOINT = 'http://51.91.110.54:8000/api/price-groups';
   readonly mapper = inject(PriceGroupMapper);
   readonly defaultModel = { id: '' } as PriceGroup;
   readonly defaultDto = { id: '' } as PriceGroupDto;

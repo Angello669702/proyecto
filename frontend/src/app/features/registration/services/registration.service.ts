@@ -10,7 +10,7 @@ import { NEVER, Observable, map, tap, catchError, throwError } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class RegistrationService extends CommonCrudService<Registration, RegistrationDto> {
-  readonly API_ENDPOINT = 'http://127.0.0.1:8000/api/registrations';
+  readonly API_ENDPOINT = 'http://51.91.110.54:8000/api/registrations';
   readonly mapper = inject(RegistrationMapper);
   readonly defaultModel = { id: '' } as Registration;
   readonly defaultDto = { id: '' } as RegistrationDto;

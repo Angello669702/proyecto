@@ -6,7 +6,7 @@ import { ActionLog } from '../interfaces/action-log.interface';
 
 @Injectable({ providedIn: 'root' })
 export class ActionLogService extends CommonCrudService<ActionLog, ActionLogDto> {
-  readonly API_ENDPOINT = 'http://127.0.0.1:8000/api/action-logs';
+  readonly API_ENDPOINT = 'http://51.91.110.54:8000/api/action-logs';
   readonly mapper = inject(ActionLogMapper);
   override readonly defaultModel = { id: '' } as ActionLog;
 }

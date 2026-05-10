@@ -9,7 +9,7 @@ import { NEVER, Observable, map, tap, catchError, throwError } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class UserService extends CommonCrudService<User, UserDto> {
-  readonly API_ENDPOINT = 'http://127.0.0.1:8000/api/user';
+  readonly API_ENDPOINT = 'http://51.91.110.54:8000/api/user';
   readonly mapper = inject(UserMapper);
   readonly defaultModel = { id: '' } as User;
   readonly defaultChangePassword: ChangePassword = { currentPassword: '', newPassword: '' };
