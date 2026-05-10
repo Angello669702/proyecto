@@ -12,15 +12,15 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->foreignUuid('user_id')->constrained('users')->restrictOnDelete();
             $table->enum('status', ['pending', 'preparing', 'shipped', 'delivered', 'cancelled'])->default('pending');
-            $table->decimal('subtotal', 10, 2);
+            $table->decimal('subtotal', 10, 2)->default(0);
             $table->decimal('discount_applied', 10, 2)->default(0);
             $table->decimal('shipping_cost', 10, 2)->default(0);
-            $table->decimal('total', 10, 2);
+            $table->decimal('total', 10, 2)->default(0);
             $table->decimal('vat_total', 10, 2)->default(0);
-            $table->text('shipping_address');
-            $table->string('payment_intent_id')->nullable()->comment('Stripe Payment Intent ID');
+            $table->text('shipping_address')->default('');
+            $table->string('payment_intent_id')->nullable()->default(null);
             $table->enum('payment_status', ['unpaid', 'paid', 'refunded'])->default('unpaid');
-            $table->text('notes')->nullable();
+            $table->text('notes')->nullable()->default(null);
             $table->timestamps();
         });
 
@@ -28,11 +28,11 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->foreignUuid('transaction_id')->constrained('transactions')->cascadeOnDelete();
             $table->foreignUuid('product_id')->constrained('products')->restrictOnDelete();
-            $table->integer('quantity');
-            $table->decimal('unit_price', 10, 2)->comment('Precio en el momento de la compra');
+            $table->integer('quantity')->default(1);
+            $table->decimal('unit_price', 10, 2)->default(0);
             $table->enum('vat_rate', ['10', '21'])->default('10');
             $table->decimal('vat_amount', 10, 2)->default(0);
-            $table->decimal('subtotal', 10, 2)->comment('quantity * unit_price');
+            $table->decimal('subtotal', 10, 2)->default(0);
             $table->timestamps();
         });
     }
