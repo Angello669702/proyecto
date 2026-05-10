@@ -1,5 +1,46 @@
 # Anteproyecto — Aplicación Web para Distribuidora de Bebidas Alcohólicas
 
+## Instalación
+
+## Requisitos
+
+- Docker
+- Docker Compose
+
+## Instalación en producción
+
+1. Clonar el repositorio:
+
+```bash
+   git clone
+   cd proyecto
+```
+
+2. Configurar el `.env` del backend:
+
+```bash
+   cp backend/.env.example backend/.env
+   nano backend/.env
+```
+
+3. Levantar los contenedores:
+
+```bash
+   sudo docker compose up --build -d
+```
+
+El entrypoint del backend se encarga automáticamente de:
+
+- Generar la clave de aplicación
+- Ejecutar las migraciones
+- Ejecutar los seeders
+- Configurar los permisos de storage
+- Cachear configuración, rutas y vistas
+
+## Desarrollo local
+
+Para desarrollo local hay que cambiar las URLs del frontend que apuntan al VPS (`http://51.91.110.54:8000`) por `http://localhost:8000`.
+
 ## Idea del Proyecto
 
 El proyecto consiste en una aplicación web orientada al sector B2B (Business to Business) para una empresa distribuidora de bebidas alcohólicas. La empresa trabaja exclusivamente con el canal **HORECA** (Hoteles, Restaurantes y Cafeterías), por lo que el acceso a la plataforma de compra está restringido a clientes previamente verificados y aprobados.
