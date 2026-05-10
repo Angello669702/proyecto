@@ -46,7 +46,6 @@ class ActionLog extends Model
             'entity_type' => $entityType,
             'entity_id' => $entityId,
             'description' => $description,
-            'ip_address' => Request::ip(),
         ]);
     }
 }
