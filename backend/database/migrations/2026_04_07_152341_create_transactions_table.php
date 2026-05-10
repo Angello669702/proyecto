@@ -17,7 +17,7 @@ return new class extends Migration
             $table->decimal('shipping_cost', 10, 2)->default(0);
             $table->decimal('total', 10, 2)->default(0);
             $table->decimal('vat_total', 10, 2)->default(0);
-            $table->text('shipping_address')->default('');
+            $table->string('shipping_address')->default('');
             $table->string('payment_intent_id')->nullable()->default(null);
             $table->enum('payment_status', ['unpaid', 'paid', 'refunded'])->default('unpaid');
             $table->text('notes')->nullable()->default(null);
