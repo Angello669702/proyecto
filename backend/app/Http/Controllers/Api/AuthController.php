@@ -10,40 +10,59 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
 
 class AuthController extends Controller
 {
-
     public function login(Request $request)
     {
-        $request->validate([
-            'username' => 'required',
-            'password' => 'required',
-        ]);
-
-        if (!Auth::attempt([
-            'name' => $request->username,
-            'password' => $request->password,
-        ])) {
+        // VER QUÉ ESTÁ RECIBIENDO EXACTAMENTE
+        $content = $request->getContent();
+        $json = json_decode($content, true);
+        
+        if (!$json) {
             return response()->json([
-                'message' => 'Credenciales incorrectas'
+                'error' => 'JSON inválido o vacío',
+                'content_type' => $request->header('Content-Type'),
+                'raw_body' => $content,
+                'method' => $request->method()
+            ], 400);
+        }
+        
+        $username = $json['username'] ?? null;
+        $password = $json['password'] ?? null;
+        
+        if (!$username || !$password) {
+            return response()->json([
+                'error' => 'Faltan credenciales',
+                'received' => $json
+            ], 400);
+        }
+        
+        $user = User::where('name', $username)->first();
+        
+        if (!$user) {
+            return response()->json([
+                'error' => 'Usuario no encontrado: ' . $username,
+                'users_count' => User::count()
+            ], 404);
+        }
+        
+        if (!Hash::check($password, $user->password)) {
+            return response()->json([
+                'error' => 'Contraseña incorrecta'
             ], 401);
         }
-
-        $user = Auth::user();
-
-        $user->load('favourites');
-
-        $token = $user->createToken('auth_token')->plainTextToken;
-
-        ActionLog::log(
-            ActionType::USER_LOGIN,
-            'User',
-            $user->id,
-            "{$user->name} inició sesión"
-        );
-
+        
+        Auth::login($user);
+        
+        try {
+            $token = $user->createToken('auth_token')->plainTextToken;
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Error al crear token: ' . $e->getMessage()
+            ], 500);
+        }
+        
         return response()->json([
             'token' => $token,
             'user' => new UserResource($user)
@@ -56,5 +75,4 @@ class AuthController extends Controller
             $request->user()->load(['favourites', 'priceGroup.items.product', 'transactions'])
         );
     }
-
 }

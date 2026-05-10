@@ -1,28 +1,9 @@
 services:
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    ports:
-      - "80:80"
-    depends_on:
-      - backend
-
-  backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    ports:
-      - "8000:8000"
-    env_file:
-      - ./backend/.env
-    depends_on:
-      - mysql
-    volumes:
-      - storage:/var/www/html/storage
 
   mysql:
     image: mysql:8.0
+    container_name: miapp_mysql
+    restart: unless-stopped
     environment:
       MYSQL_DATABASE: proyecto
       MYSQL_USER: angel
@@ -30,9 +11,44 @@ services:
       MYSQL_ROOT_PASSWORD: root
     volumes:
       - mysql_data:/var/lib/mysql
+    networks:
+      - miapp_network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: miapp_backend
+    restart: unless-stopped
     ports:
-      - "3306:3306"
+      - "8000:8000"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - miapp_network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: miapp_frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - miapp_network
 
 volumes:
   mysql_data:
-  storage:
+
+networks:
+  miapp_network:
+    driver: bridge
