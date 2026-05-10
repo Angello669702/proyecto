@@ -15,7 +15,7 @@ return new class extends Migration
             $table->string('sku')->unique();
             $table->text('description')->nullable();
             $table->decimal('price', 10, 2);
-            $table->enum('vat_rate', ['10', '21'])->default('10')->after('price');
+            $table->enum('vat_rate', ['10', '21'])->default('10');
             $table->integer('stock')->default(0);
             $table->integer('stock_alert_threshold')->default(10);
             $table->boolean('is_active')->default(true);
