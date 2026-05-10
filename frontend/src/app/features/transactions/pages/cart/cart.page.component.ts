@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { CartItem } from '../../../../shared/interfaces/cart.interface';
 import { TransactionService } from '../../services/transaction.service';
 import { CartComponent } from '../../components/cart/cart.component';
@@ -9,7 +9,7 @@ import { LoadingComponent } from '../../../../shared/components/loading/loading.
   imports: [CartComponent, LoadingComponent],
   template: `
     <div class="min-h-screen bg-stone-50 pt-20 px-6">
-      @if (cartResource.isLoading()) {
+      @if (cartResource.isLoading() || isDefault()) {
         <app-loading />
       } @else {
         <app-cart
@@ -27,6 +27,7 @@ export class CartPageComponent {
 
   readonly transaction = this.#transactionService.cart;
   cartResource = this.#transactionService.myCart();
+  isDefault = computed(() => this.#transactionService.isDefaultModel(this.transaction()));
 
   productToAddToCart = signal<CartItem>(this.#transactionService.defaultCartItem);
   productToRemoveFromCart = signal<CartItem>(this.#transactionService.defaultCartItem);

@@ -33,23 +33,23 @@
               <div class="mt-1 flex flex-col gap-0.5">
                 @if (item.discount > 0) {
                   <p class="text-xs line-through text-stone-400">
-                    {{ item.originalPrice | currency: 'EUR' }} / ud. (sin IVA)
+                    {{ item.originalPrice || 0 | currency: 'EUR' }} / ud. (sin IVA)
                   </p>
 
                   <p class="text-xs text-emerald-600 font-medium">
                     {{ item.unitPrice | currency: 'EUR' }} / ud. (sin IVA) · -{{
-                      item.discount | currency: 'EUR'
+                      item.discount || 0 | currency: 'EUR'
                     }}
                     dto.
                   </p>
                 } @else {
                   <p class="text-xs text-stone-500">
-                    {{ item.unitPrice | currency: 'EUR' }} / ud. (sin IVA)
+                    {{ item.unitPrice || 0 | currency: 'EUR' }} / ud. (sin IVA)
                   </p>
                 }
 
                 <p class="text-xs text-stone-400">
-                  {{ item.unitPrice * (1 + item.vatRate / 100) | currency: 'EUR' }}
+                  {{ item.unitPrice * (1 + item.vatRate / 100) || 0 | currency: 'EUR' }}
                   / ud. (IVA {{ item.vatRate }}% incl.)
                 </p>
               </div>
@@ -59,7 +59,7 @@
                   <span>Base (× {{ item.quantity }})</span>
 
                   <span>
-                    {{ item.subtotal | currency: 'EUR' }}
+                    {{ item.subtotal || 0 | currency: 'EUR' }}
                   </span>
                 </div>
 
@@ -67,7 +67,7 @@
                   <span>IVA {{ item.vatRate }}%</span>
 
                   <span>
-                    {{ item.vatAmount | currency: 'EUR' }}
+                    {{ item.vatAmount || 0 | currency: 'EUR' }}
                   </span>
                 </div>
 
@@ -75,7 +75,7 @@
                   <span>Total línea</span>
 
                   <span>
-                    {{ item.subtotalWithVat | currency: 'EUR' }}
+                    {{ item.subtotalWithVat || 0 | currency: 'EUR' }}
                   </span>
                 </div>
               </div>
