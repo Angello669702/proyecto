@@ -13,9 +13,11 @@ import { RouterLink } from '@angular/router';
 export class CartComponent {
   transaction = input.required<Transaction>();
 
+  readonly Math = Math;
+
   remove = output<CartItem>();
   add = output<CartItem>();
-  repeat = output<Transaction>();
+  checkout = output<void>();
 
   removeItem(cartItem: CartItem) {
     this.remove.emit(cartItem);
@@ -25,7 +27,7 @@ export class CartComponent {
     this.add.emit(cartItem);
   }
 
-  repeatTransaction() {
-    this.repeat.emit(this.transaction());
+  onCheckout() {
+    this.checkout.emit();
   }
 }

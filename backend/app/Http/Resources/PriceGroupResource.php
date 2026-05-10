@@ -10,18 +10,15 @@ class PriceGroupResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id'          => $this->id,
-            'name'        => $this->name,
+            'id' => $this->id,
+            'name' => $this->name,
             'description' => $this->description,
-            'price_group_items'       => $this->whenLoaded('items', fn() =>
-            $this->items->map(fn($item) => [
-                'product_id'   => $item->product_id,
-                'product_name' => $item->product->name ?? null,
-                'price'        => $item->price,
-            ])
-            ),
-            'created_at'  => $this->created_at->toDateTimeString(),
-            'updated_at'  => $this->updated_at->toDateTimeString(),
+            'items_count' => $this->whenCounted('items'),
+            'users_count' => $this->whenCounted('users'),
+            'items' => PriceGroupItemResource::collection($this->whenLoaded('items')),
+            'users' => UserResource::collection($this->whenLoaded('users')),
+            'created_at' => $this->created_at->toDateTimeString(),
+            'updated_at' => $this->updated_at->toDateTimeString(),
         ];
     }
 }

@@ -42,8 +42,8 @@ export class AuthService extends AuthServiceAbstract {
 
   #login(loginRequest: AuthRequest): Observable<AuthResponse> {
     return this.#httpClient.post<AuthResponse>(`${this.API_ENDPOINT}/login`, loginRequest).pipe(
-      tap((loginRequest) => this.#currentUser.set(loginRequest.user)),
       tap((loginRequest) => this.#tokenStorageService.setToken(loginRequest.token)),
+      tap((loginRequest) => this.#currentUser.set(this.#userMapper.mapOne(loginRequest.user))),
     );
   }
 
@@ -67,5 +67,9 @@ export class AuthService extends AuthServiceAbstract {
         favourites: updatedFavourites,
       };
     });
+  }
+
+  reloadUser(): void {
+    this.userResource.reload();
   }
 }

@@ -12,6 +12,8 @@ import { ActivatedRoute } from '@angular/router';
 import { LoadingGridComponent } from '../../../../shared/components/loading/loading-grid.component';
 import { TokenStorageService } from '../../../auth/services/token.service';
 import { HttpErrorResponse } from '@angular/common/http';
+import Swal from 'sweetalert2';
+import { AlertService } from '../../../../shared/services/alert.service';
 
 @Component({
   selector: 'app-catalog',
@@ -56,15 +58,6 @@ import { HttpErrorResponse } from '@angular/common/http';
                 (isActive)="toggle($event)"
                 (removeProduct)="deleteProduct($event)"
               />
-              <div
-                class="fixed bottom-6 right-6 z-50 bg-white border border-rose-200 text-rose-700 text-xs font-semibold px-4 py-3 rounded-lg shadow-lg max-w-sm transition-all duration-300"
-                [class.opacity-0]="!showRemoveError()"
-                [class.opacity-100]="showRemoveError()"
-                [class.translate-y-2]="!showRemoveError()"
-                [class.translate-y-0]="showRemoveError()"
-              >
-                {{ removeError() }}
-              </div>
             }
           </div>
         </section>
@@ -88,6 +81,7 @@ export class CatalogPageComponent {
   readonly #productService = inject(ProductService);
   readonly #transactionService = inject(TransactionService);
   readonly #authService = inject(AuthService);
+  readonly #alertService = inject(AlertService);
 
   #isAdmin = this.#authService.isAdmin;
   #currentUser = this.#authService.currentUser;
@@ -121,8 +115,8 @@ export class CatalogPageComponent {
     favouritesOnly: false,
   });
 
-  cartResource = this.isLogged() ? this.#transactionService.myCart() : undefined;
-  cart = this.isLogged() ? this.#transactionService.cart : undefined;
+  cartResource = this.isLogged() && !this.isAdmin() ? this.#transactionService.myCart() : undefined;
+  cart = this.isLogged() && !this.isAdmin() ? this.#transactionService.cart : undefined;
 
   productsInCart = computed(() => {
     if (!this.cart) return [];
@@ -158,23 +152,74 @@ export class CatalogPageComponent {
   removeProductResource = this.#productService.remove(this.productToRemove);
   toggleProductResource = this.#productService.toggle(this.productToToggle);
 
-  showRemoveError = signal(false);
+  addToCartEffect = effect(() => {
+    const status = this.addToCartResource.status();
+    const product = this.productToAddToCart().product;
 
-  removeErrorEffect = effect(() => {
-    const error = this.removeProductResource.error();
-    if (!error) return;
+    if (status === 'resolved') {
+      this.#alertService.success(`${product.name} añadido al carrito`);
+    }
 
-    this.showRemoveError.set(true);
-    setTimeout(() => this.showRemoveError.set(false), 5000);
+    if (status === 'error') {
+      this.#alertService.error('No se pudo añadir al carrito');
+    }
   });
 
-  removeError = computed(() => {
-    const error = this.removeProductResource.error();
-    if (!error) return null;
-    if (error instanceof HttpErrorResponse) {
-      return error.status === 409 ? error.error.message : 'Error al eliminar el producto';
+  removeFromCartEffect = effect(() => {
+    const status = this.removeFromCartResource.status();
+    const product = this.productToRemoveFromCart().product;
+
+    if (status === 'resolved') {
+      this.#alertService.success(`${product.name} eliminado del carrito`);
     }
-    return 'Error al eliminar el producto';
+
+    if (status === 'error') {
+      this.#alertService.error('No se pudo eliminar del carrito');
+    }
+  });
+
+  updateStockEffect = effect(() => {
+    const status = this.updateStockResource.status();
+
+    if (status === 'resolved') {
+      this.#alertService.success('Stock actualizado correctamente');
+    }
+
+    if (status === 'error') {
+      this.#alertService.error('No se pudo actualizar el stock');
+    }
+  });
+
+  toggleProductEffect = effect(() => {
+    const status = this.toggleProductResource.status();
+    const product = this.productToToggle();
+
+    if (status === 'resolved') {
+      this.#alertService.success(product.isActive ? 'Producto desactivado' : 'Producto activado');
+      this.productsResource.reload();
+    }
+
+    if (status === 'error') {
+      this.#alertService.error('No se pudo actualizar el estado');
+    }
+  });
+
+  removeProductEffect = effect(() => {
+    const status = this.removeProductResource.status();
+
+    if (status === 'resolved') {
+      this.#alertService.success('Producto eliminado correctamente');
+      this.productsResource.reload();
+    }
+
+    if (status === 'error') {
+      const error = this.removeProductResource.error() as HttpErrorResponse;
+
+      this.#alertService.modalError(
+        'Conflicto de eliminación',
+        error?.status === 409 ? error.error.message : 'No se pudo eliminar el producto',
+      );
+    }
   });
 
   addToCart(product: Product) {
@@ -196,7 +241,14 @@ export class CatalogPageComponent {
     this.productToUpdateStock.set(cartItem);
   }
 
-  deleteProduct(product: Product) {
+  async deleteProduct(product: Product) {
+    const confirmed = await this.#alertService.confirm(
+      'Eliminar producto',
+      `¿Seguro que deseas eliminar "${product.name}"?`,
+    );
+
+    if (!confirmed) return;
+
     this.productToRemove.set(product);
   }
 

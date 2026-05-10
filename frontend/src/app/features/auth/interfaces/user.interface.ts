@@ -18,6 +18,7 @@ export interface User {
   role: UserRole;
   isActive: boolean;
   favourites?: Product[];
+  priceGroup?: PriceGroup;
 }
 
 export interface UserRequest {

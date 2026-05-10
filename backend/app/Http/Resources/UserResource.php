@@ -23,6 +23,7 @@ class UserResource extends JsonResource
                 : null,
             'role'          => $this->role,
             'is_active'     => $this->is_active,
+            'price_group' => new PriceGroupResource($this->whenLoaded('priceGroup')),
             'favourites'    => $this->whenLoaded('favourites',
                 fn() => ProductResource::collection($this->favourites)
             ),

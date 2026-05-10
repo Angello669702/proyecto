@@ -6,8 +6,6 @@ import { UserDto } from '../dtos/user.interface.dto';
 import { UserMapper } from '../mappers/user.mapper';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { NEVER, Observable, map, tap, catchError, throwError } from 'rxjs';
-import { HttpClient } from '@angular/common/http';
-import { UUID } from '../../../shared/types/uuid.type';
 
 @Injectable({ providedIn: 'root' })
 export class UserService extends CommonCrudService<User, UserDto> {

@@ -1,6 +1,4 @@
-// product-filter.component.ts
 import { Component, effect, input, output, signal } from '@angular/core';
-import { Category } from '../../../categories/interfaces/category.interface';
 import { ProductFilter } from '../../interfaces/product-filter.interface';
 import { CategoryEnum } from '../../enums/category.enum';
 import { FormsModule } from '@angular/forms';

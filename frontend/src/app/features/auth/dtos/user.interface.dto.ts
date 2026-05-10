@@ -18,4 +18,5 @@ export interface UserDto {
   role: UserRole;
   is_active: boolean;
   favourites?: ProductDto[];
+  price_group?: PriceGroupDto;
 }

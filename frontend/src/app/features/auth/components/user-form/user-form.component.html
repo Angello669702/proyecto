@@ -12,7 +12,7 @@
   >
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
       <div
-        class="flex flex-col items-center sm:flex-row gap-8 mb-10 pb-8 border-b border-stone-100"
+        class="flex flex-col items-center sm:flex-row gap-8 mb-10 pb-8 border-b border-stone-100 md:col-span-2"
       >
         <div class="relative group">
           <div
@@ -29,7 +29,6 @@
               class="w-full h-full object-cover"
               alt="Profile Preview"
             />
-
             <div
               class="absolute inset-0 bg-stone-900/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
             >
@@ -44,7 +43,6 @@
           <label class="text-[10px] font-bold uppercase tracking-[0.2em] text-stone-400"
             >Imagen de Perfil</label
           >
-
           <div class="flex gap-3">
             <input
               type="file"
@@ -53,7 +51,6 @@
               accept="image/*"
               class="hidden"
             />
-
             <button
               type="button"
               (click)="fileInput.click()"
@@ -75,29 +72,7 @@
               </svg>
               Subir Nueva Foto
             </button>
-
-            <button
-              type="button"
-              (click)="userForm.patchValue({ profilePhoto: '' })"
-              class="h-10 px-4 text-stone-400 hover:text-rose-900 transition-colors cursor-pointer"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="w-4 h-4"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                />
-              </svg>
-            </button>
           </div>
-
           <p class="text-[9px] text-stone-400 uppercase tracking-tight">
             Recomendado: JPG o PNG. Máximo 2MB.
           </p>
@@ -111,8 +86,14 @@
         <input
           formControlName="name"
           type="text"
+          [class.border-rose-500]="userForm.get('name')?.invalid && userForm.get('name')?.touched"
           class="h-11 px-4 rounded-xl border border-stone-200 bg-stone-50 focus:border-rose-900 outline-hidden transition-all text-sm"
         />
+        @if (userForm.get('name')?.invalid && userForm.get('name')?.touched) {
+          <span class="text-[10px] text-rose-600 font-bold uppercase"
+            >Este campo es obligatorio</span
+          >
+        }
       </div>
 
       <div class="flex flex-col gap-2">
@@ -122,8 +103,16 @@
         <input
           formControlName="fullName"
           type="text"
+          [class.border-rose-500]="
+            userForm.get('fullName')?.invalid && userForm.get('fullName')?.touched
+          "
           class="h-11 px-4 rounded-xl border border-stone-200 bg-stone-50 focus:border-rose-900 outline-hidden transition-all text-sm"
         />
+        @if (userForm.get('fullName')?.invalid && userForm.get('fullName')?.touched) {
+          <span class="text-[10px] text-rose-600 font-bold uppercase"
+            >Nombre completo requerido</span
+          >
+        }
       </div>
 
       <div class="flex flex-col gap-2">
@@ -133,8 +122,18 @@
         <input
           formControlName="email"
           type="email"
+          [class.border-rose-500]="userForm.get('email')?.invalid && userForm.get('email')?.touched"
           class="h-11 px-4 rounded-xl border border-stone-200 bg-stone-50 focus:border-rose-900 outline-hidden transition-all text-sm"
         />
+        @if (userForm.get('email')?.touched && userForm.get('email')?.errors) {
+          <span class="text-[10px] text-rose-600 font-bold uppercase">
+            {{
+              userForm.get('email')?.hasError('required')
+                ? 'Email requerido'
+                : 'Formato de email inválido'
+            }}
+          </span>
+        }
       </div>
 
       <div class="flex flex-col gap-2">
@@ -144,8 +143,14 @@
         <input
           formControlName="companyName"
           type="text"
+          [class.border-rose-500]="
+            userForm.get('companyName')?.invalid && userForm.get('companyName')?.touched
+          "
           class="h-11 px-4 rounded-xl border border-stone-200 bg-stone-50 focus:border-rose-900 outline-hidden transition-all text-sm"
         />
+        @if (userForm.get('companyName')?.invalid && userForm.get('companyName')?.touched) {
+          <span class="text-[10px] text-rose-600 font-bold uppercase">Empresa requerida</span>
+        }
       </div>
 
       <div class="flex flex-col gap-2">
@@ -155,8 +160,14 @@
         <input
           formControlName="nif"
           type="text"
+          [class.border-rose-500]="userForm.get('nif')?.invalid && userForm.get('nif')?.touched"
           class="h-11 px-4 rounded-xl border border-stone-200 bg-stone-50 focus:border-rose-900 outline-hidden transition-all text-sm"
         />
+        @if (userForm.get('nif')?.invalid && userForm.get('nif')?.touched) {
+          <span class="text-[10px] text-rose-600 font-bold uppercase"
+            >Identificación fiscal requerida</span
+          >
+        }
       </div>
 
       <div class="flex flex-col gap-2">
@@ -166,6 +177,7 @@
         <input
           formControlName="phone"
           type="text"
+          [class.border-rose-500]="userForm.get('phone')?.invalid && userForm.get('phone')?.touched"
           class="h-11 px-4 rounded-xl border border-stone-200 bg-stone-50 focus:border-rose-900 outline-hidden transition-all text-sm"
         />
       </div>
@@ -177,19 +189,27 @@
         <input
           formControlName="address"
           type="text"
+          [class.border-rose-500]="
+            userForm.get('address')?.invalid && userForm.get('address')?.touched
+          "
           class="h-11 px-4 rounded-xl border border-stone-200 bg-stone-50 focus:border-rose-900 outline-hidden transition-all text-sm"
         />
+        @if (userForm.get('address')?.invalid && userForm.get('address')?.touched) {
+          <span class="text-[10px] text-rose-600 font-bold uppercase">Dirección requerida</span>
+        }
       </div>
     </div>
 
     @if (message()) {
-      <p class="mt-4 text-xs font-bold text-rose-900 uppercase tracking-tighter">{{ message() }}</p>
+      <div class="mt-6 p-4 bg-rose-50 border border-rose-100 rounded-xl">
+        <p class="text-xs font-bold text-rose-900 uppercase tracking-tighter">{{ message() }}</p>
+      </div>
     }
 
     <div class="flex justify-end mt-8">
       <button
         type="submit"
-        class="h-12 px-10 bg-rose-900 text-white text-xs font-bold uppercase tracking-widest rounded-xl hover:bg-rose-950 transition-all shadow-lg shadow-rose-900/20 active:scale-95 cursor-pointer"
+        class="h-12 px-10 bg-rose-900 text-white text-xs font-bold uppercase tracking-widest rounded-xl hover:bg-rose-950 transition-all shadow-lg shadow-rose-900/20 active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
       >
         Actualizar Perfil
       </button>
@@ -228,9 +248,14 @@
             <input
               formControlName="currentPassword"
               type="password"
+              [class.border-rose-500]="
+                passwordForm.get('currentPassword')?.invalid &&
+                passwordForm.get('currentPassword')?.touched
+              "
               class="h-11 px-4 rounded-xl border border-stone-200 bg-stone-50 focus:border-rose-900 outline-hidden text-sm"
             />
           </div>
+
           <div class="flex flex-col gap-2">
             <label class="text-[10px] font-bold uppercase tracking-widest text-stone-400"
               >Nueva Contraseña</label
@@ -238,9 +263,19 @@
             <input
               formControlName="newPassword"
               type="password"
+              [class.border-rose-500]="
+                passwordForm.get('newPassword')?.invalid && passwordForm.get('newPassword')?.touched
+              "
               class="h-11 px-4 rounded-xl border border-stone-200 bg-stone-50 focus:border-rose-900 outline-hidden text-sm"
             />
+            @if (
+              passwordForm.get('newPassword')?.hasError('minlength') &&
+              passwordForm.get('newPassword')?.touched
+            ) {
+              <span class="text-[10px] text-rose-600 font-bold uppercase">Mínimo 8 caracteres</span>
+            }
           </div>
+
           <div class="flex flex-col gap-2">
             <label class="text-[10px] font-bold uppercase tracking-widest text-stone-400"
               >Confirmar</label
@@ -248,15 +283,27 @@
             <input
               formControlName="confirmPassword"
               type="password"
+              [class.border-rose-500]="
+                passwordForm.get('confirmPassword')?.touched &&
+                passwordForm.hasError('passwordMismatch')
+              "
               class="h-11 px-4 rounded-xl border border-stone-200 bg-stone-50 focus:border-rose-900 outline-hidden text-sm"
             />
+            @if (
+              passwordForm.hasError('passwordMismatch') &&
+              passwordForm.get('confirmPassword')?.touched
+            ) {
+              <span class="text-[10px] text-rose-600 font-bold uppercase"
+                >Las contraseñas no coinciden</span
+              >
+            }
           </div>
 
           <div class="md:col-span-3 flex justify-end mt-4">
             <button
               type="submit"
               [disabled]="passwordForm.invalid"
-              class="h-10 px-8 bg-white text-stone-700 text-[10px] font-bold uppercase tracking-widest rounded-xl border border-stone-200 hover:bg-stone-50 transition-all disabled:opacity-50 cursor-pointer"
+              class="h-10 px-8 bg-white text-stone-700 text-[10px] font-bold uppercase tracking-widest rounded-xl border border-stone-200 hover:bg-stone-50 transition-all disabled:opacity-30 cursor-pointer"
             >
               Confirmar Cambio
             </button>

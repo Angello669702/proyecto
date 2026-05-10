@@ -14,8 +14,11 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
             'admin' => \App\Http\Middleware\IsAdmin::class,
+        ])
+        ->validateCsrfTokens(except: [
+            'api/stripe/webhook',
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        
     })->create();

@@ -29,9 +29,9 @@ export class CardComponent {
   isActive = output<Product>();
   stock = output<CartItem>();
 
-  readonly detailRoute = computed(() => ['/', 'products', '/', this.product().id]);
-  readonly updateRoute = computed(() => ['/', 'products', '/', 'update', '/', this.product().id]);
-  readonly loginRoute = computed(() => ['/', 'auth', '/', 'login']);
+  readonly detailRoute = computed(() => ['/', 'products', this.product().id]);
+  readonly updateRoute = computed(() => ['/', 'products', 'update', this.product().id]);
+  readonly loginRoute = computed(() => ['/', 'auth', 'login']);
 
   addToCart() {
     this.add.emit(this.product());

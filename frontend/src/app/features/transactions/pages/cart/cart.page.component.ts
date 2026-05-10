@@ -16,6 +16,7 @@ import { LoadingComponent } from '../../../../shared/components/loading/loading.
           [transaction]="transaction()"
           (add)="addToCart($event)"
           (remove)="removeFromCart($event)"
+          (checkout)="checkout()"
         />
       }
     </div>
@@ -39,5 +40,12 @@ export class CartPageComponent {
 
   removeFromCart(cartItem: CartItem) {
     this.productToRemoveFromCart.set(cartItem);
+  }
+
+  checkout() {
+    this.#transactionService.createCheckoutSession().subscribe({
+      next: ({ url }) => (window.location.href = url),
+      error: () => console.error('Error al iniciar el pago'),
+    });
   }
 }

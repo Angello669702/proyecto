@@ -1,0 +1,123 @@
+@startuml DiagramaBaseDatos
+
+!theme plain
+skinparam linetype ortho
+skinparam EntityBorderColor #555555
+skinparam EntityBackgroundColor #f5f5f5
+
+entity "users" as users {
+  * id : uuid <<PK>>
+  --
+  * email : string
+  * password : string
+  name : string
+  full_name : string
+  company_name : string
+  nif : string
+  phone : string
+  address : text
+  role : enum
+  is_active : boolean
+  price_group_id : uuid <<FK>>
+}
+
+entity "registration_requests" as registration_requests {
+  * id : uuid <<PK>>
+  --
+  company_name : string
+  nif : string
+  email : string
+  status : enum
+  reviewed_by : uuid <<FK>>
+}
+
+entity "categories" as categories {
+  * id : uuid <<PK>>
+  --
+  * name : string
+  description : text
+  is_active : boolean
+}
+
+entity "products" as products {
+  * id : uuid <<PK>>
+  --
+  category_id : uuid <<FK>>
+  * name : string
+  * sku : string
+  price : decimal
+  vat_rate : enum
+  stock : integer
+}
+
+entity "product_images" as product_images {
+  * id : uuid <<PK>>
+  --
+  product_id : uuid <<FK>>
+  * path : string
+  is_cover : boolean
+}
+
+entity "price_groups" as price_groups {
+  * id : uuid <<PK>>
+  --
+  * name : string
+}
+
+entity "price_group_items" as price_group_items {
+  * id : uuid <<PK>>
+  --
+  price_group_id : uuid <<FK>>
+  product_id : uuid <<FK>>
+  price : decimal
+}
+
+entity "transactions" as transactions {
+  * id : uuid <<PK>>
+  --
+  user_id : uuid <<FK>>
+  status : enum
+  total : decimal
+  payment_status : enum
+}
+
+entity "transaction_items" as transaction_items {
+  * id : uuid <<PK>>
+  --
+  transaction_id : uuid <<FK>>
+  product_id : uuid <<FK>>
+  quantity : integer
+  unit_price : decimal
+}
+
+entity "user_product_favorites" as user_product_favorites {
+  * user_id : uuid <<PK, FK>>
+  * product_id : uuid <<PK, FK>>
+}
+
+entity "action_logs" as action_logs {
+  * id : uuid <<PK>>
+  --
+  user_id : uuid <<FK>>
+  * action : string
+  entity_type : string
+}
+
+users ||--o{ transactions : "user_id"
+users ||--o{ action_logs : "user_id"
+users }o--o| price_groups : "price_group_id"
+users ||--o{ registration_requests : "reviewed_by"
+users ||--o{ user_product_favorites : "user_id"
+
+transactions ||--|{ transaction_items : "transaction_id"
+
+categories ||--|{ products : "category_id"
+
+products ||--o{ transaction_items : "product_id"
+products ||--o{ product_images : "product_id"
+products ||--o{ price_group_items : "product_id"
+products ||--o{ user_product_favorites : "product_id"
+
+price_groups ||--|{ price_group_items : "price_group_id"
+
+@enduml

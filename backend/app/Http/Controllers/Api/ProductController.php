@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Enums\ActionType;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ProductRequest;
 use App\Http\Resources\ProductResource;
+use App\Models\ActionLog;
 use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
@@ -57,6 +60,14 @@ class ProductController extends Controller
 
         return ProductResource::collection($query->paginate(9));
     }
+
+    public function all()
+    {
+        $products = Product::with('category', 'images')
+            ->where('is_active', true)
+            ->get();
+        return ProductResource::collection($products);
+    }
     public function show(Product $product)
     {
         return new ProductResource($product->load('category', 'images'));
@@ -82,6 +93,13 @@ class ProductController extends Controller
             'stock_alert_threshold' => $request->stock_alert_threshold ?? 10,
             'is_active' => $request->boolean('is_active', true),
         ]);
+
+        ActionLog::log(
+            ActionType::PRODUCT_CREATED,
+            'Product',
+            $product->id,
+            "{$request->user()->name} creó el producto '{$product->name}'"
+        );
 
         if ($request->hasFile('cover_image')) {
             $coverPath = $request->file('cover_image')->store('products/covers', 'public');
@@ -179,7 +197,16 @@ class ProductController extends Controller
             $image->delete();
         }
 
+        $userName = Auth::user();
+        $productName = $product->name;
         $product->delete();
+
+        ActionLog::log(
+            ActionType::PRODUCT_DELETED,
+            'Product',
+            $product->id,
+            "{$userName->name} eliminó el producto '{$productName}'"
+        );
 
         return response()->json(['message' => 'Producto eliminado'], 200);
     }
@@ -215,7 +242,6 @@ class ProductController extends Controller
         ]);
 
         $user = $request->user();
-
         $product = Product::with('category', 'images')->findOrFail($data['id']);
 
         $exists = $user->favourites()
@@ -224,8 +250,20 @@ class ProductController extends Controller
 
         if ($exists) {
             $user->favourites()->detach($product->id);
+            ActionLog::log(
+                ActionType::UNFAVOURITED,
+                'Product',
+                $product->id,
+                "{$user->name} quitó de favoritos '{$product->name}'"
+            );
         } else {
             $user->favourites()->attach($product->id);
+            ActionLog::log(
+                ActionType::FAVOURITED,
+                'Product',
+                $product->id,
+                "{$user->name} añadió a favoritos '{$product->name}'"
+            );
         }
 
         return new ProductResource(
@@ -249,6 +287,25 @@ class ProductController extends Controller
 
         $product->increment('stock', $data['quantity']);
 
+        $oldStock = $product->stock;
+        $product->increment('stock', $data['quantity']);
+
+        $action = $data['quantity'] > 0
+            ? ActionType::STOCK_ADDED
+            : ActionType::STOCK_REMOVED;
+
+        $quantity = abs($data['quantity']);
+        $userName = $request->user()->name ?? 'Sistema';
+
+        ActionLog::log(
+            $action,
+            'Product',
+            $product->id,
+            $data['quantity'] > 0
+                ? "{$userName} añadió {$quantity} unidades de '{$product->name}' (Stock: {$oldStock} → {$newStock})"
+                : "{$userName} quitó {$quantity} unidades de '{$product->name}' (Stock: {$oldStock} → {$newStock})"
+        );
+
         return new ProductResource(
             $product->fresh()->load('category', 'images')
         );
@@ -257,6 +314,18 @@ class ProductController extends Controller
     public function toggle(Product $product)
     {
         $product->update(['is_active' => !$product->is_active]);
+
+        $user = Auth::user();
+        $userName = $user?->name ?? 'Sistema';
+        $status = $product->is_active ? 'activó' : 'desactivó';
+
+        ActionLog::log(
+            ActionType::PRODUCT_TOGGLED,
+            'Product',
+            $product->id,
+            "{$userName} {$status} el producto '{$product->name}'"
+        );
+
         return new ProductResource($product->load('category', 'images'));
     }
 }

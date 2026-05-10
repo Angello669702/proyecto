@@ -1,3 +1,4 @@
+import { UserDto } from '../dtos/user.interface.dto';
 import { User } from './user.interface';
 
 export interface AuthRequest {
@@ -6,6 +7,6 @@ export interface AuthRequest {
 }
 
 export interface AuthResponse {
-  user: User;
+  user: UserDto;
   token: string;
 }

@@ -68,6 +68,28 @@ export abstract class CommonCrudService<
       );
   }
 
+  loadAll(params?: Signal<Record<string, string>>): ResourceRef<TModel[] | undefined> {
+    return rxResource({
+      params: () => ({ extra: params?.() ?? {} }),
+      stream: ({ params }) => this.#loadAll(params.extra),
+    });
+  }
+
+  #loadAll(params: Record<string, string>): Observable<TModel[]> {
+    return this.httpClient
+      .get<{ data: TDto[] }>(`${this.API_ENDPOINT}/all`, {
+        params: { ...params },
+      })
+      .pipe(
+        map((response) => this.mapper.mapList(response.data)),
+        tap((models) => this.modelsSignal.set(models)),
+        catchError((error) => {
+          console.error('Failed to load all models', error);
+          return throwError(() => error);
+        }),
+      );
+  }
+
   add(model: Signal<TModel>): ResourceRef<TModel | undefined> {
     return rxResource({
       params: () => model(),

@@ -1,0 +1,29 @@
+<div class="flex flex-col gap-4 px-6 py-5 bg-stone-50 border-t border-stone-100">
+  <p class="text-[10px] font-bold uppercase tracking-widest text-stone-400">
+    Asignar usuario al grupo
+  </p>
+
+  <div class="flex flex-col gap-1.5">
+    <label class="text-[10px] font-bold uppercase tracking-widest text-stone-400"> Usuario </label>
+    <ng-select
+      [items]="availableUsers()"
+      bindLabel="name"
+      placeholder="Buscar usuario por nombre..."
+      [searchable]="true"
+      [clearable]="true"
+      [(ngModel)]="selectedUser"
+      class="ng-select-custom"
+    />
+  </div>
+
+  <div class="flex justify-end gap-3">
+    <button
+      type="button"
+      (click)="sendAddUser()"
+      [disabled]="!selectedUser()"
+      class="h-9 px-6 bg-rose-900 text-white text-[10px] font-bold uppercase tracking-widest rounded-lg hover:bg-rose-950 transition-all active:scale-95 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+    >
+      Asignar
+    </button>
+  </div>
+</div>

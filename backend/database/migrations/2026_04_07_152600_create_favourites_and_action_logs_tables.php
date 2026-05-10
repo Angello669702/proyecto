@@ -22,7 +22,6 @@ return new class extends Migration
             $table->string('entity_type')->nullable()->comment('Ej: Product, User, Transaction');
             $table->string('entity_id')->nullable()->comment('ID del registro afectado');
             $table->text('description')->nullable();
-            $table->string('ip_address', 45)->nullable();
             $table->timestamp('created_at')->useCurrent();
         });
     }

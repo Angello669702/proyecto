@@ -230,9 +230,9 @@
                             {{ item.quantity }} ud ×
                             {{ item.unitPrice | currency: 'EUR' : 'symbol' : '1.2-2' : 'es' }}
                             @if (item.discount > 0) {
-                              <span class="ml-1.5 text-rose-700 font-bold"
-                                >-{{ item.discount }}%</span
-                              >
+                              <span class="ml-1.5 text-rose-700 font-bold">
+                                -{{ item.discount | number: '1.0-0' }}%
+                              </span>
                             }
                           </p>
                         </div>
@@ -328,14 +328,6 @@
                           </p>
                         </div>
                       }
-                      <div>
-                        <p class="text-[10px] uppercase tracking-wider text-stone-400 mb-1">
-                          ID pago
-                        </p>
-                        <p class="font-mono text-[10px] text-stone-400 break-all">
-                          {{ transaction.paymentIntentId || '—' }}
-                        </p>
-                      </div>
                     </div>
                   </div>
                 </div>

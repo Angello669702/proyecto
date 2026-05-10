@@ -8,7 +8,7 @@ import { Mapper } from '../../../shared/interfaces/mapper.interface';
 })
 export class PriceGroupItemMapper implements Mapper<PriceGroupItem, PriceGroupItemDto> {
   mapOne(priceGroupItem: PriceGroupItemDto): PriceGroupItem {
-    return priceGroupItem;
+    return { ...priceGroupItem, discountPercentage: priceGroupItem.discount_percentage };
   }
 
   mapList(priceGroupItems: PriceGroupItemDto[]): PriceGroupItem[] {
@@ -16,6 +16,6 @@ export class PriceGroupItemMapper implements Mapper<PriceGroupItem, PriceGroupIt
   }
 
   toDto(priceGroupItem: PriceGroupItem): PriceGroupItemDto {
-    return priceGroupItem;
+    return { ...priceGroupItem, discount_percentage: priceGroupItem.discountPercentage };
   }
 }

@@ -3,6 +3,7 @@ import { TransactionService } from '../../../transactions/services/transaction.s
 import { Product } from '../../interfaces/product.interface';
 import { ProductDetailComponent } from '../../components/product-detail/product-detail.component';
 import { CartItem } from '../../../../shared/interfaces/cart.interface';
+import { AlertService } from '../../../../shared/services/alert.service';
 
 @Component({
   selector: 'app-home',
@@ -12,6 +13,20 @@ import { CartItem } from '../../../../shared/interfaces/cart.interface';
 export class ProductDetailPageComponent {
   readonly product = input.required<Product>();
   readonly #transactionService = inject(TransactionService);
+  readonly #alertService = inject(AlertService);
+
+  addToCartEffect = effect(() => {
+    const status = this.addToCartResource.status();
+    const product = this.productToAddToCart().product;
+
+    if (status === 'resolved') {
+      this.#alertService.success(`${product.name} añadido al carrito`);
+    }
+
+    if (status === 'error') {
+      this.#alertService.error('No se pudo añadir al carrito');
+    }
+  });
 
   productToAddToCart = signal<CartItem>(this.#transactionService.defaultCartItem);
 

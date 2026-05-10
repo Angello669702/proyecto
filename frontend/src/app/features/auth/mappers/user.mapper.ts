@@ -11,6 +11,7 @@ import { TransactionMapper } from '../../transactions/mappers/transaction.mapper
 })
 export class UserMapper implements Mapper<User, UserDto> {
   readonly #productMapper = inject(ProductMapper);
+  readonly #priceGroupMapper = inject(PriceGroupMapper);
 
   mapOne(user: UserDto): User {
     return {
@@ -27,6 +28,7 @@ export class UserMapper implements Mapper<User, UserDto> {
       role: user.role,
       isActive: user.is_active,
       favourites: user.favourites ? this.#productMapper.mapList(user.favourites) : undefined,
+      priceGroup: user.price_group ? this.#priceGroupMapper.mapOne(user.price_group) : undefined,
     };
   }
 
@@ -51,6 +53,7 @@ export class UserMapper implements Mapper<User, UserDto> {
       favourites: user.favourites
         ? user.favourites.map((fav) => this.#productMapper.toDto(fav))
         : undefined,
+      price_group: user.priceGroup ? this.#priceGroupMapper.toDto(user.priceGroup) : undefined,
     };
   }
 }

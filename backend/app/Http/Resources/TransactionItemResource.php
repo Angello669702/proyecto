@@ -9,17 +9,34 @@ class TransactionItemResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
+        $originalPrice = (float) $this->product->price;
+        $unitPrice = (float) $this->unit_price;
+        $vatRate = (float) $this->vat_rate;
+        $vatAmount = (float) $this->vat_amount;
+        $subtotal = (float) $this->subtotal;
+
         return [
-            'id'         => $this->id,
-            'quantity'   => $this->quantity,
-            'unit_price' => $this->unit_price,
-            'original_price'=> $this->product->price,
-            'discount'      => $this->product->price - $this->unit_price,
-            'vat_rate'      => (int) $this->vat_rate,
-            'vat_amount'    => $this->vat_amount,
-            'subtotal'      => $this->subtotal,
-            'subtotal_with_vat' => $this->subtotal + $this->vat_amount,
-            'product'    => new ProductResource($this->whenLoaded('product')),
+            'id' => $this->id,
+
+            'quantity' => (int) $this->quantity,
+
+            'unit_price' => $unitPrice,
+
+            'original_price' => $originalPrice,
+
+            'discount' => $originalPrice - $unitPrice,
+
+            'vat_rate' => $vatRate,
+
+            'vat_amount' => $vatAmount,
+
+            'subtotal' => $subtotal,
+
+            'subtotal_with_vat' => $subtotal + $vatAmount,
+
+            'product' => new ProductResource(
+                $this->whenLoaded('product')
+            ),
         ];
     }
 }

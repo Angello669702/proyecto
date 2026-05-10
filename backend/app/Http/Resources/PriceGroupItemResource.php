@@ -7,13 +7,16 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class PriceGroupItemResource extends JsonResource
 {
-    /**
-     * Transform the resource into an array.
-     *
-     * @return array<string, mixed>
-     */
+
     public function toArray(Request $request): array
     {
-        return parent::toArray($request);
+        return [
+            'id' => $this->id,
+            'product' => new ProductResource($this->whenLoaded('product')),
+            'price' => $this->price,
+            'discount_percentage' => $this->product->price > 0
+                ? round((($this->product->price - $this->price) / $this->product->price) * 100, 2)
+                : 0,
+        ];
     }
 }

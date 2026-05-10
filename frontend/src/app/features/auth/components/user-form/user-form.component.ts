@@ -41,7 +41,7 @@ export class UserFormComponent {
   public passwordForm: FormGroup = this.#formBuilder.group(
     {
       currentPassword: ['', [Validators.required]],
-      newPassword: ['', [Validators.required, Validators.minLength(6)]],
+      newPassword: ['', [Validators.required, Validators.minLength(8)]],
       confirmPassword: ['', [Validators.required]],
     },
     { validators: this.passwordMatchValidator },
@@ -78,7 +78,8 @@ export class UserFormComponent {
 
   sendProfileUpdate() {
     if (this.userForm.invalid) {
-      this.message.set('Por favor corrige los errores del formulario.');
+      this.userForm.markAllAsTouched();
+      this.message.set('Por favor, revisa los campos en rojo antes de continuar.');
       return;
     }
 
@@ -103,7 +104,8 @@ export class UserFormComponent {
 
   sendPasswordUpdate() {
     if (this.passwordForm.invalid) {
-      this.message.set('Las contraseñas no coinciden o son inválidas.');
+      this.passwordForm.markAllAsTouched();
+      this.message.set('Revisa los datos de las contraseñas.');
       return;
     }
     const { currentPassword, newPassword } = this.passwordForm.value;

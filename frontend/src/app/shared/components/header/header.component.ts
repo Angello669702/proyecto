@@ -7,6 +7,7 @@ import { AUTH_PAGES } from '../../../features/auth/auth.routes';
 import { Router } from '@angular/router';
 import { FEATURE_PAGES } from '../../../app.routes';
 import { REGISTRATION_PAGES } from '../../../features/registration/registration.routes';
+import { UserService } from '../../../features/auth/services/user.service';
 
 @Component({
   selector: 'app-header',
@@ -47,12 +48,25 @@ export class HeaderComponent {
     all: ['/', FEATURE_PAGES.REGISTRATIONS, REGISTRATION_PAGES.ALL],
   };
 
+  readonly actionLogsNavigation: Record<string, string[]> = {
+    'action-logs': ['/', FEATURE_PAGES.ACTION_LOGS],
+  };
+
+  readonly priceGroupsNavigation: Record<string, string[]> = {
+    'price-groups': ['/', FEATURE_PAGES.PRICE_GROUPS],
+  };
+
   readonly userInitials = computed(() => {
     const user = this.user();
-    if (this.#authService.isDefaultUser(user)) return;
+
+    if (!user?.fullName) {
+      return '';
+    }
+
     return user.fullName
       .trim()
-      .split(' ')
+      .split(/\s+/)
+      .filter((part) => part.length > 0)
       .slice(0, 2)
       .map((part) => part.charAt(0))
       .join('')

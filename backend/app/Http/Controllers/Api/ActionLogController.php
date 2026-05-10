@@ -20,9 +20,4 @@ class ActionLogController extends Controller
 
         return ActionLogResource::collection($logs);
     }
-
-    public function show(ActionLog $actionLog)
-    {
-        return new ActionLogResource($actionLog->load('user'));
-    }
 }

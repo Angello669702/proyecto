@@ -10,6 +10,7 @@ import { TransactionStatus } from '../../enums/transaction-status.enum';
 import { Router } from '@angular/router';
 import { TransactionFiltersComponent } from '../../components/transactions-filter/transactions-filter.component';
 import { TableSkeletonComponent } from '../../../../shared/components/loading/table-skeleton.component';
+import { AlertService } from '../../../../shared/services/alert.service';
 
 @Component({
   selector: 'app-home',
@@ -81,6 +82,7 @@ import { TableSkeletonComponent } from '../../../../shared/components/loading/ta
 export class OrdersPageComponent {
   readonly #transactionService = inject(TransactionService);
   readonly #authService = inject(AuthService);
+  readonly #alertService = inject(AlertService);
   readonly #router = inject(Router);
 
   #isAdmin = this.#authService.isAdmin;
@@ -109,8 +111,19 @@ export class OrdersPageComponent {
   changeStatusResource = this.#transactionService.changeStatus(this.changeStatus);
 
   navigateEffect = effect(() => {
-    if (this.repeatTransacionResource.status() === 'resolved')
-      this.#router.navigate(['/', 'transactions', '/', 'cart']);
+    const status = this.repeatTransacionResource.status();
+
+    if (status === 'resolved') {
+      this.#alertService.success('Pedido añadido nuevamente al carrito');
+
+      setTimeout(() => {
+        this.#router.navigate(['/', 'transactions', 'cart']);
+      }, 800);
+    }
+
+    if (status === 'error') {
+      this.#alertService.error('No se pudo repetir el pedido');
+    }
   });
 
   repeatTransaction(transaction: Transaction) {

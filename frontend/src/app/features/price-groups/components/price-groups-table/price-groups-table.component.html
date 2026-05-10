@@ -1,0 +1,218 @@
+<table class="w-full text-sm">
+  <thead>
+    <tr class="border-b border-stone-100">
+      <th
+        class="px-6 py-4 text-left text-[10px] font-bold uppercase tracking-widest text-stone-400 w-1/3"
+      >
+        Grupo
+      </th>
+      <th
+        class="px-6 py-4 text-center text-[10px] font-bold uppercase tracking-widest text-stone-400"
+      >
+        Productos
+      </th>
+      <th
+        class="px-6 py-4 text-center text-[10px] font-bold uppercase tracking-widest text-stone-400"
+      >
+        Usuarios
+      </th>
+      <th
+        class="px-6 py-4 text-right text-[10px] font-bold uppercase tracking-widest text-stone-400"
+      >
+        Acciones
+      </th>
+    </tr>
+  </thead>
+
+  <tbody>
+    @for (group of priceGroups(); track group.id) {
+      <tr class="border-b border-stone-100 hover:bg-stone-50 transition-colors">
+        <td class="px-6 py-4">
+          <p class="font-serif font-bold text-stone-900">{{ group.name }}</p>
+          @if (group.description) {
+            <p class="text-xs text-stone-400 mt-0.5 line-clamp-1">{{ group.description }}</p>
+          }
+        </td>
+
+        <td class="px-6 py-4 text-center">
+          <button
+            (click)="togglePanel(group.id, 'items')"
+            class="inline-flex items-center gap-1.5 text-xs font-semibold text-stone-600 hover:text-rose-900 transition-colors cursor-pointer"
+          >
+            <span
+              class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-stone-100 text-stone-700 text-[10px] font-bold"
+            >
+              {{ group.itemsCount ?? group.items?.length ?? 0 }}
+            </span>
+            <span class="text-[10px] font-bold uppercase tracking-widest">
+              {{ isOpen(group.id, 'items') ? '▲' : '▼' }}
+            </span>
+          </button>
+        </td>
+
+        <td class="px-6 py-4 text-center">
+          <button
+            (click)="togglePanel(group.id, 'users')"
+            class="inline-flex items-center gap-1.5 text-xs font-semibold text-stone-600 hover:text-rose-900 transition-colors cursor-pointer"
+          >
+            <span
+              class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-stone-100 text-stone-700 text-[10px] font-bold"
+            >
+              {{ group.usersCount ?? group.users?.length ?? 0 }}
+            </span>
+            <span class="text-[10px] font-bold uppercase tracking-widest">
+              {{ isOpen(group.id, 'users') ? '▲' : '▼' }}
+            </span>
+          </button>
+        </td>
+
+        <td class="px-6 py-4">
+          <div class="flex items-center justify-end gap-2">
+            <button
+              (click)="togglePanel(group.id, 'add-item')"
+              [class.bg-rose-900]="isOpen(group.id, 'add-item')"
+              [class.text-white]="isOpen(group.id, 'add-item')"
+              [class.border-rose-900]="isOpen(group.id, 'add-item')"
+              class="h-8 px-3 text-[10px] font-bold uppercase tracking-widest rounded-lg border border-stone-200 text-stone-600 hover:border-rose-900 hover:text-rose-900 transition-all cursor-pointer"
+            >
+              + Producto
+            </button>
+            <button
+              (click)="togglePanel(group.id, 'add-user')"
+              [class.bg-rose-900]="isOpen(group.id, 'add-user')"
+              [class.text-white]="isOpen(group.id, 'add-user')"
+              [class.border-rose-900]="isOpen(group.id, 'add-user')"
+              class="h-8 px-3 text-[10px] font-bold uppercase tracking-widest rounded-lg border border-stone-200 text-stone-600 hover:border-rose-900 hover:text-rose-900 transition-all cursor-pointer"
+            >
+              + Usuario
+            </button>
+          </div>
+        </td>
+      </tr>
+
+      @if (isOpen(group.id, 'items')) {
+        <tr>
+          <td colspan="4" class="px-6 py-0 bg-stone-50 border-b border-stone-100">
+            <div class="py-4">
+              <p class="text-[10px] font-bold uppercase tracking-widest text-stone-400 mb-3">
+                Productos con precio especial
+              </p>
+              @if (!group.items || group.items.length === 0) {
+                <p class="text-sm text-stone-400 italic">Sin productos en este grupo.</p>
+              } @else {
+                <div class="flex flex-col gap-1">
+                  @for (item of group.items; track item.id) {
+                    <div
+                      class="flex items-center justify-between py-2 px-3 rounded-lg bg-white border border-stone-100"
+                    >
+                      <div class="flex items-center gap-3">
+                        <span class="text-sm font-semibold text-stone-800">{{
+                          item.product.name
+                        }}</span>
+                        <span
+                          class="text-[10px] font-bold text-stone-400 uppercase tracking-widest"
+                        >
+                          {{ item.product.sku }}
+                        </span>
+                      </div>
+                      <div class="flex items-center gap-4">
+                        <div class="text-right">
+                          <p class="text-xs text-stone-400 line-through">
+                            {{ item.product.price | currency: 'EUR' }}
+                          </p>
+                          <p class="text-sm font-bold text-rose-900">
+                            {{ item.price | currency: 'EUR' }}
+                          </p>
+                        </div>
+                        <span
+                          class="inline-block text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-100"
+                        >
+                          −{{ item.discountPercentage }}%
+                        </span>
+                        <button
+                          (click)="sendRemoveItem(group, item)"
+                          class="text-stone-300 hover:text-red-500 transition-colors cursor-pointer text-lg leading-none"
+                          title="Eliminar producto"
+                        >
+                          ×
+                        </button>
+                      </div>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          </td>
+        </tr>
+      }
+
+      @if (isOpen(group.id, 'users')) {
+        <tr>
+          <td colspan="4" class="px-6 py-0 bg-stone-50 border-b border-stone-100">
+            <div class="py-4">
+              <p class="text-[10px] font-bold uppercase tracking-widest text-stone-400 mb-3">
+                Usuarios asignados
+              </p>
+              @if (!group.users || group.users.length === 0) {
+                <p class="text-sm text-stone-400 italic">Sin usuarios en este grupo.</p>
+              } @else {
+                <div class="flex flex-col gap-1">
+                  @for (user of group.users; track user.id) {
+                    <div
+                      class="flex items-center justify-between py-2 px-3 rounded-lg bg-white border border-stone-100"
+                    >
+                      <div class="flex items-center gap-3">
+                        <div
+                          class="w-7 h-7 rounded-full bg-rose-50 flex items-center justify-center text-[10px] font-bold text-rose-900 uppercase"
+                        >
+                          {{ user.name.charAt(0) }}
+                        </div>
+                        <span class="text-sm font-semibold text-stone-800">{{ user.name }}</span>
+                        <span class="text-xs text-stone-400">{{ user.email }}</span>
+                      </div>
+                      <button
+                        (click)="sendRemoveUser(group, user)"
+                        class="text-stone-300 hover:text-red-500 transition-colors cursor-pointer text-lg leading-none"
+                        title="Quitar usuario"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          </td>
+        </tr>
+      }
+
+      @if (isOpen(group.id, 'add-item')) {
+        <tr>
+          <td colspan="4" class="p-0 border-b border-stone-100">
+            <app-add-item
+              [priceGroup]="group"
+              [products]="products()"
+              (addItem)="sendAddItem($event)"
+            />
+          </td>
+        </tr>
+      }
+
+      @if (isOpen(group.id, 'add-user')) {
+        <tr>
+          <td colspan="4" class="p-0 border-b border-stone-100">
+            <app-add-user [priceGroup]="group" [users]="users()" (addUser)="sendAddUser($event)" />
+          </td>
+        </tr>
+      }
+    }
+  </tbody>
+</table>
+
+@if (priceGroups().length === 0) {
+  <div class="flex flex-col items-center justify-center py-20 text-center">
+    <p class="text-stone-300 text-4xl mb-4">◈</p>
+    <p class="text-sm font-semibold text-stone-400">No hay grupos de precios</p>
+    <p class="text-xs text-stone-300 mt-1">Crea el primero con el botón de arriba</p>
+  </div>
+}

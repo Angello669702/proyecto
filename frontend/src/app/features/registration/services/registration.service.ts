@@ -33,7 +33,11 @@ export class RegistrationService extends CommonCrudService<Registration, Registr
       .put<RegistrationDto>(`${this.API_ENDPOINT}/${registration.id}/approve`, registration)
       .pipe(
         map((dto) => this.mapper.mapOne(dto)),
-        tap((registration) => this.#updateRegistration(registration)),
+        tap(() =>
+          this.modelsSignal.update((registrations) =>
+            registrations.filter((r) => r.id !== registration.id),
+          ),
+        ),
         catchError((error) => {
           console.error('Failed to approve an registration', error);
           return throwError(() => error);
@@ -55,19 +59,15 @@ export class RegistrationService extends CommonCrudService<Registration, Registr
       .put<RegistrationDto>(`${this.API_ENDPOINT}/${registration.id}/reject`, registration)
       .pipe(
         map((dto) => this.mapper.mapOne(dto)),
-        tap((registration) => this.#updateRegistration(registration)),
+        tap(() =>
+          this.modelsSignal.update((registrations) =>
+            registrations.filter((r) => r.id !== registration.id),
+          ),
+        ),
         catchError((error) => {
           console.error('Failed to approve an registration', error);
           return throwError(() => error);
         }),
       );
-  }
-
-  #updateRegistration(registration: Registration): void {
-    this.modelsSignal.update((registrations) => {
-      const exists = registrations.find((stored) => stored.id === registration.id);
-      if (!exists) return [...registrations, registration];
-      return registrations.map((stored) => (stored.id === registration.id ? registration : stored));
-    });
   }
 }

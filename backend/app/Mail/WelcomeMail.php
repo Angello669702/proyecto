@@ -1,5 +1,4 @@
 <?php
-// app/Mail/WelcomeMail.php
 
 namespace App\Mail;
 

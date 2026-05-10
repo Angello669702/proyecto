@@ -1,6 +1,6 @@
 import { Component, input, output, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { CurrencyPipe, NgClass } from '@angular/common';
+import { CurrencyPipe, DecimalPipe, NgClass } from '@angular/common';
 import { Transaction } from '../../interfaces/transaction.interface';
 import { TransactionStatus } from '../../enums/transaction-status.enum';
 import { PaymentStatus } from '../../enums/payment-status.enum';
@@ -9,7 +9,7 @@ import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-transactions-table',
-  imports: [RouterLink, CurrencyPipe, NgClass, NgSelectModule, FormsModule],
+  imports: [RouterLink, CurrencyPipe, NgClass, NgSelectModule, FormsModule, DecimalPipe],
   templateUrl: './transactions-table.component.html',
 })
 export class TransactionsTableComponent {

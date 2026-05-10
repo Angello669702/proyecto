@@ -1,0 +1,35 @@
+@startuml MapaWeb
+skinparam shadowing false
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam direction TB
+
+rectangle "Aplicación B2B Bebidas" {
+    
+    node "Zona Pública" as Pub {
+        [Inicio / Landing]
+        [Catálogo Público]
+        [Formulario Registro]
+        [Login]
+    }
+
+    node "Zona Cliente (Privada)" as Cliente {
+        [Dashboard / Mis Pedidos]
+        [Catálogo Precios VIP]
+        [Carrito / Checkout]
+        [Mi Perfil]
+        [Favoritos]
+    }
+
+    node "Zona Administrador" as Admin {
+        [Gestión Solicitudes]
+        [Gestión Clientes]
+        [Gestión Catálogo]
+        [Control Pedidos]
+        [Logs de Sistema]
+    }
+}
+
+Pub --> Cliente : Login con éxito
+Pub --> Admin : Login como admin
+@enduml

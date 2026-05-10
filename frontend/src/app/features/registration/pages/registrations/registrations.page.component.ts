@@ -5,20 +5,30 @@ import { RegistrationFiltersComponent } from '../../components/registration-filt
 import { RegistrationStatus } from '../../enums/registration-status.enum';
 import { Registration } from '../../interfaces/registration.interface';
 import { PaginationButtonsComponent } from '../../../../shared/components/pagination-buttons/pagination-buttons.component';
+import { TableSkeletonComponent } from '../../../../shared/components/loading/table-skeleton.component';
 
 @Component({
   selector: 'app-home',
-  imports: [RegistrationListComponent, RegistrationFiltersComponent, PaginationButtonsComponent],
+  imports: [
+    RegistrationListComponent,
+    RegistrationFiltersComponent,
+    PaginationButtonsComponent,
+    TableSkeletonComponent,
+  ],
   template: `
     <div class="min-h-screen bg-stone-50 mt-16 flex flex-col">
       <div class="max-w-7xl mx-auto px-4 py-8 flex flex-col gap-6 flex-1 w-full">
         <app-registration-filters (filter)="applyFilters($event)" />
 
-        <app-registration-list
-          [registrations]="registrations()"
-          (approve)="approve($event)"
-          (reject)="reject($event)"
-        />
+        @if (registrationsResource.isLoading()) {
+          <app-table-skeleton />
+        } @else {
+          <app-registration-list
+            [registrations]="registrations()"
+            (approve)="approve($event)"
+            (reject)="reject($event)"
+          />
+        }
       </div>
 
       <footer
@@ -54,6 +64,15 @@ export class RegistrationsPageComponent {
 
   approveResource = this.#registrationService.approve(this.approveRegistration);
   rejectResource = this.#registrationService.reject(this.rejectRegistration);
+
+  reloadEffect = effect(() => {
+    if (
+      this.approveResource.status() === 'resolved' ||
+      this.rejectResource.status() === 'resolved'
+    ) {
+      this.registrationsResource.reload();
+    }
+  });
 
   applyFilters(filter: RegistrationStatus | 'all') {
     this.filter.set(filter);

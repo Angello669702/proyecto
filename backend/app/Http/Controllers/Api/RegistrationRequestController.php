@@ -27,11 +27,6 @@ class RegistrationRequestController extends Controller
         return RegistrationRequestResource::collection($requests);
     }
 
-    public function show(RegistrationRequest $registrationRequest)
-    {
-        return new RegistrationRequestResource($registrationRequest->load('reviewedBy'));
-    }
-
     public function store(RegistrationRequestRequest $request)
     {
         $registrationRequest = RegistrationRequest::create($request->validated());

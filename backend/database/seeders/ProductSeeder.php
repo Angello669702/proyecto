@@ -67,7 +67,6 @@ class ProductSeeder extends Seeder
             }
         }
 
-        // Price group items
         $p1 = Product::where('sku', 'VIN-001')->first();
         $p2 = Product::where('sku', 'VIN-002')->first();
         $p4 = Product::where('sku', 'CER-001')->first();

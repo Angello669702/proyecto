@@ -5,4 +5,5 @@ export interface PriceGroupItem {
   id: UUID;
   product: Product;
   price: number;
+  discountPercentage: number;
 }

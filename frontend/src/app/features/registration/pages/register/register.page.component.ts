@@ -3,7 +3,7 @@ import { RegistrationService } from '../../services/registration.service';
 import { Router } from '@angular/router';
 import { RegistrationFormComponent } from '../../components/registration-form/registration-form.component';
 import { Registration, RegistrationRequest } from '../../interfaces/registration.interface';
-import { RegistrationMapper } from '../../mappers/registration.mapper';
+import { AlertService } from '../../../../shared/services/alert.service';
 
 @Component({
   selector: 'app-home',
@@ -13,7 +13,7 @@ import { RegistrationMapper } from '../../mappers/registration.mapper';
 export class RegisterPageComponent {
   readonly #registrationService = inject(RegistrationService);
   readonly #router = inject(Router);
-  readonly #mapper = inject(RegistrationMapper);
+  readonly #alertService = inject(AlertService);
 
   messagge = signal<string>('');
 
@@ -21,9 +21,23 @@ export class RegisterPageComponent {
   registrationResource = this.#registrationService.add(this.registration);
 
   navigateEffect = effect(() => {
-    this.registrationResource.status() === 'resolved'
-      ? this.#router.navigate(['/home'])
-      : this.messagge.set(this.registrationResource.error()?.message ?? 'Error de servidor');
+    const status = this.registrationResource.status();
+
+    if (status === 'resolved') {
+      this.#alertService.success('Solicitud de registro enviada correctamente');
+
+      setTimeout(() => {
+        this.#router.navigate(['/home']);
+      }, 1000);
+    }
+
+    if (status === 'error') {
+      const errorMessage = this.registrationResource.error()?.message ?? 'Error de servidor';
+
+      this.messagge.set(errorMessage);
+
+      this.#alertService.modalError('Error de registro', errorMessage);
+    }
   });
 
   register(registration: RegistrationRequest) {

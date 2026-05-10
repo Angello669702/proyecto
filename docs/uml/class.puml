@@ -1,0 +1,41 @@
+@startuml DiagramaClases
+
+hide attributes
+hide methods
+
+skinparam classFontStyle Bold
+skinparam ArrowColor #555555
+skinparam ClassBorderColor #888888
+skinparam ClassBackgroundColor #f5f5f5
+skinparam nodesep 60
+skinparam ranksep 60
+
+class User
+class RegistrationRequest
+class Category
+class Product
+class ProductImage
+class PriceGroup
+class PriceGroupItem
+class Transaction
+class TransactionItem
+class UserProductFavorite
+class ActionLog
+
+User "1" -- "0..*" Transaction : realiza >
+User "1" -- "0..*" ActionLog : genera >
+User "1" -- "0..*" UserProductFavorite : guarda >
+User "0..*" -- "0..1" PriceGroup : pertenece a >
+User "1" -- "0..*" RegistrationRequest : revisa >
+
+Transaction "1" *-- "1..*" TransactionItem : contiene
+TransactionItem "0..*" -- "1" Product : referencia >
+
+Product "0..*" -- "1" Category : pertenece a >
+Product "1" *-- "0..*" ProductImage : tiene >
+Product "1" -- "0..*" PriceGroupItem : tiene precios en >
+Product "1" -- "0..*" UserProductFavorite : es favorito de >
+
+PriceGroup "1" *-- "0..*" PriceGroupItem : define precios de >
+
+@enduml

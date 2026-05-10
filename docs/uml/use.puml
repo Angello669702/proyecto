@@ -1,0 +1,62 @@
+@startuml DiagramaCasosUso
+
+left to right direction
+skinparam packageStyle rectangle
+skinparam actorStyle awesome
+skinparam ArrowColor #555555
+skinparam UsecaseBackgroundColor #f9f9f9
+skinparam UsecaseBorderColor #888888
+
+actor "Usuario Anónimo" as Anon
+actor "Cliente\n(Autenticado)" as Cliente
+actor "Administrador" as Admin
+
+rectangle "Plataforma B2B HORECA" {
+    
+    usecase "Navegar catálogo público\ny categorías" as UC_CatalogoPub
+    usecase "Buscar y filtrar productos" as UC_Buscar
+    usecase "Solicitar alta como cliente" as UC_SolicitarAlta
+    usecase "Iniciar sesión (Login)" as UC_Login
+
+    usecase "Ver catálogo con\nprecios personalizados" as UC_CatalogoPriv
+    usecase "Gestionar carrito de compra" as UC_Carrito
+    usecase "Realizar checkout" as UC_Checkout
+    usecase "Procesar pago (Stripe)" as UC_PagoStripe
+    usecase "Ver historial de pedidos" as UC_Historial
+    usecase "Repetir pedido anterior" as UC_Repetir
+    usecase "Gestionar lista de favoritos" as UC_Favoritos
+    usecase "Gestionar perfil y dirección" as UC_Perfil
+
+    usecase "Revisar solicitudes de alta\n(Aprobar/Rechazar)" as UC_AdminSolicitudes
+    usecase "Gestionar clientes (CRUD)\ny asignar tarifas" as UC_AdminUsuarios
+    usecase "Gestionar catálogo\n(Productos y Categorías)" as UC_AdminCatalogo
+    usecase "Recibir alertas y\ncontrolar stock" as UC_AdminStock
+    usecase "Gestionar pedidos y\ncambiar estados" as UC_AdminPedidos
+    usecase "Auditar historial\nde acciones (Logs)" as UC_AdminLogs
+}
+
+Anon --> UC_CatalogoPub
+Anon --> UC_Buscar
+Anon --> UC_SolicitarAlta
+Anon --> UC_Login
+
+Cliente --> UC_Login
+Cliente --> UC_CatalogoPriv
+Cliente --> UC_Buscar
+Cliente --> UC_Carrito
+Cliente --> UC_Checkout
+UC_Checkout ..> UC_PagoStripe : <<include>>
+Cliente --> UC_Historial
+Cliente --> UC_Repetir
+Cliente --> UC_Favoritos
+Cliente --> UC_Perfil
+
+Admin --> UC_Login
+Admin --> UC_AdminSolicitudes
+Admin --> UC_AdminUsuarios
+Admin --> UC_AdminCatalogo
+Admin --> UC_AdminStock
+Admin --> UC_AdminPedidos
+Admin --> UC_AdminLogs
+
+@enduml

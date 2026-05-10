@@ -24,18 +24,18 @@ import { LoadingGridComponent } from '../components/loading/loading-grid.compone
         <span
           class="text-[10px] font-bold tracking-[0.4em] text-rose-900 uppercase bg-rose-50 px-4 py-1.5 rounded-full"
         >
-          Boutique de Bebidas Premium
+          Distribuidora de bebidas
         </span>
 
         <h1
           class="text-4xl lg:text-6xl font-serif font-bold text-stone-900 leading-[1.1] max-w-3xl"
         >
-          Tu proveedor de confianza para experiencias exclusivas
+          Bebidas para tu negocio, sin complicaciones
         </h1>
 
         <p class="text-stone-500 text-base lg:text-lg max-w-xl leading-relaxed font-light">
-          Accede a un catálogo curado con precios adaptados a tu negocio. Gestiona tus pedidos con
-          la agilidad que tu empresa necesita.
+          Consulta productos, revisa stock y realiza pedidos de forma rápida desde un único
+          catálogo.
         </p>
 
         <div class="flex flex-col sm:flex-row gap-4 mt-4">

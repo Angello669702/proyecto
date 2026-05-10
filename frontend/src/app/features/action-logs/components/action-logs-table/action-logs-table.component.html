@@ -1,0 +1,87 @@
+<div class="w-full overflow-x-auto">
+  <table class="w-full border-collapse text-sm">
+    <thead>
+      <tr class="border-b-2 border-stone-200">
+        <th
+          class="py-3 px-4 text-left text-[10px] font-bold uppercase tracking-[0.2em] text-stone-400"
+        >
+          Usuario
+        </th>
+        <th
+          class="py-3 px-4 text-left text-[10px] font-bold uppercase tracking-[0.2em] text-stone-400"
+        >
+          Acción
+        </th>
+        <th
+          class="py-3 px-4 text-left text-[10px] font-bold uppercase tracking-[0.2em] text-stone-400"
+        >
+          Descripción
+        </th>
+        <th
+          class="py-3 px-4 text-right text-[10px] font-bold uppercase tracking-[0.2em] text-stone-400"
+        >
+          Fecha
+        </th>
+      </tr>
+    </thead>
+
+    <tbody>
+      @for (log of actionLogs(); track log.id) {
+        <tr class="border-b border-stone-100 hover:bg-stone-50/70 transition-colors">
+          <td class="py-4 px-4">
+            <div class="flex flex-col gap-0.5">
+              @if (log.user) {
+                <span class="font-semibold text-stone-800 text-xs">
+                  {{ log.user.name }}
+                </span>
+                <span class="text-[11px] text-stone-400">
+                  {{ log.user.email }}
+                </span>
+              } @else {
+                <span class="text-[11px] text-stone-400 italic">Sistema</span>
+              }
+            </div>
+          </td>
+
+          <td class="py-4 px-4">
+            <span
+              class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider"
+              [class]="getActionBadgeClass(log.action)"
+            >
+              {{ getActionLabel(log.action) }}
+            </span>
+          </td>
+
+          <td class="py-4 px-4">
+            <p class="text-xs text-stone-600 leading-relaxed max-w-md">
+              {{ log.description || '—' }}
+            </p>
+          </td>
+
+          <td class="py-4 px-4 text-right">
+            <div class="flex flex-col items-end gap-0.5">
+              <span class="text-xs text-stone-600 tabular-nums">
+                {{ log.createdAt | date: 'dd/MM/yyyy' }}
+              </span>
+              <span class="text-[10px] text-stone-400 tabular-nums">
+                {{ log.createdAt | date: 'HH:mm' }}
+              </span>
+            </div>
+          </td>
+        </tr>
+      } @empty {
+        <tr>
+          <td colspan="4" class="py-16 text-center">
+            <div class="flex flex-col items-center gap-3">
+              <span class="text-3xl">📋</span>
+              <p class="text-stone-400 font-serif italic text-sm">No hay registros de actividad</p>
+              <p class="text-[11px] text-stone-300">
+                Los logs aparecerán aquí cuando haya actividad en la plataforma
+              </p>
+            </div>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>

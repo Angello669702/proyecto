@@ -11,7 +11,7 @@
     </span>
   </div>
 
-  @if (isLogged()) {
+  @if (isLogged() && !isAdmin()) {
     <button
       (click)="toggleFavourite(); $event.stopPropagation()"
       class="absolute top-2 right-2 z-20 w-9 h-9 rounded-full backdrop-blur-md border flex items-center justify-center transition-all duration-200 shadow-sm cursor-pointer"

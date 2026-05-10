@@ -1,6 +1,5 @@
 import { UUID } from '../../../shared/types/uuid.type';
 import { ProductDto } from '../../products/dtos/product.interface.dto';
-import { Product } from '../../products/interfaces/product.interface';
 
 export interface TransactionItemDto {
   id: UUID;

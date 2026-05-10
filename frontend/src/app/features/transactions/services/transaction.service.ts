@@ -39,6 +39,17 @@ export class TransactionService extends CommonCrudService<Transaction, Transacti
     );
   }
 
+  createCheckoutSession(): Observable<{ url: string }> {
+    return this.httpClient
+      .post<{ url: string }>('http://127.0.0.1:8000/api/stripe/checkout', {})
+      .pipe(
+        catchError((error) => {
+          console.error('Failed to create checkout session', error);
+          return throwError(() => error);
+        }),
+      );
+  }
+
   buildParams(filter: Signal<TransactionStatus | 'all'>): Signal<Record<string, string>> {
     return computed(() => ({ status: filter() }));
   }

@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './features/auth/guards/auth.guard';
+import { adminGuard } from './features/auth/guards/admin.guard';
 
 export enum FEATURE_PAGES {
   PRODUCTS = 'products',
@@ -7,6 +8,8 @@ export enum FEATURE_PAGES {
   TRANSACTIONS = 'transactions',
   REGISTRATIONS = 'registrations',
   CATEGORIES = 'categories',
+  ACTION_LOGS = 'action-logs',
+  PRICE_GROUPS = 'price-groups',
 }
 
 export const routes: Routes = [
@@ -17,6 +20,18 @@ export const routes: Routes = [
         path: '',
         pathMatch: 'full',
         redirectTo: '/home',
+      },
+      {
+        path: FEATURE_PAGES.PRICE_GROUPS,
+        loadChildren: () =>
+          import('./features/price-groups/price-groups.routes').then((r) => r.PRICE_GROUPS_ROUTES),
+        canActivate: [adminGuard],
+      },
+      {
+        path: FEATURE_PAGES.ACTION_LOGS,
+        loadChildren: () =>
+          import('./features/action-logs/action-log.routes').then((r) => r.ACTION_LOGS_ROUTES),
+        canActivate: [adminGuard],
       },
       {
         path: FEATURE_PAGES.PRODUCTS,

@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Enums\ActionType;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\TransactionResource;
+use App\Models\ActionLog;
 use App\Models\Product;
 use App\Models\Transaction;
 use App\Models\TransactionItem;
@@ -16,21 +18,28 @@ class TransactionController extends Controller
     {
         $user = $request->user();
 
-        $query = $user->role === 'admin'
-            ? Transaction::with('user', 'items.product')
-            : $user->transactions()->with('items.product');
+        $query = Transaction::with('user', 'items.product')
+            ->where(function ($q) {
+                $q->where('status', '!=', 'pending')
+                    ->orWhere(function ($q2) {
+                        $q2->where('status', 'pending')
+                            ->where('subtotal', '>', 0);
+                    });
+            });
+
+        if ($user->role !== 'admin') {
+            $query->where('user_id', $user->id);
+        }
 
         if ($request->filled('status') && $request->input('status') !== 'all') {
             $query->where('status', $request->input('status'));
         }
 
-        $transactions = $query->orderBy('status')->paginate(20);
+        $transactions = $query
+            ->orderBy('status')
+            ->paginate(20);
 
         return TransactionResource::collection($transactions);
-    }
-    public function show(Transaction $transaction)
-    {
-        return new TransactionResource($transaction->load('user', 'items.product'));
     }
 
     public function myCart(Request $request)
@@ -100,6 +109,13 @@ class TransactionController extends Controller
                     'shipping_address' => $user->address ?? '',
                     'payment_status'   => 'unpaid',
                 ]);
+
+                ActionLog::log(
+                    ActionType::TRANSACTION_CREATED,
+                    'Transaction',
+                    $transaction->id,
+                    "{$user->name} creó un nuevo carrito"
+                );
             }
 
             $existingItem = $transaction->items()
@@ -112,16 +128,31 @@ class TransactionController extends Controller
 
             if ($existingItem) {
                 $newQuantity = $existingItem->quantity + $request->quantity;
+
+                if ($newQuantity > $product->stock) {
+                    return response()->json([
+                        'message' => "Stock insuficiente para: {$product->name}. Stock disponible: {$product->stock}"
+                    ], 422);
+                }
+
+                $subtotal = $unitPrice * $newQuantity;
+
                 $existingItem->update([
-                    'quantity' => $newQuantity,
-                    'subtotal' => $unitPrice * $newQuantity,
+                    'quantity'   => $newQuantity,
+                    'subtotal'   => $subtotal,
+                    'vat_rate'   => $product->vat_rate,
+                    'vat_amount' => $subtotal * ($product->vat_rate / 100),
                 ]);
             } else {
+                $subtotal = $unitPrice * $request->quantity;
+
                 $transaction->items()->create([
                     'product_id' => $product->id,
                     'quantity'   => $request->quantity,
                     'unit_price' => $unitPrice,
-                    'subtotal'   => $unitPrice * $request->quantity,
+                    'subtotal'   => $subtotal,
+                    'vat_rate'   => $product->vat_rate,
+                    'vat_amount' => $subtotal * ($product->vat_rate / 100),
                 ]);
             }
 
@@ -129,6 +160,14 @@ class TransactionController extends Controller
 
             DB::commit();
             $transaction->refresh();
+
+            ActionLog::log(
+                ActionType::CART_ITEM_ADDED,
+                'Transaction',
+                $transaction->id,
+                "{$user->name} añadió {$request->quantity} x '{$product->name}' al carrito"
+            );
+
             return new TransactionResource($transaction->load('user', 'items.product'));
 
         } catch (\Exception $e) {
@@ -172,6 +211,7 @@ class TransactionController extends Controller
         DB::beginTransaction();
 
         try {
+            $productName = $item->product->name;
             $newQuantity = $item->quantity - $request->quantity;
 
             if ($newQuantity <= 0) {
@@ -186,38 +226,18 @@ class TransactionController extends Controller
             $this->recalculate($transaction);
 
             DB::commit();
+            ActionLog::log(
+                ActionType::CART_ITEM_REMOVED,
+                'Transaction',
+                $transaction->id,
+                "{$user->name} quitó {$request->quantity} x '{$productName}' del carrito"
+            );
             return new TransactionResource($transaction->load('user', 'items.product'));
 
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json(['message' => 'Error al eliminar el producto', 'error' => $e->getMessage()], 500);
         }
-    }
-
-    public function destroy(Request $request, Transaction $transaction)
-    {
-        $user = $request->user();
-
-        if ($user->role !== 'admin' && $transaction->user_id !== $user->id) {
-            return response()->json(['message' => 'No autorizado'], 403);
-        }
-
-        if (!in_array($transaction->status, ['pending', 'cancelled'])) {
-            return response()->json(['message' => 'Solo se pueden eliminar pedidos pendientes o cancelados'], 409);
-        }
-
-        $transaction->delete();
-        return response()->json(['message' => 'Pedido eliminado correctamente'], 200);
-    }
-
-    public function updateStatus(Request $request, Transaction $transaction)
-    {
-        $request->validate([
-            'status' => ['required', 'in:pending,preparing,shipped,delivered,cancelled'],
-        ]);
-
-        $transaction->update(['status' => $request->status]);
-        return new TransactionResource($transaction->load('user', 'items.product'));
     }
 
     public function repeat(Request $request)
@@ -299,7 +319,15 @@ class TransactionController extends Controller
         }
 
         $transaction = Transaction::findOrFail($request->id);
+        $oldStatus = $transaction->status;
         $transaction->update(['status' => $request->status]);
+
+        ActionLog::log(
+            ActionType::TRANSACTION_STATUS_CHANGED,
+            'Transaction',
+            $transaction->id,
+            "Admin {$request->user()->name} cambió el estado de la transacción #{$transaction->id} de '{$oldStatus}' a '{$request->status}'"
+        );
 
         return new TransactionResource($transaction->load('user', 'items.product'));
     }
@@ -310,17 +338,21 @@ class TransactionController extends Controller
 
         $subtotal = $transaction->items()->sum('subtotal');
 
-        $discountApplied = $transaction->items->sum(
-            fn($item) => ($item->product->price - $item->unit_price) * $item->quantity
+        $subtotalOriginal = $transaction->items->sum(
+            fn($item) => $item->product->price * $item->quantity
         );
 
+        $discountApplied = $subtotalOriginal - $subtotal;
+
         $vatTotal = $transaction->items()->sum('vat_amount');
+
+        $total = $subtotal + $vatTotal + $transaction->shipping_cost;
 
         $transaction->update([
             'subtotal'         => $subtotal,
             'discount_applied' => $discountApplied,
             'vat_total'        => $vatTotal,
-            'total'            => $subtotal - $discountApplied + $vatTotal + $transaction->shipping_cost,
+            'total'            => $total,
         ]);
     }
 }

@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { unloggedGuard } from '../auth/guards/unlogged.guard';
+import { adminGuard } from '../auth/guards/admin.guard';
 
 export enum REGISTRATION_PAGES {
   REGISTER = 'register',
@@ -27,6 +28,7 @@ export const REGISTRATION_ROUTES: Routes = [
           import('./pages/registrations/registrations.page.component').then(
             (c) => c.RegistrationsPageComponent,
           ),
+        canActivate: [adminGuard],
       },
     ],
   },
